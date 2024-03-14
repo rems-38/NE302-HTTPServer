@@ -10,65 +10,86 @@
 #define HTAB '\t'
 #define LF '\n'
 
+typedef struct Element {
+    char *word;
+    size_t length;
+    struct Element *fils;
+    struct Element *frere;
+} Element;
 
-void logElement(GrammarElement *el) {
-    switch (el->type) {
-        case 'a':
-            printf("__alpha: %c\n", el->data.alpha);
-            break;
-        case 'd':
-            printf("__digit: %c\n", el->data.digit);
-            break;
-        case 's':
-            printf("__%c: %c\n", el->data.separator == ' ' ? 'sp' : 'htab' , el->data.separator);
-            break;
-        case 'p':
-            printf("__icar: %c\n", el->data.punctuation);
-            break;
-        case 'i':
-            printf("__istring: %s\n", el->data.istring);
-            break;
-        default:
-            break;
-    }
+
+
+/* Element *ajoutFils(Element *main, char *text, size_t len) {
+    
 }
+*/
+
+/* Element *ajoutFrere(Element *data, char *text size_t len) {
+
+}
+*/
+
+
+int verifMessage(char *text, Element *data) {
+    size_t curr = 0;
+
+    char *starting = malloc(5 * sizeof(char));
+    strncpy(starting, text, 5);
+    
+    if (verifDebut(starting) == false) return -1;
+    ajoutFils(data, starting, len);
+    curr += len;
+
+    
+
+}
+
+
+bool verifDebut(char *text){
+    if (strcmp(text, "start")) return true;
+    return false;
+}
+
+/*bool verifMot(char *text){
+    char *textbis = *text
+    while(isSeparateur(textbis)==false){
+        *textbis += sizeof(char);
+    }
+    if(verifALPHA(text) && verifSeparateur(textbis)){ return true;}
+    return false
+}
+
+bool isSeparateur(char *text){
+    if (strcmp(text[0]," ")||strcmp(text[0],"   ")||strcmp(text[0],"-"||strcmp(text[0],"_")){return true;}
+    return false
+}
+
+bool verifSeparateur(char *text)
+
+
+*/
 
 int main(int argc, char *argv[]) {
     
-    FILE *ftest = fopen(argv[1], "r")
+    FILE *ftest = fopen(argv[1], "r");
     char *line = NULL;
     size_t len = 0;
-    size_t read;
+    ssize_t read;
+
+    element *message = malloc(sizeof(element));
 
     if (ftest == NULL) {
         printf("Impossible d'ouvrir le fichier %s\n", argv[1]);
         return -1;
     }
 
+    if ((read = getline(&line, &len, ftest)) != -1) {
+        message->word = line;
+        message->length = read; // 27 (26 + 1)
+        verifMessage(line, message);
+    }
 
-    while ((read = getline(&line, &len, test)) != -1) {
-        if (line[0] == ';') { continue; }
-
-        char *ligne_split;
-        
-        ligne_split = strtok(line," = ");
-
-
-        printf("%d : %d\n",ligne_split[0],ligne_split[1]);
-       /* char *type = ligne_split[0];
-
-        int i = 2;
-        while (ligne_split[i] != '\0'){
-
-        }
-*/
-        printf("%s\n", line);
-
-        }
-    
-
-    fclose(gram);
-    if (line) { free(line); }
-
+    fclose(ftest);
+    if (line) free(line);
     return 0;
 } 
