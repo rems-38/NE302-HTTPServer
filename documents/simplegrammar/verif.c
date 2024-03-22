@@ -8,11 +8,44 @@ int verifMessage(char *text, Element *data) {
     char *starting = malloc(5 * sizeof(char));
     strncpy(starting, text, 5);
     
-    if (verifDebut(starting) == false) return -1;
+    if (verifDebut(starting) == false){return -1};
+
     ajoutFils(data, starting, len);
     curr += len;
 
+    *text += curr;
 
+    int i = 0;
+    bool boucle = true;
+
+    while(boucle){
+    if(verifMot(&text+curr,curr)){
+        if(verifPonct(&text+curr,curr)){
+            i++;
+        }
+        else{
+            boucle = false;
+        }
+    }
+    else if (verifNombre(&text+curr,curr)){
+        if(isSeparateur(&text+curr,curr)){
+            i++;
+        }
+        else{
+            boucle = false;
+        }
+    }
+    else{
+        boucle = false;
+    }
+
+    if(i<2){return false;} // vérifier si on a au moins 2 séquences
+
+    while(isPonct(&text+curr,curr)){ // optionnel
+        curr += sizeof(char);
+    }
+
+    // Manque fin LF
 }
 
 bool verifDebut(char *text){
@@ -20,30 +53,35 @@ bool verifDebut(char *text){
     return false;
 }
 
-bool verifMot(char *text){
-    char *textbis = *text
-    while(isSeparateur(textbis)==false){
-        *textbis += sizeof(char);
-    }
-    if(verifALPHA(text) && verifSeparateur(textbis)){ return true;}
-    return false
-}
+bool verifMot(char *text,size_t curr){
 
+    curr_comp = curr;
 
-bool verifALPHA(char *text){
-    while(isSeparateur(text)==false){
-        if (isAlpha(text)==false){
-            return false;
+    while(isALPHA(text+curr)){ 
+        curr += sizeof(char);
         }
-        *text += sizeof(char);
+
+    if (curr == curr_comp){
+        return false;
     }
-    return true
+
+
+    if (isSeparateur(text+curr)==false){
+        return false;
+    }
+
+    return true;
 }
 
-bool verifSeparateur(char *text){
-    
+bool verifPonct(char *text,size_t curr){
+
 }
 
+bool verifNombre(char *text,size_t curr){
+
+}
+
+// Verif caractère par caractère
 
 bool isSeparateur(char *text){
     if (strcmp(text[0]," ")||strcmp(text[0],"   ")||strcmp(text[0],"-"||strcmp(text[0],"_"))){return true;}
