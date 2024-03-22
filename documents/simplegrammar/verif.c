@@ -13,22 +13,20 @@ int verifMessage(char *text, Element *data) {
     ajoutFils(data, starting, len);
     curr += len;
 
-    *text += curr;
-
     int i = 0;
     bool boucle = true;
 
     while(boucle){
-    if(verifMot(&text+curr,curr)){
-        if(verifPonct(&text+curr,curr)){
+    if(verifMot(text+curr,curr)){
+        if(verifPonct(text+curr,curr)){
             i++;
         }
         else{
             boucle = false;
         }
     }
-    else if (verifNombre(&text+curr,curr)){
-        if(isSeparateur(&text+curr,curr)){
+    else if (verifNombre(text+curr,curr)){
+        if(isSeparateur(text+curr,curr)){
             i++;
         }
         else{
@@ -41,7 +39,7 @@ int verifMessage(char *text, Element *data) {
 
     if(i<2){return false;} // vérifier si on a au moins 2 séquences
 
-    while(isPonct(&text+curr,curr)){ // optionnel
+    while(isPonct(text+curr,curr)){ // optionnel
         curr += sizeof(char);
     }
 
