@@ -1,15 +1,6 @@
 #include<stdlib.h>
 #include<stdio.h>
 
-int main(){
-
-    if(verifMessage(&text,&data)){}
-    else{
-        printf("message non conforme");
-    }
-
-  return 0;
-}
 
 int verifMessage(char *text, Element *data) {
     size_t curr = 0;
