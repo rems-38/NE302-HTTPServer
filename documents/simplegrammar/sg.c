@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
         message->word = line;
         message->length = read; // 27 (26 + 1)
         int output = verifMessage(message);
-        printf("output : %d\n", output);
+        printf("%d\n", output);
     }
 
     fclose(ftest);
