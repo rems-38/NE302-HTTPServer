@@ -64,7 +64,7 @@ bool isDebut(char *text){
 }
 
 bool isAlpha(char text){
-    return (text >= AMAJ && text <= ZMAJ) || (text >= AMIN && text <= ZIN);
+    return (text >= AMAJ && text <= ZMAJ) || (text >= AMIN && text <= ZMIN);
 }
 
 bool isDigit(char text) {
@@ -143,11 +143,11 @@ int verifMessage(Element *data) {
         else { boucle = false; }
 
         // if (i < 2) { return false; } // vérifier si on a au moins 2 séquences
-
-        // while(isPonct(data->word+curr,curr)){ // optionnel
-        //     curr += 1;
-        // }
         
+    }
+
+    while (isPonct(*(data->word+curr))) {
+        curr++;
     }
 
     if (isFin(data->word+curr) == false) { return -1; }
