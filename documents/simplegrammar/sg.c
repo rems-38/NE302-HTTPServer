@@ -6,9 +6,22 @@
 
 #define INIT "message"
 
-#define SP ' '
-#define HTAB '\t'
-#define LF '\n'
+#define AMAJ 65
+#define ZMAJ 90
+#define AMIN 97
+#define ZMIN 122
+#define ZERO 48
+#define NINE 57
+#define SP 32           // espace
+#define HTAB 9          // \t
+#define DASH 45         // -
+#define UNDERSCORE 95   // _
+#define COMMA 44        // ,
+#define DOT 46          // .
+#define EXCLAMATION 33  // !
+#define QUESTION 63     // ?
+#define COLON 58        // :
+#define LF 10           // \n
 
 /*
 Table ASCII :
@@ -51,19 +64,19 @@ bool isDebut(char *text){
 }
 
 bool isAlpha(char text){
-    return (text >= 65 && text <= 90) || (text >= 97 && text <= 122);
+    return (text >= AMAJ && text <= ZMAJ) || (text >= AMIN && text <= ZIN);
 }
 
 bool isDigit(char text) {
-    return (text >= 48 && text <= 57);
+    return (text >= ZERO && text <= NINE);
 }
 
 bool isSeparateur(char text) {
-    return (text == 32 || text == 9 || text == 45 || text == 95);
+    return (text == SP || text == HTAB || text == DASH || text == UNDERSCORE);
 }
 
 bool isPonct(char text) {
-    return (text == 44 || text == 46 || text == 33 || text == 63 || text == 58);
+    return (text == COMMA || text == DOT || text == EXCLAMATION || text == QUESTION || text == COLON);
 }
 
 bool isFin(char *text) {
@@ -71,7 +84,7 @@ bool isFin(char *text) {
 }
 
 bool isLF(char text) {
-    return (text == 10);
+    return (text == LF);
 }
 
 bool isMot(char *text, size_t *curr){
