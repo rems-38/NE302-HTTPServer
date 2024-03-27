@@ -7,7 +7,7 @@
 nombre = 1*DIGIT 
 ponct = "," / "." / "!" / "?" / ":"
 separateur = SP / HTAB / "-" / "_" 
-debut = "start" 
+debut = "start"
 fin = "fin" 
 mot = 1*ALPHA separateur  
 message = debut 2*( mot ponct /nombre separateur ) [ponct] fin LF 
