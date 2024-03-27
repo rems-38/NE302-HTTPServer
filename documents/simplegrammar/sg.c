@@ -79,11 +79,11 @@ bool isDebut(char *text, Element *head){
     return strcmp(text, "start");
 }
 
-bool isAlpha(char text, Element *pere){
+bool isAlpha(char text){
     return (text >= AMAJ && text <= ZMAJ) || (text >= AMIN && text <= ZMIN);
 }
 
-bool isDigit(char text, Element *pere) {
+bool isDigit(char text) {
     return (text >= ZERO && text <= NINE);
 }
 
@@ -131,7 +131,7 @@ bool isMot(char *text, size_t *curr, Element *head) {
     Element *c = malloc(sizeof(Element));
     Element *save_c = c;
     Element *tmp = malloc(sizeof(Element));
-    while (isAlpha(*(text+icurr), head)) { 
+    while (isAlpha(*(text+icurr))) { 
         tmp = addEl("__alpha", text+icurr, 1);
         c->frere = tmp;
         c = c->frere;
@@ -159,7 +159,7 @@ bool isNombre(char *text, size_t *curr, Element *head) {
     Element *c = malloc(sizeof(Element));
     Element *save_c = c;
     Element *tmp = malloc(sizeof(Element));
-    while (isDigit(*(text+icurr), head)) {
+    while (isDigit(*(text+icurr))) {
         tmp = addEl("__digit", text+icurr, 1);
         c->frere = tmp;
         c = c->frere;
