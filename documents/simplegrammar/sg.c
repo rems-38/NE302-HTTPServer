@@ -71,8 +71,8 @@ Element *addEl(char *key, char *word, size_t length) {
 }
 
 bool isDebut(char *text, Element *head){
-    Element *el = addEl("debut", "start", 5);
-    Element *sub = addEl("__istring", "start", 5);
+    Element *el = addEl("debut", "start", 5); //fils du message
+    Element *sub = addEl("__istring", "start", 5); //fils de debut
     el->fils = sub;
     head->fils = el;    
 
@@ -129,8 +129,8 @@ bool isMot(char *text, size_t *curr, Element *head) {
     bool res = false;
 
     Element *c = malloc(sizeof(Element));
-    Element *save_c = c;
-    Element *tmp = malloc(sizeof(Element));
+    Element *save_c = c; //pointeur vers l'Element c pour plus tard
+    Element *tmp = malloc(sizeof(Element)); //pour l'ajout des lettres
     while (isAlpha(*(text+icurr))) { 
         tmp = addEl("__alpha", text+icurr, 1);
         c->frere = tmp;
@@ -146,10 +146,11 @@ bool isMot(char *text, size_t *curr, Element *head) {
         }
     }
     
-    Element *el = addEl("mot", text, icurr);
+    Element *el = addEl("mot", text, icurr+1);
     head->frere = el;
     head->frere->fils = save_c->frere;
 
+    //free(c); ???
     return res;
 }
 
@@ -171,11 +172,12 @@ bool isNombre(char *text, size_t *curr, Element *head) {
     head->frere = el;
     head->frere->fils = save_c->frere;
 
+    //free(c); ???
     return icurr != 0;
 }
 
 int verifMessage(Element *data) {
-    Element *head = data;
+    Element *head = data; //pointeur vers la tete de l'arbre
     size_t curr = 0;
     
     if (isDebut(head->word, data) == false) { return -1; }
@@ -205,11 +207,9 @@ int verifMessage(Element *data) {
             else { boucle = false; }
         }
         else { boucle = false; }
-
-        // if (i < 2) { return false; } // vérifier si on a au moins 2 séquences
-        
     }
-
+    if (i < 2) { return -1; } // vérifier si on a au moins 2 séquences
+  
     while (isPonct(*(head->word+curr), data)) {
         data = data->frere;
         curr++;
