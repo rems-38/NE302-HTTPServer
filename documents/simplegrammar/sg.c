@@ -178,7 +178,7 @@ bool isNombre(char *text, size_t *curr, Element *head) {
 
 int verifMessage(Element *data) {
     Element *head = data; //pointeur vers la tete de l'arbre
-    size_t curr = 0;
+    size_t curr = 0; //pour le parcours de la ligne
     
     if (isDebut(head->word, data) == false) { return -1; }
     data = data->fils;

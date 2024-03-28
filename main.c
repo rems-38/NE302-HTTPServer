@@ -98,8 +98,28 @@ request-line = 1*("!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^
 request-line = 1*("!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA) SP 1*( "/" *(ALPHA / DIGIT / "-" / "." / "_" / "~" / "%" HEXDIG HEXDIG / "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "=" / ":" / "@") ) [ "?" *(ALPHA / DIGIT / "-" / "." / "_" / "~" / "%" HEXDIG HEXDIG / "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "=" / ":" / "@" / "/" / "?" ) ] SP %x48.54.54.50 ; HTTP "/" DIGIT "." DIGIT CRLF
 
 */
-bool verifStartLine(char *text, size_t curr){
-    return true;
+
+
+bool verifRequestLine(char *text, size_t curr){
+     size_t icurr = 0;
+
+    while(isTchar(*(text+icurr))){  //isTchar(char text)
+
+
+    }
+
+}
+
+bool verifStartLine(char *text, size_t curr){ //start-line = request-line
+    size_t icurr = 0;
+    bool res = false;
+
+    if(verifRequestLine(text, &curr)){res = true;}
+
+    Element *el = addEl("start-line", &text, icurr);
+    head->fils = el;
+    
+    return res;
 }
 
 /* Arbre du header-field
@@ -130,10 +150,11 @@ bool verifHeaderField(char *text, size_t curr){
 
 int verifMessage(Element *data){
 
+    Element *head = data; //pointeur vers la tete de l'arbre
     char *text = data->word;
     size_t curr = 0;
 
-    if(!verifRequestLine(text,curr)){
+    if(!verifStartLine(text,&curr)){
         return -1;
     }
 
