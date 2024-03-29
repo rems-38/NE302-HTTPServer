@@ -1,54 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <string.h>
-#include <stdbool.h>
-
-#define INIT "message"
-
-#define AMAJ 65
-#define ZMAJ 90
-#define AMIN 97
-#define ZMIN 122
-#define ZERO 48
-#define NINE 57
-#define SP 32           // espace
-#define HTAB 9          // \t
-#define DASH 45         // -
-#define UNDERSCORE 95   // _
-#define COMMA 44        // ,
-#define DOT 46          // .
-#define EXCLAMATION 33  // !
-#define QUESTION 63     // ?
-#define COLON 58        // :
-#define LF 10           // \n
-
-/*
-Table ASCII :
-A-Z = 65-90
-a-z = 97-122
-0-9 = 48-57
-SP = 32
-HTAB = 9
-- = 45
-_ = 95
-, = 44
-. = 46
-! = 33
-? = 63
-: = 58
-LF = 10
-*/
-
-typedef struct Element {
-    char *key;
-    char *word;
-    size_t length;
-    struct Element *fils;
-    struct Element *frere;
-} Element;
-
-
+#include "verifMessage.h"
+#include "isX.h"
 
 
 int main(int argc, char *argv[]) {
@@ -80,91 +31,12 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-// HTTP-message = start-line *( header-field CRLF ) CRLF [ message-body ]
 
 
-/* Arbre de la start-line
-
-start-line = request-line
-request-line = method SP request-target SP HTTP-version CRLF
-request-line = token SP origin-form SP HTTP-version CRLF
-request-line = token SP origin-form SP HTTP-name "/" DIGIT "." DIGIT CRLF
-request-line = token SP absolute-path [ "?" query ] SP HTTP-name "/" DIGIT "." DIGIT CRLF
-request-line = token SP 1*( "/" segment ) [ "?" query ] SP HTTP-name "/" DIGIT "." DIGIT CRLF
-request-line = 1*tchar SP 1*( "/" segment ) [ "?" query ] SP HTTP-name "/" DIGIT "." DIGIT CRLF
-request-line = 1*("!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA) SP 1*( "/" segment ) [ "?" query ] SP HTTP-name "/" DIGIT "." DIGIT CRLF
-request-line = 1*("!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA) SP 1*( "/" *pchar ) [ "?" *( pchar / "/" / "?" ) ] SP %x48.54.54.50 ; HTTP "/" DIGIT "." DIGIT CRLF
-request-line = 1*("!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA) SP 1*( "/" *(unreserved / pct-encoded / sub-delims / ":" / "@") ) [ "?" *(unreserved / pct-encoded / sub-delims / ":" / "@" / "/" / "?" ) ] SP %x48.54.54.50 ; HTTP "/" DIGIT "." DIGIT CRLF
-request-line = 1*("!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA) SP 1*( "/" *(ALPHA / DIGIT / "-" / "." / "_" / "~" / "%" HEXDIG HEXDIG / "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "=" / ":" / "@") ) [ "?" *(ALPHA / DIGIT / "-" / "." / "_" / "~" / "%" HEXDIG HEXDIG / "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "=" / ":" / "@" / "/" / "?" ) ] SP %x48.54.54.50 ; HTTP "/" DIGIT "." DIGIT CRLF
-
-*/
 
 
-bool verifRequestLine(char *text, size_t curr){
-     size_t icurr = 0;
-
-    while(isTchar(*(text+icurr))){  //isTchar(char text)
 
 
-    }
-
-}
-
-bool verifStartLine(char *text, size_t curr){ //start-line = request-line
-    size_t icurr = 0;
-    bool res = false;
-
-    if(verifRequestLine(text, &curr)){res = true;}
-
-    Element *el = addEl("start-line", &text, icurr);
-    head->fils = el;
-    
-    return res;
-}
-
-/* Arbre du header-field
-
-header-field =  Connection-header / Content-Length-header / Content-Type-header / Cookie-header / Transfer-Encoding-header / Expect-header / Host-header / ( field-name ":" OWS field-value OWS )
-
-OWS = *( SP / HTAB )
-
-Connection-header = "Connection" ":" OWS Connection OWS
-Connection-header = "Connection" ":" OWS *( "," OWS ) connection-option *( OWS "," [ OWS connection-option ] ) OWS
-Connection-header = "Connection" ":" OWS *( "," OWS ) token *( OWS "," [ OWS token ] ) OWS
-Connection-header = "Connection" ":" OWS *( "," OWS ) 1*("!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA) *( OWS "," [ OWS 1*("!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA) ] ) OWS
-
-Content-Length-header = "Content-Length" ":" OWS Content-Length OWS
-
-Content-Type-header = "Content-Type" ":" OWS Content-Type OWS
-
-Cookie-header = "Cookie:" OWS cookie-string OWS
 
 
-*/
 
-
-bool verifHeaderField(char *text, size_t curr){
-    return true;
-}
-
-
-int verifMessage(Element *data){
-
-    Element *head = data; //pointeur vers la tete de l'arbre
-    char *text = data->word;
-    size_t curr = 0;
-
-    if(!verifStartLine(text,&curr)){
-        return -1;
-    }
-
-    bool boucle = true;
-
-    while(boucle){
-        if(!verifHeaderField(text,curr)){
-            return -1;
-        }
-    }
-
-    return 1;
-}
