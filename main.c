@@ -1,9 +1,14 @@
 #include "verifMessage.h"
-#include "isX.h"
+//#include "isX.h"
 
 
 int main(int argc, char *argv[]) {
     
+    if(argc != 2){
+        printf("Erreur dans le nombre d'arguments\n");
+        return 0;
+    }
+
     FILE *ftest = fopen(argv[1], "r");
     char *line = NULL;
     size_t len = 0;
@@ -21,7 +26,7 @@ int main(int argc, char *argv[]) {
         message->word = line;
         message->length = read;
         int output = verifMessage(message);
-        printf("%d\n", output);
+        printf("Résultat de la vérification du message : %d\n", output);
 
         printArbre(message, 0);
     }

@@ -1,12 +1,12 @@
 #include "arbre.h"
 
-typedef struct Element {
+/*typedef struct Element {
     char *key;
     char *word;
     size_t length;
     struct Element *fils;
     struct Element *frere;
-} Element;
+} Element;*/
 
 void printArbre(Element *head, int level) {
     if (head == NULL) { return; }

@@ -48,14 +48,6 @@
 #define CR 13
 
 
-/*typedef struct Element {
-    char *key;
-    char *word;
-    size_t length;
-    struct Element *fils;
-    struct Element *frere;
-} Element;*/
-
 /*
 Table ASCII :
 A-Z = 65-90
@@ -78,15 +70,19 @@ bool isMethod(char *text, size_t *curr, Element *head);
 
 
 bool isToken(char *text,size_t *curr, Element *head);
-bool isTchar(char text, size_t *curr);
-
+bool isTchar(char text);
+/*
 bool isRequestTarget(char *text, size_t *curr, Element *head);
 bool isOriginForm(char *text, size_t *curr, Element *head);
 bool isAbsolutePath(char *text, size_t *curr, Element *head);
-
+bool isSegment(char *text, size_t *curr, Element *head);
+*/
 bool isAlpha(char text);
 bool isDigit(char text);
+/*
 bool isSP(char text, size_t *curr, Element *head);
+bool isPchar(char *text, size_t *curr, Element *head);
 
 bool isHTTPVersion(char *text, size_t *curr, Element *head);
-bool isHTTPname(char *text, size_t *curr);
+bool isHTTPname(char *text);
+*/

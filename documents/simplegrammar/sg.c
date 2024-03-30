@@ -131,6 +131,7 @@ bool isMot(char *text, size_t *curr, Element *head) {
     Element *c = malloc(sizeof(Element));
     Element *save_c = c; //pointeur vers l'Element c pour plus tard
     Element *tmp = malloc(sizeof(Element)); //pour l'ajout des lettres
+    
     while (isAlpha(*(text+icurr))) { 
         tmp = addEl("__alpha", text+icurr, 1);
         c->frere = tmp;

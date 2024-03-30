@@ -23,12 +23,12 @@ bool verifStartLine(char *text, size_t *curr, Element *head){ //start-line = req
     bool res = false;
 
     Element *tmp = malloc(sizeof(Element));
-    head->fils = tmp;                                 // on créer maintenant l'élément qu'on donne a isRequestLine 
-    if(isRequestLine(text, &curr, tmp)){res = true;}
+    //head->fils = tmp;                                 // on créer maintenant l'élément qu'on donne a isRequestLine 
+    if(isRequestLine(text, curr, tmp)){res = true;}
     // mettre le if avant pour avoir curr pour la taille dans la start-line ??
-    Element *el = addEl("start-line", &text, &curr); //quelle valeure mettre pour length??
+    Element *el = addEl("start-line", text, *curr); //quelle valeure mettre pour length??
     head->fils = el;
-    el->fils = tmp;
+    el->fils = tmp->fils;
     return res;
 }
 
@@ -52,12 +52,12 @@ Cookie-header = "Cookie:" OWS cookie-string OWS
 
 
 */
-
-bool verifHeaderField(char *text, size_t curr, Element *head){
+/*
+bool verifHeaderField(char *text, size_t *curr, Element *head){
 
     return true;
 }
-
+*/
 
 
 int verifMessage(Element *data){
@@ -69,12 +69,12 @@ int verifMessage(Element *data){
     if(!verifStartLine(text,&curr,data)){ 
         return -1;
     }
-    data = data->fils;
-
+    //data = data->fils;
+    /*
     bool boucle = true;
 
     while(boucle){
-        if(verifHeaderField(text,curr, data)){
+        if(verifHeaderField(text,&curr, data)){
             data = data->frere;
             if(isCRLF(text, curr, data)){
                 data= data->frere;
@@ -95,7 +95,7 @@ int verifMessage(Element *data){
         data=data->frere;
         curr++;
     }
-
+    */
     data = head;
     return 1;
 }
