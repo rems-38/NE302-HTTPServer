@@ -4,16 +4,16 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "verifMessage.h"
+//#include "verifMessage.h"
 #include "arbre.h"
 
-typedef struct Element {
+/*typedef struct Element {
     char *key;
     char *word;
     size_t length;
     struct Element *fils;
     struct Element *frere;
-} Element;
+} Element;*/
 
 #define INIT "message"
 
@@ -48,13 +48,13 @@ typedef struct Element {
 #define CR 13
 
 
-typedef struct Element {
+/*typedef struct Element {
     char *key;
     char *word;
     size_t length;
     struct Element *fils;
     struct Element *frere;
-} Element;
+} Element;*/
 
 /*
 Table ASCII :
@@ -73,12 +73,12 @@ _ = 95
 LF = 10
 */
 
-bool isRequestLine(char *text, size_t curr, Element *head);
-bool isMethod(char *text, size_t curr, Element *head);
+bool isRequestLine(char *text, size_t *curr, Element *head);
+bool isMethod(char *text, size_t *curr, Element *head);
 
 
-bool isToken(char *text,size_t curr, Element *head);
-bool isTchar(char text);
+bool isToken(char *text,size_t *curr, Element *head);
+bool isTchar(char text, size_t *curr);
 
 bool isRequestTarget(char *text, size_t *curr, Element *head);
 bool isOriginForm(char *text, size_t *curr, Element *head);
@@ -87,3 +87,6 @@ bool isAbsolutePath(char *text, size_t *curr, Element *head);
 bool isAlpha(char text);
 bool isDigit(char text);
 bool isSP(char text, size_t *curr, Element *head);
+
+bool isHTTPVersion(char *text, size_t *curr, Element *head);
+bool isHTTPname(char *text, size_t *curr);

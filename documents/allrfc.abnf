@@ -60,7 +60,7 @@ chunk-ext-val = token / quoted-string
 chunk-size = 1*HEXDIG
 chunked-body = *chunk last-chunk trailer-part CRLF
 
-authority     = [ userinfo "@" ] host [ ":" port ]
+authority     = [ userinfo "@" ] host [ ":" port ] 
 userinfo      = *( unreserved / pct-encoded / sub-delims / ":" )
 host          = IP-literal / IPv4address / reg-name
 port          = *DIGIT

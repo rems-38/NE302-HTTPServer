@@ -21,12 +21,14 @@ request-line = 1*("!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^
 
 bool verifStartLine(char *text, size_t *curr, Element *head){ //start-line = request-line
     bool res = false;
-    
-    Element *el = addEl("start-line", &text, 0); //quelle valeure mettre pour length??
-    head->fils = el;
 
-    if(isRequestLine(text, &curr, head->fils)){res = true;}
-    
+    Element *tmp = malloc(sizeof(Element));
+    head->fils = tmp;                                 // on créer maintenant l'élément qu'on donne a isRequestLine 
+    if(isRequestLine(text, &curr, tmp)){res = true;}
+    // mettre le if avant pour avoir curr pour la taille dans la start-line ??
+    Element *el = addEl("start-line", &text, &curr); //quelle valeure mettre pour length??
+    head->fils = el;
+    el->fils = tmp;
     return res;
 }
 
@@ -51,7 +53,7 @@ Cookie-header = "Cookie:" OWS cookie-string OWS
 
 */
 
-bool verifHeaderField(char *text, size_t curr){
+bool verifHeaderField(char *text, size_t curr, Element *head){
 
     return true;
 }
@@ -72,16 +74,10 @@ int verifMessage(Element *data){
     bool boucle = true;
 
     while(boucle){
-        if(verifHeaderField(text,curr)){
-            data
-            if(text[curr] == CR){
-                curr++;
-                if(text[curr] == LF){
-                    curr++;
-                }
-                else{
-                    boucle = false;
-                }
+        if(verifHeaderField(text,curr, data)){
+            data = data->frere;
+            if(isCRLF(text, curr, data)){
+                data= data->frere;
             }
             else{
                 boucle = false;
@@ -92,14 +88,14 @@ int verifMessage(Element *data){
         }
     }
 
-    if(text[curr] != CR){return -1;}
-    curr++;
-    if(text[curr] != LF){return -1;}
-    curr++;
+    if(!isCRLF(text, curr, data)){return -1;}
+    data= data->frere;
 
     while(isMessageBody(text, curr)){
+        data=data->frere;
         curr++;
     }
 
+    data = head;
     return 1;
 }

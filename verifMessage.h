@@ -4,16 +4,16 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "verifMessage.h"
-#include "arbre.h"
+#include "isX.h"
+//#include "arbre.h"
 
-typedef struct Element {
+/*typedef struct Element {
     char *key;
     char *word;
     size_t length;
     struct Element *fils;
     struct Element *frere;
-} Element;
+} Element;*/
 
 #define INIT "message"
 
@@ -66,6 +66,6 @@ LF = 10
 
 bool verifStartLine(char *text, size_t *curr, Element *head);
 
-bool verifHeaderField(char *text, size_t *curr);
+bool verifHeaderField(char *text, size_t *curr, Element *head);
 
 int verifMessage(Element *data);

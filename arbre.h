@@ -5,6 +5,13 @@
 #include <stdbool.h>
 
 //include la structure Element ??
+typedef struct Element {
+    char *key;
+    char *word;
+    size_t length;
+    struct Element *fils;
+    struct Element *frere;
+} Element;
 
 void printArbre(Element *head, int level);
 Element *addEl(char *key, char *word, size_t length);
