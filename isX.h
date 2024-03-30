@@ -18,6 +18,7 @@
 #define INIT "message"
 
 #define AMAJ 65
+#define FMAJ 70
 #define ZMAJ 90
 #define AMIN 97
 #define ZMIN 122
@@ -71,18 +72,29 @@ bool isMethod(char *text, size_t *curr, Element *head);
 
 bool isToken(char *text,size_t *curr, Element *head);
 bool isTchar(char text);
-/*
+
 bool isRequestTarget(char *text, size_t *curr, Element *head);
 bool isOriginForm(char *text, size_t *curr, Element *head);
 bool isAbsolutePath(char *text, size_t *curr, Element *head);
 bool isSegment(char *text, size_t *curr, Element *head);
-*/
+
+
 bool isAlpha(char text);
 bool isDigit(char text);
-/*
+
 bool isSP(char text, size_t *curr, Element *head);
+// bool isHTAB(char text, size_t *curr, Element *head);
 bool isPchar(char *text, size_t *curr, Element *head);
 
+bool isUnreserved(char text, Element *head);
+bool isPctEncoded(char *text,size_t *curr, Element *head);
+bool isSubDelims(char text, Element *head);
+bool isHEXDIG(char text);
+bool isOCTET(char text);
+/*
 bool isHTTPVersion(char *text, size_t *curr, Element *head);
 bool isHTTPname(char *text);
-*/
+
+
+bool isConnectionHeader(char *text, size_t *curr, Element *head);
+bool isOWS(char *text, size_t *curr, Element *head);*/

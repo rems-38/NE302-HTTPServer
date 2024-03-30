@@ -18,6 +18,7 @@
 #define INIT "message"
 
 #define AMAJ 65
+#define FMAJ 70
 #define ZMAJ 90
 #define AMIN 97
 #define ZMIN 122

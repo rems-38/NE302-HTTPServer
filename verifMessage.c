@@ -54,11 +54,14 @@ Cookie-header = "Cookie:" OWS cookie-string OWS
 */
 /*
 bool verifHeaderField(char *text, size_t *curr, Element *head){
+    bool res = false;
 
-    return true;
+    Element *tmp = malloc(sizeof(Element));
+
+
+    return res;
 }
 */
-
 
 int verifMessage(Element *data){
 

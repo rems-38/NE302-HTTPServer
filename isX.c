@@ -14,33 +14,40 @@
     return el;
 }*/
 
+bool isSP(char text, size_t *curr, Element *head){ // /!\ attention à l'ajout de l'élément SP en tant que frère de la tete
+    Element *el = addEl("__sp", &text, 1);
+    head->frere = el;
+    *curr += 1;
+
+    return (text == ' ');
+}
+/*
+bool isHTAB(char text, size_t *curr, Element *head) {
+    Element *el = addEl("__htab", &text, 1);
+    head->frere = el;
+    *curr += 1;
+
+    return (text == HTAB);
+}
+*/
 bool isRequestLine(char *text, size_t *curr, Element *head){
     bool res = true;
-
-    /*Element *tmp = malloc(sizeof(Element));
-    head->fils = tmp;                                 // on créer maintenant l'élément qu'on donne a isRequestLine 
-    if(isRequestLine(text, curr, tmp)){res = true;}
-    // mettre le if avant pour avoir curr pour la taille dans la start-line ??
-    Element *el = addEl("start-line", text, *curr); //quelle valeure mettre pour length??
-    head->fils = el;
-    el->fils = tmp;*/
-
 
     Element *tmp = malloc(sizeof(Element)); //contruction du sous-arbre pour ensuite le relier a "request-line" car on ne connait pas encore la taille pour créer l'élément "request-line"
     //head->fils = tmp;
 
-    
     if(!isMethod(text, curr, tmp)) {res = false;}
     tmp = tmp->fils; //method devient la tete
     Element *save = tmp;
     
-    /*
+
     if(!isSP(text[*curr], curr, tmp)) {res = false;}
     tmp = tmp->frere; //SP devient la tete
 
+
     if(!isRequestTarget(text, curr, tmp)) {res = false;}
     tmp = tmp->frere; //request-target devient la tete
-
+/*
     if(!isSP(text[*curr], curr, tmp)) {res = false;}
     tmp = tmp->frere; //SP devient la tete
 
@@ -50,7 +57,7 @@ bool isRequestLine(char *text, size_t *curr, Element *head){
 
     //if(!isCRLF(text, curr, tmp)) {res = false;}
     
-    Element *el = addEl("request-line", text, *curr);
+    Element *el = addEl("request_line", text, *curr);
     head->fils = el; 
     head->fils->fils = save;
     return res;
@@ -79,7 +86,7 @@ bool isToken(char *text,size_t *curr, Element *head){ //token = 1*tchar
     Element *tmp = malloc(sizeof(Element)); //pour l'ajout des tchar
 
     while(isTchar(text[icurr+(*curr)])){
-        tmp = addEl("__tchar", text+icurr, 1);
+        tmp = addEl("tchar", text+icurr, 1);
         c->frere = tmp;
         c = c->frere;
         icurr += 1;                         
@@ -93,82 +100,181 @@ bool isToken(char *text,size_t *curr, Element *head){ //token = 1*tchar
         return false;
     }
     else{
-        *curr += icurr + 1;
+        *curr += icurr;
         return true;
     }
 }
-/*
+
 bool isRequestTarget(char *text, size_t *curr, Element *head){ // request-target = origin-form
     bool res = false;
     size_t curr_mem = *curr;            //sauvegarde de curr pour pouvoir définir la taille de request-target ensuite
-    
-    Element *el = malloc(sizeof(Element));
+    Element *tmp = malloc(sizeof(Element));
 
-    if(isOriginForm(text, curr, el)){res = true;}
-    el = 
-    head-> // maintenant qu'on a la longueur de request-target on peut l'ajouter à l'arbre
-
+    if(isOriginForm(text, curr, tmp)){res = true;}
+    Element *el = addEl("resquest-target", text, (*curr)-curr_mem); 
+    head->frere = el; // maintenant qu'on a la longueur de request-target on peut l'ajouter à l'arbre
+    el->fils = tmp->fils;
+    free(tmp);
     return res;
 }
 
 bool isOriginForm(char *text, size_t *curr, Element *head){ // origin-form = absolute-path [ "?" query ]
     
     size_t curr_mem = *curr; 
-    head = head->fils;
+    Element *tmp = malloc(sizeof(Element));
 
-    if(!isAbsolutePath(text, curr, head)){return false;}
+    if(!isAbsolutePath(text, curr, tmp)){return false;}
 
-    //["?" query] = ???
-    head = addEl("request-target", text, (*curr)-curr_mem);
-    
+    //["?" query]
+    Element *el = addEl("request-target", text, (*curr)-curr_mem);
+    head->fils = el;
+    el->fils = tmp->fils;
     
     return true;
 }
 
 bool isAbsolutePath(char *text, size_t *curr, Element *head){ // absolute-path = 1*( "/" segment )
     
-    head->fils = addEl("absolute-path", text, 0);
+    Element *tmp = malloc(sizeof(Element));
+    Element *c = malloc(sizeof(Element));
+    Element *save = c;    //head->fils = addEl("absolute-path", text, 0);
     
+    size_t curr_mem = *curr;
     size_t icurr = 0;
     bool boucle = true;
 
     while(boucle){
-        if(!strcmp(text+icurr+(*curr),"/")){
+        if(strcmp(text+(*curr),"/")){
+            tmp = addEl("__icar", "/", 1);
+            c->frere = tmp;
+            c = c->frere;
+            (*curr)++;
+        }
+        else{
             boucle = false;
         }
-
-        icurr += 1;
-
-        if(!isSegment(text+icurr,curr,head)){
+        if(isSegment(text+(*curr),curr,head)){
+            (*curr)++;
+        }
+        else{
             boucle = false;
         }
+        icurr++;
     }
 
     if (icurr == 0){
         return false;
     }
 
-    *curr += icurr;
-
+    //*curr += icurr;
+    Element *el = addEl("absolute-path", text, (*curr)-curr_mem);
+    head->fils = el;
+    el->fils = save->frere;
     return true;
 }
-
 
 bool isSegment(char *text, size_t *curr, Element *head){ // segment = *pchar
     bool boucle = true;
 
+    Element *tmp = malloc(sizeof(Element));
+    Element *c = malloc(sizeof(Element));
+    Element *save=c;
+    
+    size_t curr_mem = *curr;
+    
     while(boucle){
-        if(!isPchar(text,curr,head)){
+        if(isPchar(text,curr,tmp)){
+            c->frere= tmp->fils;
+            c = c->frere;
+        }
+        else{
             boucle = false;
         }
     }
+    
+    Element *el = addEl("segment", text,(*curr)-curr_mem);
+    head->fils = el;
+    el->fils = save->frere;
+    
     return true;
 }
 
-bool isPchar(char *text, size_t *curr, Element *head){
 
+bool isPchar(char *text, size_t *curr, Element *head){  // pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
+
+    Element *tmp = malloc(sizeof(Element));
+    Element *el;
+    if(isUnreserved(*(text+(*curr)),tmp)){
+        el = addEl("pchar",text,1);
+        head->fils= el;
+        el->fils = tmp->fils;
+        *curr += 1;
+        return true;
+    }
+    else if(isPctEncoded(text+(*curr),curr,tmp)){
+        el = addEl("pchar",text,3);
+        head->fils= el;
+        el->fils = tmp->fils;
+        return true;
+    }
+    else if(isSubDelims(*(text+(*curr)),tmp)){
+        el = addEl("pchar",text,1);
+        head->fils= el;
+        el->fils = tmp->fils;
+        return true;
+    }
+    else if(strcmp(text+(*curr),":")){
+        el = addEl("pchar",text,1);
+        head->fils= el;
+        el->fils = addEl("colon", text+(*curr), 1);
+        *curr += 1;
+        return true;
+    }
+    else if(strcmp(text,"@")){
+        el = addEl("pchar",text,1);
+        head->fils= el;
+        el->fils = addEl("at-sign", text+(*curr), 1);
+        *curr += 1;
+        return true;
+    }
+    return false;
 }
 
+bool isUnreserved(char text, Element *head){    //unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
+    head->fils = addEl("unreserved",&text,1);
+    return (isAlpha(text)||isDigit(text)||text==DASH||text == DOT||text == UNDERSCORE||text == VAGUE);  
+}
+
+bool isPctEncoded(char *text, size_t *curr, Element *head){ //pct-encoded = "%" HEXDIG HEXDIG
+    head->fils = addEl("pct-encoded",text,3);
+    head = head->fils;
+
+    if(*text == '%'){
+        head->fils = addEl("pourcent",text,1);
+        *curr=+1;
+        head = head->fils;
+        
+        if(isHEXDIG(*(text+1))){
+            head->frere = addEl("hexdig",text+1,1);
+            *curr+=1;
+            head = head->frere;
+        
+            if(isHEXDIG(*(text+2))){
+                head->frere = addEl("hexdig",text+2,1);
+                *curr+=1;
+                return true;
+            }
+        }
+    } 
+    return false;
+}
+
+bool isSubDelims(char text, Element *head){ // sub-delims = "!" / "$" / "&" / "'" / "(" / ")"/ "*" / "+" / "," / ";" / "="
+    head->fils = addEl("sub-delims",&text,1);
+    return(text == '!' || text == '*'|| text == '&'|| text == SQUOTE || text == '(' || text == ')' || text == '*' || text == '+' || text == ',' || text == ';' || text == '=');
+}
+
+/*
 bool isHTTPVersion(char *text, size_t *curr, Element *head){ //HTTP-version = HTTP-name "/" DIGIT "." DIGIT
     head->frere = addEl("HTTP-version", text, 8); //HTTP-version devient la tete
     head = head->frere; ///je fais des fils  a SP
@@ -219,7 +325,10 @@ bool isHTTPname(char *text){ //HTTP-name = HTTP
     return strcmp(text,"HTTP");
 }
 
-bool isMessageBody(char *text, size_t *curr){
+bool isMessageBody(char *text, size_t *curr, Element *head){
+    
+    Element *el = addEl("message-body",text,8);
+    head -> fils = el;
 
     if(!isOCTET(text+(*curr))){
         return false;
@@ -230,13 +339,32 @@ bool isMessageBody(char *text, size_t *curr){
     return true;
 }
 
-bool isOCTET(char text){
-    for(int i=0; i<8 ; i++){
-        if(!(text+i == 1 || text+i = 0)){
-            return false;
-        }
+
+*/
+
+/*
+bool isConnectionHeader(char *text, size_t *curr, Element *head) {
+}
+
+bool isCookieHeader(char *text, size_t *curr, Element *head) {
+    if (!strcmp(text+*curr, "Cookie:")) { return false; }
+    *curr += 7;
+
+    while (isOWS(text+(*curr)), curr, head)) {
+        continue;
     }
-    return true;
+
+    if (!isCookieString(text+(*curr), curr, head)) { return ;alse
+    }
+                        
+}
+
+
+bool isOWS(char *text, size_t *curr, Element *head) {
+    while (isSP(*(text+*curr)) || isHTAB(*text+*curr)) {
+        continue;
+    }
+    return false;
 }
 */
 
@@ -244,6 +372,14 @@ bool isTchar(char text){ // tchar = ("!" / "#" / "$" / "%" / "&" / "'" / "*" / "
     return (text == EXCLAMATION || text == HASHTAG || text == DOLLAR || text == POURCENT || text == ESP || text == SQUOTE || text == STAR || text == PLUS || text == DASH || text == DOT || text == CIRCONFLEXE || text == UNDERSCORE || text == 96 || text == BARRE || text == VAGUE || isAlpha(text) || isDigit(text)) ;
 }
 
+bool isOCTET(char text){
+    for(int i=0; i<8 ; i++){
+        if(!(text+i == 1 || text+i == 0)){
+            return false;
+        }
+    }
+    return true;
+}
 
 bool isAlpha(char text){
     return (text >= AMAJ && text <= ZMAJ) || (text >= AMIN && text <= ZMIN);
@@ -252,12 +388,7 @@ bool isAlpha(char text){
 bool isDigit(char text) {
     return (text >= ZERO && text <= NINE);
 }
-/*
-bool isSP(char text, size_t *curr, Element *head){ // /!\ attention à l'ajout de l'élément SP en tant que frère de la tete
-    Element *el = addEl("SP"," ",1);
-    head->frere = el;
-    *curr += 1;
 
-    return (text == ' ');
+bool isHEXDIG(char text){ // HEXDIG  =  DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
+    return((text>=ZERO && text<=NINE) || (text>=AMAJ && text<=FMAJ));
 }
-*/
