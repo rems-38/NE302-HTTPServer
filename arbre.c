@@ -11,7 +11,11 @@
 void printArbre(Element *head, int level) {
     if (head == NULL) { return; }
     for (int i = 0; i < level; i++) { printf("\t"); }
-    printf("%s: %s\n", head->key, head->word);
+    printf("%s: ", head->key);
+    for (int j = 0; j < head->length; j++) {
+        printf("%c", head->word[j]);
+    }
+    printf("\n");
     printArbre(head->fils, level+1);
     printArbre(head->frere, level);
 }

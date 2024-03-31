@@ -1,1 +1,1 @@
-Cookie: 	 pair 	
+Cookie: 	 coucou=#salut:je+ok; test="value" 	

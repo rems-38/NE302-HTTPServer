@@ -20,19 +20,47 @@ Cookie-header = "Cookie:" OWS cookie-string OWS
 Cookie-header = "Cookie:" OWS cookie-pair *( ";" SP cookie-pair ) OWS
 Cookie-header = "Cookie:" OWS cookie-name "=" cookie-value *( ";" SP cookie-name "=" cookie-value ) OWS
 Cookie-header = "Cookie:" OWS token "=" ( DQUOTE *cookie-octet DQUOTE ) / *cookie-octet *( ";" SP token "=" ( DQUOTE *cookie-octet DQUOTE ) / *cookie-octet ) OWS
-Cookie-header = "Cookie:" OWS 1*tchar "=" ( DQUOTE *cookie-octet DQUOTE ) / *cookie-octet *( ";" SP 1*tchar "=" ( DQUOTE *cookie-octet DQUOTE ) / *cookie-octet ) OWS
 Cookie-header = "Cookie:" OWS 1*tchar "=" ( DQUOTE *(%x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E) DQUOTE ) / *(%x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E) *( ";" SP 1*tchar "=" ( DQUOTE *(%x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E) DQUOTE ) / *(%x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E) ) OWS
 
 HTAB :  	
 
 */
-
-#define SP 32
-#define HTAB 9
+#define AMAJ 65
+#define FMAJ 70
+#define ZMAJ 90
+#define AMIN 97
+#define ZMIN 122
+#define ZERO 48
+#define NINE 57
+#define SP 32           // espace
+#define HTAB 9          // \t
+#define DASH 45         // -
+#define UNDERSCORE 95   // _
+#define COMMA 44        // ,
+#define DOT 46          // .
+#define EXCLAMATION 33  // !
+#define QUESTION 63     // ?
+#define COLON 58        // :
+#define HASHTAG 35      // #
+#define DOLLAR 36       // $
+#define POURCENT 37     // %
+#define ESP 38          // &
+#define SQUOTE 39       // '
+#define DQUOTE 34       // "
+#define FQUOTE 96       // `
+#define STAR 42         // *
+#define PLUS 43         // +
+#define SLASH 47        // /
+#define CIRCONFLEXE 94  // ^
+#define BARRE 124       // |
+#define VAGUE 126       // ~
+#define LF 10           // \n
+#define CR 13
 
 bool isConnectionHeader(char *text, size_t *curr, Element *head) {
 }
 
+// OWS = *( SP / HTAB )
 bool isOWS(char *text, size_t *curr, Element *data) {
     Element *el = addEl("OWS", text, strlen(text));
     Element *head = el;
@@ -66,15 +94,168 @@ bool isOWS(char *text, size_t *curr, Element *data) {
         data = top;
     }
 
+    data->length = count;
     *curr += count;
     return true;
 }
 
-bool isCookiePair(char *text, size_t *curr, Element *data) {
-    *curr += 4;
-    return strcmp(text, "pair");
+
+bool isAlpha(char text){
+    return (text >= AMAJ && text <= ZMAJ) || (text >= AMIN && text <= ZMIN);
+}
+bool isDigit(char text) {
+    return (text >= ZERO && text <= NINE);
+}
+// tchar = ("!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA)
+bool isTchar(char text){ 
+    return (text == EXCLAMATION || text == HASHTAG || text == DOLLAR || text == POURCENT || text == ESP || text == SQUOTE || text == STAR || text == PLUS || text == DASH || text == DOT || text == CIRCONFLEXE || text == UNDERSCORE || text == 96 || text == BARRE || text == VAGUE || isAlpha(text) || isDigit(text)) ;
+}
+// token = 1*tchar
+bool isToken(char *text, size_t *curr, Element *data) {
+    size_t icurr = 0;
+
+    Element *el = addEl("token", text, strlen(text));
+    data->fils = el;
+    data = data->fils;
+    Element *save = data;
+
+    Element *tmp; //pour l'ajout des tchar
+    while(isTchar(*(text+icurr))){
+        tmp = addEl("tchar", text+icurr, 1);
+        if (icurr == 0) {
+            data->fils = tmp;
+            data = data->fils;
+        } else {
+            data->frere = tmp;
+            data = data->frere;
+        }
+        icurr += 1;
+    }
+
+    if(icurr == 0){
+        return false;
+    }
+    else{
+        data = save;
+        data->length = icurr;
+        *curr += icurr;
+        return true;
+    }
+}
+// cookie-name = token
+bool isCookieName(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("cookie_name", text, 6); // changer la length
+    data->fils = el;
+    data = data->fils;
+
+    return isToken(text, curr, data);
 }
 
+bool isDQUOTE(char text, Element *head) {
+    Element *el = addEl("__dquote", &text, 1);
+    if (strcmp(head->key, "cookie-value") == 0) {
+        head->fils = el;
+        head = head->fils;
+    } else {
+        head->frere = el;
+        head = head->frere;
+    }
+
+    return (text == DQUOTE);
+}
+
+// cookie-octet = *(%x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E)
+bool isCookieOctet(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("cookie-octet", text, 1);
+    if (data->length == 1) {
+        data->frere = el;
+        data = data->frere;
+    } else {
+        data->fils = el;
+        data = data->fils;
+    }
+
+    size_t count = 0;
+    while (*(text+count) == EXCLAMATION || (*(text+count) >= HASHTAG && *(text+count) <= PLUS) || (*(text+count) >= DASH && *(text+count) <= COLON) || (*(text+count) >= 60 && *(text+count) <= 91) || (*(text+count) >= 93 && *(text+count) <= VAGUE)) {
+        Element *el = addEl("__icar", text+count, 1);
+        if (count == 0) {
+            data->fils = el;
+            data = data->fils;
+        } else {
+            data->frere = el;
+            data = data->frere;
+        }
+        count += 1;
+    }
+    *curr += count;
+    data->length = count;
+}
+
+// cookie-value = ( DQUOTE *cookie-octet DQUOTE ) / *cookie-octet
+bool isCookieValue(char *text, size_t *curr, Element *data) {
+    size_t count = 0;
+
+    Element *el = addEl("cookie-value", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+    Element *save = data;
+
+    if (isDQUOTE(text[count], data)) {
+        count++;
+        Element *pre = data;
+        data = data->fils;
+        while (*(text+count) != DQUOTE) {
+            isCookieOctet(text+count, &count, data);
+            data = data->frere;
+        }
+
+        isDQUOTE(text[count], data);
+        count++;
+    } else {
+        isCookieOctet(text+count, &count, data);
+    }
+
+    data = save;
+    data->length = count;
+
+    *curr += count;
+    return true;
+}
+
+// cookie-pair = cookie-name "=" cookie-value
+bool isCookiePair(char *text, size_t *curr, Element *data) {
+    size_t count = 0;
+
+    Element *el = addEl("cookie-pair", text, strlen(text));
+    if (data->length != 1) { // c'est pas un __sp
+        data->fils = el;
+        data = data->fils;
+    } else {
+        data->frere = el;
+        data = data->frere;
+    }
+    Element *save = data;
+
+    if (!isCookieName(text, &count, data)) { return false; }
+    data = data->fils;
+
+    if (*(text+count) == '=') {
+        Element *eq = addEl("__equal", text+count, 1);
+        data->frere = eq;
+        data = data->frere;
+        count += 1;
+    }
+
+    if (!isCookieValue(text+count, &count, data)) { return false; }
+
+    data = save;
+    data->length = count;
+
+    *curr += count;
+    return true;
+}
+
+// cookie-string = cookie-pair *( ";" SP cookie-pair )
 bool isCookieString(char *text, size_t *curr, Element *data) {
     size_t count = 0;
 
@@ -84,7 +265,7 @@ bool isCookieString(char *text, size_t *curr, Element *data) {
     Element *save = data;
 
     if (!isCookiePair(text, &count, data)) { return false; }
-
+    data = data->fils;
     if (*(text+count) == ';') {
         while (text[count] == ';' && text[count+1] == SP) {
             Element *el1 = addEl("__colon", text+count, 1);
@@ -96,16 +277,19 @@ bool isCookieString(char *text, size_t *curr, Element *data) {
             data = data->frere;
 
             count += 2;
+
             if (!isCookiePair(text+count, &count, data)) { return false; }
         }
     }
 
     data = save;
+    data->length = count;
 
     *curr += count;
     return true;
 }
 
+// Cookie-header = "Cookie:" OWS cookie-string OWS
 bool isCookieHeader(char *text, Element *data) {
     if (!strcmp(text, "Cookie:")) { return false; }
 
