@@ -144,6 +144,8 @@ bool isToken(char *text, size_t *curr, Element *data, bool is_fils) {
 
 // obs-text = %x80-FF
 bool isObsText(char text) {
+    // d'après gcc la condition est toujours FALSE et TRUE en même temps
+    // je comprends pas trop mais ok
     return (text >= 128 && text <= 255);
 }
 
@@ -161,15 +163,16 @@ bool isFieldName(char *text, size_t *curr, Element *data) {
 
 // field-vchar = VCHAR / obs-text
 bool isFieldVchar(char text, Element *data) {
-    Element *el = addEl("field-vchar", text, 1);
+    Element *el = addEl("field-vchar", &text, 1);
     data->frere = el;
     data = data->frere;
 
-    if (text >= EXCLAMATION && text <= VAGUE) { Element *el = addEl("__vchar", text, 1); }
-    else if (isObsText(text)) { Element *el = addEl("obs-text", text, 1); }
+    Element *sub;
+    if (text >= EXCLAMATION && text <= VAGUE) { sub = addEl("__vchar", &text, 1); }
+    else if (isObsText(text)) { sub = addEl("obs-text", &text, 1); }
     else { return false; }
 
-    data->fils = el;
+    data->fils = sub;
     data = data->fils;
 
     return true;
@@ -187,9 +190,10 @@ bool isFieldContent(char *text, size_t *curr, Element *data) {
 
     if (*(text+count) == SP || *(text+count) == HTAB) {
         while(*(text+count) == SP || *(text+count) == HTAB) {
-            if (*(text+count) == SP) { Element *el = addEl("__sp", *(text+count), 1); }
-            else { Element *el = addEl("__htab", *(text+count), 1); }
-            data->frere = el;
+            Element *sub;
+            if (*(text+count) == SP) { sub = addEl("__sp", text+count, 1); }
+            else { sub = addEl("__htab", text+count, 1); }
+            data->frere = sub;
             data = data->frere;
             count++;
         }
@@ -218,10 +222,11 @@ bool isObsFold(char *text, size_t *curr, Element *data) {
 
     if (*(text+count) != SP || *(text+count) != HTAB) { return false; }
     while (*(text+count) == SP || *(text+count) == HTAB) {
-        if (*(text+count) == SP) { Element *el = addEl("__sp", *(text+count), 1); }
-        else { Element *el = addEl("__htab", *(text+count), 1); }
+        Element *sub;
+        if (*(text+count) == SP) { sub = addEl("__sp", text+count, 1); }
+        else { sub = addEl("__htab", text+count, 1); }
         
-        data->frere = el;
+        data->frere = sub;
         data = data->frere;
         count++;
     }
@@ -299,6 +304,7 @@ bool isCookieOctet(char *text, size_t *curr, Element *data, bool is_fils) {
     }
     *curr += count;
     updateLength(data, count);
+    return true;
 }
 
 // cookie-value = ( DQUOTE *cookie-octet DQUOTE ) / *cookie-octet
@@ -312,7 +318,6 @@ bool isCookieValue(char *text, size_t *curr, Element *data) {
 
     if (isDQUOTE(text[count], data, true)) {
         count++;
-        Element *pre = data;
         data = data->fils;
         while (*(text+count) != DQUOTE) {
             isCookieOctet(text+count, &count, data, false);
@@ -407,13 +412,12 @@ bool isCookieHeader(char *text, Element *data) {
     data->fils = cookie;
     data = data->fils;
 
-    int i_curr = 7;
-
-    if(!isOWS(text+i_curr, &i_curr, data, false)) {return false; }
+    size_t count = 7;
+    if(!isOWS(text+count, &count, data, false)) {return false; }
     data = data->frere;
-    if (!isCookieString(text+i_curr, &i_curr, data)) { return false; }
+    if (!isCookieString(text+count, &count, data)) { return false; }
     data = data->frere;
-    if(!isOWS(text+i_curr, &i_curr, data, false)) {return false; }
+    if(!isOWS(text+count, &count, data, false)) {return false; }
 
     return true;
 }
@@ -422,15 +426,17 @@ bool isCookieHeader(char *text, Element *data) {
 bool isQdText(char *text, size_t *curr, Element *data) {
     // ça veut dire quoi les 2 ; au milieu ?!
     // return (text == HTAB || text == SP || text == EXCLAMATION || (text >= HASHTAG && text <= 91) || (text >= 93 && text <= 126));
+    return true;
 }
 
 // quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )
 bool isQuotedPair(char *text, size_t *curr, Element *data) {
-    return false;
+    return true;
 }
+
 // quoted-string = DQUOTE *( qdtext / quoted-pair ) DQUOTE
 bool isQuotedString(char *text, size_t *curr, Element *data) {
-    return false;
+    return true;
 }
 
 // parameter = token "=" ( token / quoted-string )
@@ -659,11 +665,12 @@ bool isIPvFuture(char *text, size_t *curr, Element *data) {
 
     if (!isUnreserved(*(text+count)) && !isSubDelims(*(text+count)) && *(text+count) != COLON) { return false; }
     while (isUnreserved(*(text+count)) || isSubDelims(*(text+count)) || *(text+count) == COLON) {
-        if (isUnreserved(*(text+count))) { Element *el = addEl("__unreserved", text+count, 1); }
-        else if (isSubDelims(*(text+count))) { Element *el = addEl("__subdelims", text+count, 1); }
-        else { Element *el = addEl("__colon", text+count, 1); }
+        Element *sub;
+        if (isUnreserved(*(text+count))) { sub = addEl("__unreserved", text+count, 1); }
+        else if (isSubDelims(*(text+count))) { sub = addEl("__subdelims", text+count, 1); }
+        else { sub = addEl("__colon", text+count, 1); }
         
-        data->frere = el;
+        data->frere = sub;
         data = data->frere;
         count += 1;
     }
@@ -807,6 +814,7 @@ bool isH16(char *text, size_t *curr, Element *data, bool is_fils) {
         count += 1;
     }
 
+    *curr += count;
     return (count >= 1 && count <= 4);
 }
 
@@ -919,15 +927,16 @@ bool isRegName(char *text, size_t *curr, Element *data) {
     size_t count = 0;
     bool fst = true;
     while (!(isUnreserved(*(text+count)) || isSubDelims(*(text+count)) || isPctEncoded(text+count, &count, data))) {
-        if (isUnreserved(*(text+count))) { Element *el = addEl("__unreserved", text+count, 1); count++; }
-        else if (isSubDelims(*(text+count))) { Element *el = addEl("__subdelims", text+count, 1); count++; }
-        else { Element *el = addEl("__pctencoded", text-count, 3); } // - car déjà augmenter lors de l'appel dans le while si true
+        Element *sub;
+        if (isUnreserved(*(text+count))) { sub = addEl("__unreserved", text+count, 1); count++; }
+        else if (isSubDelims(*(text+count))) { sub = addEl("__subdelims", text+count, 1); count++; }
+        else { sub = addEl("__pctencoded", text-count, 3); } // - car déjà augmenter lors de l'appel dans le while si true
 
         if (fst) {
-            data->fils = el;
+            data->fils = sub;
             data = data->fils;
         } else {
-            data->frere = el;
+            data->frere = sub;
             data = data->frere;
         }
         fst = false;
@@ -1024,7 +1033,6 @@ bool isExpect(char *text, size_t *curr, Element *data) {
     data->frere = el;
     data = data->frere;
 
-    size_t count = 0;
     if (strcmp(text, "100-continue")) { return false; }
 
     updateLength(data, 14);
