@@ -45,7 +45,7 @@ bool isRequestLine(char *text, size_t *curr, Element *head){
     tmp = tmp->frere; //SP devient la tete
 
 
-    if(!isRequestTarget(text, curr, tmp)) {res = false;}
+    if(!isRequestTarget(text+(*curr), curr, tmp)) {res = false;}
     tmp = tmp->frere; //request-target devient la tete
 /*
     if(!isSP(text[*curr], curr, tmp)) {res = false;}
@@ -105,15 +105,15 @@ bool isToken(char *text,size_t *curr, Element *head){ //token = 1*tchar
     }
 }
 
-bool isRequestTarget(char *text, size_t *curr, Element *head){ // request-target = origin-form
+bool isRequestTarget(char *text, size_t *curr, Element *head){ // request-target = origin-form      //head = SP
     bool res = false;
     size_t curr_mem = *curr;            //sauvegarde de curr pour pouvoir définir la taille de request-target ensuite
     Element *tmp = malloc(sizeof(Element));
 
     if(isOriginForm(text, curr, tmp)){res = true;}
-    Element *el = addEl("resquest-target", text, (*curr)-curr_mem); 
-    head->frere = el; // maintenant qu'on a la longueur de request-target on peut l'ajouter à l'arbre
-    el->fils = tmp->fils;
+    Element *el = addEl("request-target", text, (*curr)-curr_mem); 
+    head->frere = el; //request target devient le frere de SP          // maintenant qu'on a la longueur de request-target on peut l'ajouter à l'arbre
+    el->fils = tmp->fils; //Origin form devient le fils de request target
     free(tmp);
     return res;
 }
@@ -125,8 +125,17 @@ bool isOriginForm(char *text, size_t *curr, Element *head){ // origin-form = abs
 
     if(!isAbsolutePath(text, curr, tmp)){return false;}
 
-    //["?" query]
-    Element *el = addEl("request-target", text, (*curr)-curr_mem);
+    /*
+
+    if(strcmp(text+(*curr),"?")){
+        *curr += 1;
+        if (isQuery(text, curr, tmp)){
+            curr
+        }
+    }
+
+    */
+    Element *el = addEl("origin-form", text, (*curr)-curr_mem);
     head->fils = el;
     el->fils = tmp->fils;
     
@@ -153,8 +162,9 @@ bool isAbsolutePath(char *text, size_t *curr, Element *head){ // absolute-path =
         else{
             boucle = false;
         }
-        if(isSegment(text+(*curr),curr,head)){
+        if(isSegment(text+(*curr),curr,c)){ //appel avec head=c="/"
             (*curr)++;
+            c = c->frere; //c devient segment
         }
         else{
             boucle = false;
@@ -173,18 +183,18 @@ bool isAbsolutePath(char *text, size_t *curr, Element *head){ // absolute-path =
     return true;
 }
 
-bool isSegment(char *text, size_t *curr, Element *head){ // segment = *pchar
+bool isSegment(char *text, size_t *curr, Element *head){ // segment = *pchar         //head="/"
     bool boucle = true;
 
-    Element *tmp = malloc(sizeof(Element));
+    Element *tmp = addEl("tmp","text",strlen("text"));      //malloc(sizeof(Element));
     Element *c = malloc(sizeof(Element));
     Element *save=c;
     
     size_t curr_mem = *curr;
-    
+    //printf("Dans isSegment text vaut : -%s-",text);
     while(boucle){
         if(isPchar(text,curr,tmp)){
-            c->frere= tmp->fils;
+            c->frere = tmp; //->fils;
             c = c->frere;
         }
         else{
@@ -193,7 +203,7 @@ bool isSegment(char *text, size_t *curr, Element *head){ // segment = *pchar
     }
     
     Element *el = addEl("segment", text,(*curr)-curr_mem);
-    head->fils = el;
+    head->frere = el; // segment devient le frere de head="/"
     el->fils = save->frere;
     
     return true;
@@ -203,14 +213,14 @@ bool isSegment(char *text, size_t *curr, Element *head){ // segment = *pchar
 bool isPchar(char *text, size_t *curr, Element *head){  // pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
 
     Element *tmp = malloc(sizeof(Element));
-    Element *el;
+    //Element *el;
     if(isUnreserved(*(text+(*curr)),tmp)){
-        el = addEl("pchar",text,1);
-        head->fils= el;
-        el->fils = tmp->fils;
+        head = addEl("pchar",text,1);
+        //head->fils = el;
+        head->fils = tmp->fils;
         *curr += 1;
         return true;
-    }
+    }/*
     else if(isPctEncoded(text+(*curr),curr,tmp)){
         el = addEl("pchar",text,3);
         head->fils= el;
@@ -236,15 +246,16 @@ bool isPchar(char *text, size_t *curr, Element *head){  // pchar = unreserved / 
         el->fils = addEl("at-sign", text+(*curr), 1);
         *curr += 1;
         return true;
-    }
+    }*/
     return false;
 }
 
 bool isUnreserved(char text, Element *head){    //unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
+    //printf("Dans isUreserverd text vaux : %c\n",text);
     head->fils = addEl("unreserved",&text,1);
     return (isAlpha(text)||isDigit(text)||text==DASH||text == DOT||text == UNDERSCORE||text == VAGUE);  
 }
-
+/*
 bool isPctEncoded(char *text, size_t *curr, Element *head){ //pct-encoded = "%" HEXDIG HEXDIG
     head->fils = addEl("pct-encoded",text,3);
     head = head->fils;
@@ -272,7 +283,7 @@ bool isPctEncoded(char *text, size_t *curr, Element *head){ //pct-encoded = "%" 
 bool isSubDelims(char text, Element *head){ // sub-delims = "!" / "$" / "&" / "'" / "(" / ")"/ "*" / "+" / "," / ";" / "="
     head->fils = addEl("sub-delims",&text,1);
     return(text == '!' || text == '*'|| text == '&'|| text == SQUOTE || text == '(' || text == ')' || text == '*' || text == '+' || text == ',' || text == ';' || text == '=');
-}
+}*/
 
 /*
 bool isHTTPVersion(char *text, size_t *curr, Element *head){ //HTTP-version = HTTP-name "/" DIGIT "." DIGIT
