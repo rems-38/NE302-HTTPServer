@@ -86,9 +86,9 @@ bool isSP(char text, size_t *curr, Element *head);
 // bool isHTAB(char text, size_t *curr, Element *head);
 bool isPchar(char *text, size_t *curr, Element *head);
 
-bool isUnreserved(char text, Element *head);
+bool isUnreserved(char text, Element *head);/*
 bool isPctEncoded(char *text,size_t *curr, Element *head);
-bool isSubDelims(char text, Element *head);
+bool isSubDelims(char text, Element *head);*/
 bool isHEXDIG(char text);
 bool isOCTET(char text);
 /*

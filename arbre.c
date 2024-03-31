@@ -16,6 +16,7 @@ void printArbre(Element *head, int level) {
         printf("%c", head->word[j]);
     }
     printf("\n");
+    sleep(1);
     printArbre(head->fils, level+1);
     printArbre(head->frere, level);
 }
