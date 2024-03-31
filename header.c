@@ -36,7 +36,9 @@ HTAB :
 #define DOT 46          // .
 #define EXCLAMATION 33  // !
 #define QUESTION 63     // ?
+#define EQUAL 61        // =
 #define COLON 58        // :
+#define SEMICOLON 59    // ;
 #define HASHTAG 35      // #
 #define DOLLAR 36       // $
 #define POURCENT 37     // %
@@ -53,8 +55,6 @@ HTAB :
 #define LF 10           // \n
 #define CR 13
 
-bool isConnectionHeader(char *text, size_t *curr, Element *head) {
-}
 
 // OWS = *( SP / HTAB )
 bool isOWS(char *text, size_t *curr, Element *data) {
@@ -240,7 +240,7 @@ bool isCookiePair(char *text, size_t *curr, Element *data) {
     if (!isCookieName(text, &count, data)) { return false; }
     data = data->fils;
 
-    if (*(text+count) == '=') {
+    if (*(text+count) == EQUAL) {
         Element *eq = addEl("__equal", text+count, 1);
         data->frere = eq;
         data = data->frere;
@@ -267,8 +267,8 @@ bool isCookieString(char *text, size_t *curr, Element *data) {
 
     if (!isCookiePair(text, &count, data)) { return false; }
     data = data->fils;
-    if (*(text+count) == ';') {
-        while (text[count] == ';' && text[count+1] == SP) {
+    if (*(text+count) == SEMICOLON) {
+        while (text[count] == SEMICOLON && text[count+1] == SP) {
             Element *el1 = addEl("__colon", text+count, 1);
             data->frere = el1;
             data = data->frere;
@@ -337,7 +337,7 @@ bool isParameter(char *text, size_t *curr, Element *data) {
     size_t count = 0;
     if (!isToken(text, &count, data)) { return false; }
     data = data->fils;
-    if (*(text+count) == '=') {
+    if (*(text+count) == EQUAL) {
         Element *el = addEl("__equal", text+count, 1);
         data->frere = el;
         data = data->frere;
@@ -382,7 +382,7 @@ bool isMediaType(char *text, size_t *curr, Element *data) {
     size_t count = 0;
     if (!isType(text, &count, data)) { return false; }
     data = data->fils;
-    if (*(text+count) == '/') {
+    if (*(text+count) == SLASH) {
         Element *el = addEl("__slash", text+count, 1);
         data->frere = el;
         data = data->frere;
@@ -394,7 +394,7 @@ bool isMediaType(char *text, size_t *curr, Element *data) {
     while (*(text+count) == SP || *(text+count) == HTAB) {
         if (!isOWS(text+count, &count, data)) { return false; }
         data = data->frere;
-        if (*(text+count) == ';') {
+        if (*(text+count) == SEMICOLON) {
             Element *el = addEl("__semicolon", text+count, 1);
             data->frere = el;
             data = data->frere;
@@ -446,16 +446,72 @@ bool isContentLength(char *text, size_t *curr, Element *data) {
     return true;
 }
 
+// connection-option = token
+bool isConnectionOption(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("connection-option", text, strlen(text));
+    if (strcmp(data->key, "__comma") == 0) {
+        data->fils = el;
+        data = data->fils;
+    } else {
+        data->frere = el;
+        data = data->frere;
+    }
+
+    return isToken(text, curr, data);
+}
+
+// Connection = *( "," OWS ) connection-option *( OWS "," [ OWS connection-option ] )
+bool isConnection(char *text, size_t *curr, Element *data) {
+    size_t count = 0;
+
+    Element *el = addEl("Connection", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    if (*(text+count) == COMMA) {
+        while (*(text+count) == COMMA) {
+            Element *el = addEl("__comma", text+count, 1);
+            data->fils = el;
+            data = data->fils;
+            count += 1;
+            if (!isOWS(text+count, &count, data)) { return false; }
+            data = data->frere;
+        }
+    }
+    
+    if (!isConnectionOption(text+count, &count, data)) { return false; }
+
+    while (*(text+count) == SP || *(text+count) == HTAB) {
+        if (!isOWS(text+count, &count, data)) { return false; }
+        data = data->frere;
+        if (*(text+count) == COMMA) {
+            Element *el = addEl("__comma", text+count, 1);
+            data->frere = el;
+            data = data->frere;
+            count += 1;
+            if (*(text+count) == SP || *(text+count) == HTAB) {
+                if (!isOWS(text+count, &count, data)) { return false; }
+                data = data->frere;
+                if (!isConnectionOption(text+count, &count, data)) { return false; }
+            }
+        }
+    }
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
 // Content-Length-header = "Content-Length" ":" OWS Content-Length OWS
 bool isContentLengthHeader(char *text, Element *data) {
     if (!strcmp(text, "Content-Length")) { return false; }
 
-    Element *el = addEl("Content-Length-header", text, 21);
+    Element *el = addEl("Content-Length-header", text, 14);
     data->fils = el;
     data = data->fils;
 
     size_t count = 14;
-    if (*(text+count) == ':') {
+    if (*(text+count) == COLON) {
         Element *el = addEl("__colon", text+count, 1);
         data->frere = el;
         data = data->frere;
@@ -480,7 +536,7 @@ bool isContentTypeHeader(char *text, Element *data) {
     data = data->fils;
 
     size_t count = 12;
-    if (*(text+count) == ':') {
+    if (*(text+count) == COLON) {
         Element *el = addEl("__colon", text+count, 1);
         data->frere = el;
         data = data->frere;
@@ -492,7 +548,30 @@ bool isContentTypeHeader(char *text, Element *data) {
     if (!isOWS(text+count, &count, data)) { return false; }
 
     updateLength(data, count);
+    return true;
+}
 
+// Connection-header = "Connection" ":" OWS Connection OWS
+bool isConnectionHeader(char *text, Element *data) {
+    if (!strcmp(text, "Connection")) { return false; }
+
+    Element *el = addEl("Connection-header", text, 10);
+    data->fils = el;
+    data = data->fils;
+
+    size_t count = 10;
+    if (*(text+count) == COLON) {
+        Element *el = addEl("__colon", text+count, 1);
+        data->frere = el;
+        data = data->frere;
+        count += 1;
+    } else { return false; }
+    if (!isOWS(text+count, &count, data)) { return false; }
+    data = data->frere;
+    if (!isConnection(text+count, &count, data)) { return false; }
+    if (!isOWS(text+count, &count, data)) { return false; }
+
+    updateLength(data, count);
     return true;
 }
 
@@ -506,7 +585,7 @@ bool verifHeaderField(Element *data){
     data->fils = el;
     data = data->fils;
 
-    if (isContentLengthHeader(data->word, data)) {
+    if (isConnectionHeader(data->word, data)) {
         res = true;
     }
 
