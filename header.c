@@ -330,9 +330,11 @@ bool isParameter(char *text, size_t *curr, Element *data) {
     Element *el = addEl("parameter", text, strlen(text));
     data->frere = el;
     data = data->frere;
+    Element *save = data;
+
 
     size_t count = 0;
-    if (!isToken(text, &count, data, false)) { return false; }
+    if (!isToken(text, &count, data, true)) { return false; }
     data = data->fils;
     if (*(text+count) == EQUAL) {
         Element *el = addEl("__equal", text+count, 1);
@@ -341,11 +343,12 @@ bool isParameter(char *text, size_t *curr, Element *data) {
         count += 1;
     } else { return false; }
     int ok = 0;
-    if (isToken(text+count, &count, data, true)) { ok = 1; }
+    if (isToken(text+count, &count, data, false)) { ok = 1; }
     else if (!isQuotedString(text+count, &count, data)) { ok = 1;}
     else { ok = 0; }
 
     if (ok) {
+        data = save;
         updateLength(data, count);
         *curr += count;
         return true;
@@ -358,7 +361,7 @@ bool isSubType(char *text, size_t *curr, Element *data) {
     data->frere = el;
     data = data->frere;
 
-    return isToken(text, curr, data, false);
+    return isToken(text, curr, data, true);
 }
 
 // type = token
@@ -367,7 +370,7 @@ bool isType(char *text, size_t *curr, Element *data) {
     data->fils = el;
     data = data->fils;
 
-    return isToken(text, curr, data, false);
+    return isToken(text, curr, data, true);
 }
 
 // media-type = type "/" subtype *( OWS ";" OWS parameter )
@@ -544,6 +547,7 @@ bool isContentTypeHeader(char *text, Element *data) {
     if (!isOWS(text+count, &count, data, false)) { return false; }
     data = data->frere;
     if (!isContentType(text+count, &count, data)) { return false; }
+    data = data->frere;
     if (!isOWS(text+count, &count, data, false)) { return false; }
 
     updateLength(data, count);
@@ -584,7 +588,7 @@ bool verifHeaderField(Element *data){
     data->fils = el;
     data = data->fils;
 
-    if (isCookieHeader(data->word, data)) {
+    if (isContentTypeHeader(data->word, data)) {
         res = true;
     }
 

@@ -1,1 +1,1 @@
-Connection: ,   coucou	
+Content-Type:	image/jpeg    	;  href=img.jpeg
