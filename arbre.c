@@ -33,3 +33,8 @@ Element *addEl(char *key, char *word, size_t length) {
     
     return el;
 }
+
+void updateLength(Element *data, size_t length) {
+  data->length = length;
+  strncpy(data->word, data->word, length);
+}

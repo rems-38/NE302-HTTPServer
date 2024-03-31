@@ -15,3 +15,4 @@ typedef struct Element {
 
 void printArbre(Element *head, int level);
 Element *addEl(char *key, char *word, size_t length);
+void updateLength(Element *data, size_t length);
