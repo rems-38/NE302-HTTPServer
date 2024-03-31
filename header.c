@@ -82,7 +82,7 @@ bool isOWS(char *text, size_t *curr, Element *data) {
         count++;
     }
 
-    if (data->fils == NULL) {
+    if (data->length != 1 && data->fils == NULL) {
         data->fils = head;
         data = data->fils;
     } else {
@@ -94,7 +94,7 @@ bool isOWS(char *text, size_t *curr, Element *data) {
         data = top;
     }
 
-    data->length = count;
+    updateLength(data, count);
     *curr += count;
     return true;
 }
@@ -115,8 +115,13 @@ bool isToken(char *text, size_t *curr, Element *data) {
     size_t icurr = 0;
 
     Element *el = addEl("token", text, strlen(text));
-    data->fils = el;
-    data = data->fils;
+    if (strncmp(data->key, "__equal", 7) == 0) {
+        data->frere = el;
+        data = data->frere;
+    } else {
+        data->fils = el;
+        data = data->fils;
+    }
     Element *save = data;
 
     Element *tmp; //pour l'ajout des tchar
@@ -137,7 +142,7 @@ bool isToken(char *text, size_t *curr, Element *data) {
     }
     else{
         data = save;
-        data->length = icurr;
+        updateLength(data, icurr);
         *curr += icurr;
         return true;
     }
@@ -188,7 +193,7 @@ bool isCookieOctet(char *text, size_t *curr, Element *data) {
         count += 1;
     }
     *curr += count;
-    data->length = count;
+    updateLength(data, count);
 }
 
 // cookie-value = ( DQUOTE *cookie-octet DQUOTE ) / *cookie-octet
@@ -216,7 +221,7 @@ bool isCookieValue(char *text, size_t *curr, Element *data) {
     }
 
     data = save;
-    data->length = count;
+    updateLength(data, count);
 
     *curr += count;
     return true;
@@ -249,7 +254,7 @@ bool isCookiePair(char *text, size_t *curr, Element *data) {
     if (!isCookieValue(text+count, &count, data)) { return false; }
 
     data = save;
-    data->length = count;
+    updateLength(data, count);
 
     *curr += count;
     return true;
@@ -283,7 +288,7 @@ bool isCookieString(char *text, size_t *curr, Element *data) {
     }
 
     data = save;
-    data->length = count;
+    updateLength(data, count);
 
     *curr += count;
     return true;
@@ -306,6 +311,144 @@ bool isCookieHeader(char *text, Element *data) {
 }
 
 
+// obs-text = %x80-FF
+bool isObsText(char text) {
+    return (text >= 128 && text <= 255);
+}
+
+
+// qdtext = HTAB / SP / "!" / %x23-5B ; '#'-'[' / %x5D-7E ; ']'-'~' / obs-text
+bool isQdText(char *text, size_t *curr, Element *data) {
+    // ça veut dire quoi les 2 ; au milieu ?!
+    // return (text == HTAB || text == SP || text == EXCLAMATION || (text >= HASHTAG && text <= 91) || (text >= 93 && text <= 126));
+}
+
+// quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )
+bool isQuotedPair(char *text, size_t *curr, Element *data) {
+    return false;
+}
+// quoted-string = DQUOTE *( qdtext / quoted-pair ) DQUOTE
+bool isQuotedString(char *text, size_t *curr, Element *data) {
+    return false;
+}
+
+// parameter = token "=" ( token / quoted-string )
+bool isParameter(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("parameter", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    size_t count = 0;
+    if (!isToken(text, &count, data)) { return false; }
+    data = data->fils;
+    if (*(text+count) == '=') {
+        Element *el = addEl("__equal", text+count, 1);
+        data->frere = el;
+        data = data->frere;
+        count += 1;
+    } else { return false; }
+    int ok = 0;
+    if (isToken(text+count, &count, data)) { ok = 1; }
+    else if (!isQuotedString(text+count, &count, data)) { ok = 1;}
+    else { ok = 0; }
+
+    if (ok) {
+        updateLength(data, count);
+        *curr += count;
+        return true;
+    } else { return false; }
+}
+
+// type = token
+bool isSubType(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("subtype", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    return isToken(text, curr, data);
+}
+
+// type = token
+bool isType(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("type", text, strlen(text));
+    data->fils = el;
+    data = data->fils;
+
+    return isToken(text, curr, data);
+}
+
+// media-type = type "/" subtype *( OWS ";" OWS parameter )
+bool isMediaType(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("media-type", text, strlen(text));
+    data->fils = el;
+    data = data->fils;
+
+    size_t count = 0;
+    if (!isType(text, &count, data)) { return false; }
+    data = data->fils;
+    if (*(text+count) == '/') {
+        Element *el = addEl("__slash", text+count, 1);
+        data->frere = el;
+        data = data->frere;
+        count += 1;
+    } else { return false; }
+    if (!isSubType(text+count, &count, data)) { return false; }
+    data = data->frere;
+
+    while (*(text+count) == SP || *(text+count) == HTAB) {
+        if (!isOWS(text+count, &count, data)) { return false; }
+        data = data->frere;
+        if (*(text+count) == ';') {
+            Element *el = addEl("__semicolon", text+count, 1);
+            data->frere = el;
+            data = data->frere;
+            count += 1;
+        } else { return false; }
+        if (!isOWS(text+count, &count, data)) { return false; }
+        data = data->frere;
+        if (!isParameter(text+count, &count, data)) { return false; }
+        data = data->frere;
+    }
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+//  Content-Type = media-type
+bool isContentType(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("Content-Type", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    return isMediaType(text, curr, data);
+}
+
+// Content-Type-header = "Content-Type" ":" OWS Content-Type OWS
+bool isContentTypeHeader(char *text, Element *data) {
+    if (!strcmp(text, "Content-Type")) { return false; }
+
+    Element *el = addEl("Content-Type-header", text, 12);
+    data->fils = el;
+    data = data->fils;
+
+    size_t count = 12;
+    if (*(text+count) == ':') {
+        Element *el = addEl("__colon", text+count, 1);
+        data->frere = el;
+        data = data->frere;
+        count += 1;
+    } else { return false; }
+    if (!isOWS(text+count, &count, data)) { return false; }
+    data = data->frere;
+    if (!isContentType(text+count, &count, data)) { return false; }
+    if (!isOWS(text+count, &count, data)) { return false; }
+
+    updateLength(data, count);
+
+    return false;
+}
+
 
 bool verifHeaderField(Element *data){
     bool res = false;
@@ -316,7 +459,7 @@ bool verifHeaderField(Element *data){
     data->fils = el;
     data = data->fils;
 
-    if (isCookieHeader(data->word, data)) {
+    if (isContentTypeHeader(data->word, data)) {
         res = true;
     }
 

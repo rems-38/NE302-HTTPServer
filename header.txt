@@ -1,1 +1,1 @@
-Cookie: 	 coucou=#salut:je+ok; test="value" 	
+Content-Type:	image/jpeg    	;  href=img.jpeg
