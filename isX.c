@@ -40,12 +40,14 @@ bool isRequestLine(char *text, size_t *curr, Element *head){
     tmp = tmp->fils; //method devient la tete
     Element *save = tmp;
     
+    printf("valeur curr sortie de méthode : %ld\n",*curr);
 
     if(!isSP(text[*curr], curr, tmp)) {res = false;}
     tmp = tmp->frere; //SP devient la tete
 
+    printf("valeur curr après SP : %ld\n",*curr);
 
-    if(!isRequestTarget(text+(*curr), curr, tmp)) {res = false;}
+    if(!isRequestTarget(text, curr, tmp)) {res = false;} // ancien premier argument : text+(*curr)
     tmp = tmp->frere; //request-target devient la tete
 /*
     if(!isSP(text[*curr], curr, tmp)) {res = false;}
@@ -110,8 +112,10 @@ bool isRequestTarget(char *text, size_t *curr, Element *head){ // request-target
     size_t curr_mem = *curr;            //sauvegarde de curr pour pouvoir définir la taille de request-target ensuite
     Element *tmp = malloc(sizeof(Element));
 
+    printf("valeur curr début RequestTarget : %ld\n",*curr);
+
     if(isOriginForm(text, curr, tmp)){res = true;}
-    Element *el = addEl("request-target", text, (*curr)-curr_mem); 
+    Element *el = addEl("request-target", text+curr_mem, (*curr)-curr_mem); 
     head->frere = el; //request target devient le frere de SP          // maintenant qu'on a la longueur de request-target on peut l'ajouter à l'arbre
     el->fils = tmp->fils; //Origin form devient le fils de request target
     free(tmp);
@@ -119,31 +123,69 @@ bool isRequestTarget(char *text, size_t *curr, Element *head){ // request-target
 }
 
 bool isOriginForm(char *text, size_t *curr, Element *head){ // origin-form = absolute-path [ "?" query ]
-    
+    printf("valeur curr début OriginForm : %ld\n",*curr);
     size_t curr_mem = *curr; 
     Element *tmp = malloc(sizeof(Element));
-
+    
     if(!isAbsolutePath(text, curr, tmp)){return false;}
-
     /*
-
+    // [ "?" query ]
     if(strcmp(text+(*curr),"?")){
         *curr += 1;
         if (isQuery(text, curr, tmp)){
-            curr
+        }
+        else{
+            return false;
         }
     }
+*/
 
-    */
-    Element *el = addEl("origin-form", text, (*curr)-curr_mem);
+    Element *el = addEl("origin-form", text+curr_mem, (*curr)-curr_mem);
     head->fils = el;
     el->fils = tmp->fils;
     
     return true;
 }
+/*
+bool isQuery(char *text, size_t *curr, Element *head){ // query = *( pchar / "/" / "?" )
+    bool boucle = true;
+    size_t curr_comp = curr;
 
+    Element *tmp = malloc(sizeof(Element));
+    Element *c = malloc(sizeof(Element));
+    Element *save = c;
+
+    while(boucle){
+        if(strcmp(text+(*curr),"/")){
+            tmp = addEl("__ponct", "/", 1);
+            c->frere = tmp;
+            c = c->frere;
+            *curr += 1;
+        }
+        else if(strcmp(text+(*curr),"?")){
+            tmp = addEl("__ponct", "?", 1);
+            c->frere = tmp;
+            c = c->frere;
+            *curr += 1;
+        }
+        else if(isPchar(text,curr,tmp)){
+            c->frere = tmp;
+            c = c->frere;
+        }
+        else{
+            boucle = false;
+        }
+    }
+
+    Element *el = addEl("query", text, (*curr)-curr_comp);
+    head->fils = el; 
+    head->fils->fils = save;
+
+    return true;
+}
+*/
 bool isAbsolutePath(char *text, size_t *curr, Element *head){ // absolute-path = 1*( "/" segment )
-    
+    printf("valeur curr début absolute-path : %ld\n",*curr);
     Element *tmp = malloc(sizeof(Element));
     Element *c = malloc(sizeof(Element));
     Element *save = c;    //head->fils = addEl("absolute-path", text, 0);
@@ -151,33 +193,52 @@ bool isAbsolutePath(char *text, size_t *curr, Element *head){ // absolute-path =
     size_t curr_mem = *curr;
     size_t icurr = 0;
     bool boucle = true;
-
+    //printf("txt avant boucle  : %s, curseur : %ld\n", text, (*curr));
     while(boucle){
-        if(strcmp(text+(*curr),"/")){
+        if ((*curr)<10){
+            printf("valeur texte : %s\n",text+(*curr));
+            printf("valeur curr début boucle absolute path : %ld\n",*curr);
+        }
+       
+        if(*(text+(*curr))=='/'){
             tmp = addEl("__icar", "/", 1);
             c->frere = tmp;
             c = c->frere;
-            (*curr)++;
+            *curr += 1;
+
+            if ((*curr)<10){
+            printf("valeur texte : %s\n",text+(*curr));
+            printf("valeur curr première condition boucle absolute path : %ld\n",*curr);
+            }
+            
+            if (isSegment(text+(*curr), curr, c))
+            { // appel avec head=c="/"
+                *curr += 1;
+                if ((*curr)<10){
+                    printf("valeur texte : %s\n",text+(*curr));
+                    printf("valeur curr deuxième condition boucle absolute path : %ld\n",*curr);
+                }
+                c = c->frere; // c devient segment
+            }
+            else
+            {
+                boucle = false;
+            }
         }
         else{
             boucle = false;
         }
-        if(isSegment(text+(*curr),curr,c)){ //appel avec head=c="/"
-            (*curr)++;
-            c = c->frere; //c devient segment
-        }
-        else{
-            boucle = false;
-        }
+        
         icurr++;
     }
+    printf("sortie absolute-path\n");
 
     if (icurr == 0){
         return false;
     }
 
     //*curr += icurr;
-    Element *el = addEl("absolute-path", text, (*curr)-curr_mem);
+    Element *el = addEl("absolute-path", text+curr_mem, (*curr)-curr_mem);
     head->fils = el;
     el->fils = save->frere;
     return true;
@@ -186,13 +247,14 @@ bool isAbsolutePath(char *text, size_t *curr, Element *head){ // absolute-path =
 bool isSegment(char *text, size_t *curr, Element *head){ // segment = *pchar         //head="/"
     bool boucle = true;
 
-    Element *tmp = addEl("tmp","text",strlen("text"));      //malloc(sizeof(Element));
+    Element *tmp = malloc(sizeof(Element)); //addEl("tmp","text",strlen("text"));
     Element *c = malloc(sizeof(Element));
     Element *save=c;
     
     size_t curr_mem = *curr;
     //printf("Dans isSegment text vaut : -%s-",text);
     while(boucle){
+        //printf("caractère : %s\n curseur : %ld\n",text,*curr);
         if(isPchar(text,curr,tmp)){
             c->frere = tmp; //->fils;
             c = c->frere;
@@ -201,8 +263,8 @@ bool isSegment(char *text, size_t *curr, Element *head){ // segment = *pchar    
             boucle = false;
         }
     }
-    
-    Element *el = addEl("segment", text,(*curr)-curr_mem);
+    //printf("sortie de la boucle segment\n");
+    Element *el = addEl("segment", text+curr_mem,(*curr)-curr_mem);
     head->frere = el; // segment devient le frere de head="/"
     el->fils = save->frere;
     
