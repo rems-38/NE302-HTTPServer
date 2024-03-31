@@ -141,13 +141,124 @@ bool isToken(char *text, size_t *curr, Element *data, bool is_fils) {
         return true;
     }
 }
-// cookie-name = token
-bool isCookieName(char *text, size_t *curr, Element *data) {
-    Element *el = addEl("cookie_name", text, 6); // changer la length
+
+// obs-text = %x80-FF
+bool isObsText(char text) {
+    return (text >= 128 && text <= 255);
+}
+
+// field-name = token
+bool isFieldName(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("field-name", text, strlen(text));
     data->fils = el;
     data = data->fils;
 
-    return isToken(text, curr, data, false);
+    if (!isToken(text, curr, data, true)) { return false; }
+
+    updateLength(data, *curr);
+    return true;
+}
+
+// field-vchar = VCHAR / obs-text
+bool isFieldVchar(char text, Element *data) {
+    Element *el = addEl("field-vchar", text, 1);
+    data->frere = el;
+    data = data->frere;
+
+    if (text >= EXCLAMATION && text <= VAGUE) { Element *el = addEl("__vchar", text, 1); }
+    else if (isObsText(text)) { Element *el = addEl("obs-text", text, 1); }
+    else { return false; }
+
+    data->fils = el;
+    data = data->fils;
+
+    return true;
+}
+
+// field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
+bool isFieldContent(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("field-content", text, strlen(text));
+    data->fils = el;
+    data = data->fils;
+
+    size_t count = 0;
+    if (!isFieldVchar(*text, data)) { return false; }
+    count++;
+
+    if (*(text+count) == SP || *(text+count) == HTAB) {
+        while(*(text+count) == SP || *(text+count) == HTAB) {
+            if (*(text+count) == SP) { Element *el = addEl("__sp", *(text+count), 1); }
+            else { Element *el = addEl("__htab", *(text+count), 1); }
+            data->frere = el;
+            data = data->frere;
+            count++;
+        }
+        if (!isFieldVchar(*(text+count), data)) { return false; }
+        count++;
+    }
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+// obs-fold = CRLF 1*( SP / HTAB )
+bool isObsFold(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("obs-fold", text, strlen(text));
+    data->fils = el;
+    data = data->fils;
+
+    size_t count = 0;
+    if (*text == CR && (*text+1) == LF) {
+        Element *el = addEl("__crlf", text, 2);
+        data->fils = el;
+        data = data->fils;
+        count += 2;
+    } else { return false; }
+
+    if (*(text+count) != SP || *(text+count) != HTAB) { return false; }
+    while (*(text+count) == SP || *(text+count) == HTAB) {
+        if (*(text+count) == SP) { Element *el = addEl("__sp", *(text+count), 1); }
+        else { Element *el = addEl("__htab", *(text+count), 1); }
+        
+        data->frere = el;
+        data = data->frere;
+        count++;
+    }
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+// field-value = *( field-content / obs-fold )
+bool isFieldValue(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("field-value", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    size_t count = 0;
+    // while (isFieldContent(*(text+count), &count, data) || isObsFold(*(text+count), &count, data)) {
+    //     if 
+    // }
+    // à compléter : faire gaffe au pointeur vers count, pas incrémenter 2 fois lors de la vérif du if...
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+
+// cookie-name = token
+bool isCookieName(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("cookie_name", text, strlen(text));
+    data->fils = el;
+    data = data->fils;
+
+    if (!isToken(text, curr, data, true)) { return false; }
+
+    updateLength(data, *curr);
+    return true;
 }
 
 bool isDQUOTE(char text, Element *head, bool is_fils) {
@@ -306,13 +417,6 @@ bool isCookieHeader(char *text, Element *data) {
 
     return true;
 }
-
-
-// obs-text = %x80-FF
-bool isObsText(char text) {
-    return (text >= 128 && text <= 255);
-}
-
 
 // qdtext = HTAB / SP / "!" / %x23-5B ; '#'-'[' / %x5D-7E ; ']'-'~' / obs-text
 bool isQdText(char *text, size_t *curr, Element *data) {
