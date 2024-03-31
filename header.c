@@ -914,6 +914,20 @@ bool isHost(char *text, size_t *curr, Element *data) {
     return true;
 }
 
+// Expect = "100-continue"
+bool isExpect(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("Expect", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    size_t count = 0;
+    if (strcmp(text, "100-continue")) { return false; }
+
+    updateLength(data, 14);
+    *curr += 14;
+    return true;
+}
+
 // Content-Length-header = "Content-Length" ":" OWS Content-Length OWS
 bool isContentLengthHeader(char *text, Element *data) {
     if (!strcmp(text, "Content-Length")) { return false; }
@@ -982,6 +996,32 @@ bool isConnectionHeader(char *text, Element *data) {
     if (!isOWS(text+count, &count, data, false)) { return false; }
     data = data->frere;
     if (!isConnection(text+count, &count, data)) { return false; }
+    if (!isOWS(text+count, &count, data, false)) { return false; }
+
+    updateLength(data, count);
+    return true;
+}
+
+// Expect-header = "Expect" ":" OWS Expect OWS
+bool isExpectHeader(char *text, Element *data) {
+    if (!strcmp(text, "Expect")) { return false; }
+
+    Element *el = addEl("Expect-header", text, 6);
+    data->fils = el;
+    data = data->fils;
+
+    size_t count = 6;
+    if (*(text+count) == COLON) {
+        Element *el = addEl("__colon", text+count, 1);
+        data->frere = el;
+        data = data->frere;
+        count += 1;
+    } else { return false; }
+
+    if (!isOWS(text+count, &count, data, false)) { return false; }
+    data = data->frere;
+    if (!isExpect(text+count, &count, data)) { return false; }
+    data = data->frere;
     if (!isOWS(text+count, &count, data, false)) { return false; }
 
     updateLength(data, count);
