@@ -211,7 +211,7 @@ bool isAbsolutePath(char *text, size_t *curr, Element *head){ // absolute-path =
             printf("valeur curr première condition boucle absolute path : %ld\n",*curr);
             }
             
-            if (isSegment(text+(*curr), curr, c))
+            if (isSegment(text, curr, c))
             { // appel avec head=c="/"
                 *curr += 1;
                 if ((*curr)<10){
@@ -275,11 +275,11 @@ bool isSegment(char *text, size_t *curr, Element *head){ // segment = *pchar    
 bool isPchar(char *text, size_t *curr, Element *head){  // pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
 
     Element *tmp = malloc(sizeof(Element));
-    //Element *el;
+    Element *el;
     if(isUnreserved(*(text+(*curr)),tmp)){
-        head = addEl("pchar",text,1);
-        //head->fils = el;
-        head->fils = tmp->fils;
+        el = addEl("pchar",text,1);
+        head->fils = el;
+        el->fils = tmp->fils;
         *curr += 1;
         return true;
     }/*
