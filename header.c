@@ -52,6 +52,10 @@ HTAB :
 #define CIRCONFLEXE 94  // ^
 #define BARRE 124       // |
 #define VAGUE 126       // ~
+#define OPAREN 40       // (
+#define CPAREN 41       // )
+#define OBRACKET 91     // [
+#define CBRACKET 93     // ]
 #define LF 10           // \n
 #define CR 13
 
@@ -504,6 +508,412 @@ bool isConnection(char *text, size_t *curr, Element *data) {
     return true;
 }
 
+
+// unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
+bool isUnreserved(char text) {
+    return isAlpha(text) || isDigit(text) || text == DASH || text == DOT || text == UNDERSCORE || text == VAGUE;
+}
+
+// sub-delims = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
+bool isSubDelims(char text) {
+    return (text == EXCLAMATION || text == DOLLAR || text == ESP || text == SQUOTE || text == OPAREN || text == CPAREN || text == STAR || text == PLUS || text == COMMA || text == SEMICOLON || text == EQUAL);
+}
+
+// HEXDIG = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
+bool isHexdig(char text) {
+    return isDigit(text) || (text >= AMAJ && text <= FMAJ);
+}
+
+// IPvFuture = "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
+bool isIPvFuture(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("IPvFuture", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    size_t count = 0;
+    if (*(text+count) == 'v') {
+        Element *el = addEl("__v", text+count, 1);
+        data->fils = el;
+        data = data->fils;
+        count += 1;
+    } else { return false; }
+    
+    if (!isHexdig(*(text+count))) { return false; }
+    while (isHexdig(*(text+count))) {
+        Element *el = addEl("__hexdig", text+count, 1);
+        data->frere = el;
+        data = data->frere;
+        count += 1;
+    }
+    
+    if (*(text+count) == DOT) {
+        Element *el = addEl("__dot", text+count, 1);
+        data->frere = el;
+        data = data->frere;
+        count += 1;
+    } else { return false; }
+
+    if (!isUnreserved(*(text+count)) && !isSubDelims(*(text+count)) && *(text+count) != COLON) { return false; }
+    while (isUnreserved(*(text+count)) || isSubDelims(*(text+count)) || *(text+count) == COLON) {
+        if (isUnreserved(*(text+count))) { Element *el = addEl("__unreserved", text+count, 1); }
+        else if (isSubDelims(*(text+count))) { Element *el = addEl("__subdelims", text+count, 1); }
+        else { Element *el = addEl("__colon", text+count, 1); }
+        
+        data->frere = el;
+        data = data->frere;
+        count += 1;
+    }
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+// dec-octet     = "25" %x30-35          ; 250-255
+//               / "2" %x30-34 DIGIT     ; 200-249
+//               / "1" 2DIGIT            ; 100-199
+//              / %x31-39 DIGIT         ; 10-99
+//              / DIGIT                 ; 0-9
+bool isDecOctet(char *text, size_t *curr, Element *data, bool is_fils) {
+    Element *el = addEl("dec-octet", text, strlen(text));
+    if (is_fils) {
+        data->fils = el;
+        data = data->fils;
+    } else {
+        data->frere = el;
+        data = data->frere;
+    }
+
+    size_t count = 0;
+    if (isDigit(*text)) {
+        Element *el = addEl("__digit", text, 1);
+        data->frere = el;
+        data = data->frere;
+        count = 1;
+    }
+    else if (*text >= ZERO+1 && *text <= NINE) {
+        Element *el = addEl("__digit", text, 1);
+        data->frere = el;
+        data = data->frere;
+        if (isDigit(*(text+1))) {
+            Element *el = addEl("__digit", text+1, 1);
+            data->frere = el;
+            data = data->frere;
+            count = 2;
+        } else { return false; }
+    }
+    else if (*text == '1' && isDigit(*(text+1))) {
+        Element *el = addEl("__digit", text, 1);
+        data->frere = el;
+        data = data->frere;
+        for (int i = 0; i < 2; i++) {
+            if (!isDigit(*(text+i+1))) { return false; }
+            Element *el = addEl("__digit", text+i+1, 1);
+            data->frere = el;
+            data = data->frere;
+        }
+        count = 3;
+    }
+    else if (*text == '2' && *(text+1) >= ZERO && *(text+1) <= ZERO+4 && isDigit(*(text+2))) {
+        Element *el = addEl("__digit", text, 1);
+        data->frere = el;
+        data = data->frere;
+        if (*(text+1) >= ZERO && *(text+1) <= ZERO+4) {
+            Element *el = addEl("__digit", text+1, 1);
+            data->frere = el;
+            data = data->frere;
+            if (isDigit(*(text+2))) {
+                Element *el = addEl("__digit", text+2, 1);
+                data->frere = el;
+                data = data->frere;
+                count = 3;
+            } else { return false; }
+        } else { return false; }
+    }
+    else if (*text == '2' && *(text+1) == '5' && *(text+2) >= ZERO && *(text+2) <= ZERO+5) {
+        Element *el = addEl("__digit", text, 1);
+        data->frere = el;
+        data = data->frere;
+        if (*(text+1) == '5') {
+            Element *el = addEl("__digit", text+1, 1);
+            data->frere = el;
+            data = data->frere;
+            if (*(text+2) >= ZERO && *(text+2) <= ZERO+5) {
+                Element *el = addEl("__digit", text+2, 1);
+                data->frere = el;
+                data = data->frere;
+                count = 3;
+            } else { return false; }
+        } else { return false; }
+    }    
+    else { return false; }
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+// IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet
+bool isIPv4address(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("IPv4address", text, strlen(text));
+    data->fils = el;
+    data = data->fils;  
+
+    size_t count = 0;
+    for (size_t i = 0; i < 4; i++) {
+        if (!isDecOctet(text+count, &count, data, i == 0)) { return false; }
+        
+        if (i ==0) { data = data->fils; }
+        else { data = data->frere; }
+        
+        if (*(text+count) == DOT) {
+            Element *el = addEl("__dot", text+count, 1);
+            data->frere = el;
+            data = data->frere;
+            count += 1;
+        } else { return false; }
+    }
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+// h16 = 1*4HEXDIG
+bool isH16(char *text, size_t *curr, Element *data, bool is_fils) {
+    Element *el = addEl("h16", text, strlen(text));
+    if (is_fils) {
+        data->fils = el;
+        data = data->fils;
+    } else {
+        data->frere = el;
+        data = data->frere;
+    }
+        
+    size_t count = 0;
+    while (isHexdig(*(text+count))) {
+        Element *el = addEl("__hexdig", text+count, 1);
+        if (count == 0) {
+            data->fils = el;
+            data = data->fils;
+        } else {
+            data->frere = el;
+            data = data->frere;
+        }
+        count += 1;
+    }
+
+    return (count >= 1 && count <= 4);
+}
+
+// ls32 = ( h16 ":" h16 ) / IPv4address
+bool isLS32(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("ls32", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    size_t count = 0;
+    if (isH16(text, &count, data, true)) {
+        if (*(text+count) == COLON) {
+            Element *el = addEl("__colon", text+count, 1);
+            data->frere = el;
+            data = data->frere;
+            count += 1;
+            if (!isH16(text+count, &count, data, false)) { return false; }
+        } else { return false; }
+    }
+    else if (!isIPv4address(text, &count, data)) { return false; }
+    else { return false; }
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+// IPv6address =                             6( h16 ":" ) ls32
+//              /                       "::" 5( h16 ":" ) ls32
+//              / [ h16               ] "::" 4( h16 ":" ) ls32
+//              / [ h16 *1( ":" h16 ) ] "::" 3( h16 ":" ) ls32
+//              / [ h16 *2( ":" h16 ) ] "::" 2( h16 ":" ) ls32
+//              / [ h16 *3( ":" h16 ) ] "::"    h16 ":"   ls32
+//              / [ h16 *4( ":" h16 ) ] "::"              ls32
+//              / [ h16 *5( ":" h16 ) ] "::"              h16
+//              / [ h16 *6( ":" h16 ) ] "::"
+bool isIPv6Address(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("IPv6address", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    size_t count = 0;
+    
+    // à coder
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+// IP-literal = "[" ( IPv6address / IPvFuture  ) "]"
+bool isIPLiteral(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("IP-literal", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    if(*(text) != OBRACKET) { return false; }
+    Element *el1 = addEl("__obracket", text, 1);
+    data->fils = el1;
+    data = data->fils;
+
+    size_t count = 1;
+    if (!isIPv6Address(text+count, &count, data)) { return false; }
+    else if (!isIPvFuture(text+count, &count, data)) { return false; }
+    else { return false; }
+
+    if(*(text+count) != CBRACKET) { return false; }
+    Element *el2 = addEl("__cbracket", text+count, 1);
+    data->frere = el2;
+    data = data->frere;
+    
+    updateLength(data, count);
+    *curr += count+1;
+    return true;
+}
+
+// pct-encoded = "%" HEXDIG HEXDIG
+bool isPctEncoded(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("pct-encoded", text, strlen(text));
+    data->fils = el;
+    data = data->fils;
+
+    size_t count = 0;
+    if (*(text+count) == POURCENT) {
+        Element *el = addEl("__percent", text+count, 1);
+        data->fils = el;
+        data = data->fils;
+        count += 1;
+    } else { return false; }
+
+    for (size_t i = 0; i < 2; i++) {
+        if (!isHexdig(*(text+count))) { return false; }
+        Element *el = addEl("__hexdig", text+count, 1);
+        data->frere = el;
+        data = data->frere;
+        count += 1;
+    }
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+// reg-name = *( unreserved / pct-encoded / sub-delims )
+bool isRegName(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("reg-name", text, strlen(text));
+    data->fils = el;
+    data = data->fils;
+
+    size_t count = 0;
+    bool fst = true;
+    while (!(isUnreserved(*(text+count)) || isSubDelims(*(text+count)) || isPctEncoded(text+count, &count, data))) {
+        if (isUnreserved(*(text+count))) { Element *el = addEl("__unreserved", text+count, 1); count++; }
+        else if (isSubDelims(*(text+count))) { Element *el = addEl("__subdelims", text+count, 1); count++; }
+        else { Element *el = addEl("__pctencoded", text-count, 3); } // - car déjà augmenter lors de l'appel dans le while si true
+
+        if (fst) {
+            data->fils = el;
+            data = data->fils;
+        } else {
+            data->frere = el;
+            data = data->frere;
+        }
+        fst = false;
+    }
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+// host = IP-literal / IPv4address / reg-name
+bool ishost(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("host", text, strlen(text));
+    data->fils = el;
+    data = data->fils;
+
+    size_t count = 0;
+    bool rtn = false;
+    if (isIPLiteral(text, &count, data)) { rtn = true; }
+    else if (isIPv4address(text, &count, data)) { rtn = true; }
+    else if (isRegName(text, &count, data)) { rtn = true; }
+
+    updateLength(data, count);
+    *curr += count;
+    return rtn;
+}
+
+// uri-host = host
+bool isUriHost(char *text, size_t *curr, Element *data) {
+    size_t count = 0;
+
+    Element *el = addEl("Uri-host", text, strlen(text));
+    data->fils = el;
+    data = data->fils;
+
+    if (!ishost(text, &count, data)) { return false; }
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+// port = *DIGIT
+bool isPort(char *text, size_t *curr, Element *data) {
+    size_t count = 0;
+
+    Element *el = addEl("Port", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    while (isDigit(*(text+count))) {
+        Element *el = addEl("__digit", text+count, 1);
+        if (count == 0) {
+            data->fils = el;
+            data = data->fils;
+        } else {
+            data->frere = el;
+            data = data->frere;
+        }
+        count += 1;
+    }
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+// Host = uri-host [ ":" port ]
+bool isHost(char *text, size_t *curr, Element *data) {
+    size_t count = 0;
+
+    Element *el = addEl("Host", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    if (!isUriHost(text, &count, data)) { return false; }
+    data = data->fils;
+    if (*(text+count) == COLON) {
+        Element *el = addEl("__colon", text+count, 1);
+        data->frere = el;
+        data = data->frere;
+        count += 1;
+        if (!isPort(text+count, &count, data)) { return false; }
+    }
+
+    // updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
 // Content-Length-header = "Content-Length" ":" OWS Content-Length OWS
 bool isContentLengthHeader(char *text, Element *data) {
     if (!strcmp(text, "Content-Length")) { return false; }
@@ -578,6 +988,30 @@ bool isConnectionHeader(char *text, Element *data) {
     return true;
 }
 
+// Host-header = "Host" ":" OWS Host OWS
+bool isHostHeader(char *text, Element *data) {
+    if (!strcmp(text, "Host")) { return false; }
+
+    Element *el = addEl("Host-header", text, 4);
+    data->fils = el;
+    data = data->fils;
+
+    size_t count = 4;
+    if (*(text+count) == COLON) {
+        Element *el = addEl("__colon", text+count, 1);
+        data->frere = el;
+        data = data->frere;
+        count += 1;
+    } else { return false; }
+    if (!isOWS(text+count, &count, data, false)) { return false; }
+    data = data->frere;
+    if (!isHost(text+count, &count, data)) { return false; }
+    data = data->frere;
+    if (!isOWS(text+count, &count, data, false)) { return false; }
+
+    updateLength(data, count);
+    return true;
+}
 
 bool verifHeaderField(Element *data){
     bool res = false;
@@ -588,7 +1022,7 @@ bool verifHeaderField(Element *data){
     data->fils = el;
     data = data->fils;
 
-    if (isContentTypeHeader(data->word, data)) {
+    if (isHostHeader(data->word, data)) {
         res = true;
     }
 
