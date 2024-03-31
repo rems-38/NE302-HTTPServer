@@ -17,10 +17,6 @@ Content-Length-header = "Content-Length" ":" OWS Content-Length OWS
 Content-Type-header = "Content-Type" ":" OWS Content-Type OWS
 
 Cookie-header = "Cookie:" OWS cookie-string OWS
-Cookie-header = "Cookie:" OWS cookie-pair *( ";" SP cookie-pair ) OWS
-Cookie-header = "Cookie:" OWS cookie-name "=" cookie-value *( ";" SP cookie-name "=" cookie-value ) OWS
-Cookie-header = "Cookie:" OWS token "=" ( DQUOTE *cookie-octet DQUOTE ) / *cookie-octet *( ";" SP token "=" ( DQUOTE *cookie-octet DQUOTE ) / *cookie-octet ) OWS
-Cookie-header = "Cookie:" OWS 1*tchar "=" ( DQUOTE *(%x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E) DQUOTE ) / *(%x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E) *( ";" SP 1*tchar "=" ( DQUOTE *(%x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E) DQUOTE ) / *(%x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E) ) OWS
 
 HTAB :  	
 
@@ -424,6 +420,57 @@ bool isContentType(char *text, size_t *curr, Element *data) {
     return isMediaType(text, curr, data);
 }
 
+// Content-Length = 1*DIGIT
+bool isContentLength(char *text, size_t *curr, Element *data) {
+    size_t count = 0;
+
+    Element *el = addEl("Content-Length", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    if (!isDigit(*(text+count))) { return false; }
+    while (isDigit(*(text+count))) {
+        Element *el = addEl("__digit", text+count, 1);
+        if (count == 0) {
+            data->fils = el;
+            data = data->fils;
+        } else {
+            data->frere = el;
+            data = data->frere;
+        }
+        count += 1;
+    }
+
+    updateLength(data, count);
+    *curr += count;
+    return true;
+}
+
+// Content-Length-header = "Content-Length" ":" OWS Content-Length OWS
+bool isContentLengthHeader(char *text, Element *data) {
+    if (!strcmp(text, "Content-Length")) { return false; }
+
+    Element *el = addEl("Content-Length-header", text, 21);
+    data->fils = el;
+    data = data->fils;
+
+    size_t count = 14;
+    if (*(text+count) == ':') {
+        Element *el = addEl("__colon", text+count, 1);
+        data->frere = el;
+        data = data->frere;
+        count += 1;
+    } else { return false; }
+    if (!isOWS(text+count, &count, data)) { return false; }
+    data = data->frere;
+    if (!isContentLength(text+count, &count, data)) { return false; }
+    if (!isOWS(text+count, &count, data)) { return false; }
+
+
+    updateLength(data, count);
+    return true;
+}
+
 // Content-Type-header = "Content-Type" ":" OWS Content-Type OWS
 bool isContentTypeHeader(char *text, Element *data) {
     if (!strcmp(text, "Content-Type")) { return false; }
@@ -446,7 +493,7 @@ bool isContentTypeHeader(char *text, Element *data) {
 
     updateLength(data, count);
 
-    return false;
+    return true;
 }
 
 
@@ -459,7 +506,7 @@ bool verifHeaderField(Element *data){
     data->fils = el;
     data = data->fils;
 
-    if (isContentTypeHeader(data->word, data)) {
+    if (isContentLengthHeader(data->word, data)) {
         res = true;
     }
 
