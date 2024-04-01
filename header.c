@@ -1023,7 +1023,7 @@ bool isExpect(char *text, size_t *curr, Element *data) {
 }
 
 // Cookie-header = "Cookie:" OWS cookie-string OWS
-bool isCookieHeader(char *text, Element *data) {
+bool isCookieHeader(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Cookie", text, strlen(text));
     data->fils = el;
     data = data->fils;
@@ -1041,11 +1041,13 @@ bool isCookieHeader(char *text, Element *data) {
     data = data->frere;
     if(!isOWS(text+count, &count, data, false)) {return false; }
 
+    updateLength(data, count);
+    *curr += count;
     return true;
 }
 
 // Content-Length-header = "Content-Length" ":" OWS Content-Length OWS
-bool isContentLengthHeader(char *text, Element *data) {
+bool isContentLengthHeader(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Content-Length-header", text, strlen(text));
     data->fils = el;
     data = data->fils;
@@ -1068,13 +1070,13 @@ bool isContentLengthHeader(char *text, Element *data) {
     if (!isContentLength(text+count, &count, data)) { return false; }
     if (!isOWS(text+count, &count, data, false)) { return false; }
 
-
     updateLength(data, count);
+    *curr += count;
     return true;
 }
 
 // Content-Type-header = "Content-Type" ":" OWS Content-Type OWS
-bool isContentTypeHeader(char *text, Element *data) {
+bool isContentTypeHeader(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Content-Type-header", text, strlen(text));
     data->fils = el;
     data = data->fils;
@@ -1099,11 +1101,12 @@ bool isContentTypeHeader(char *text, Element *data) {
     if (!isOWS(text+count, &count, data, false)) { return false; }
 
     updateLength(data, count);
+    *curr += count;
     return true;
 }
 
 // Connection-header = "Connection" ":" OWS Connection OWS
-bool isConnectionHeader(char *text, Element *data) {
+bool isConnectionHeader(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Connection-header", text, strlen(text));
     data->fils = el;
     data = data->fils;
@@ -1127,11 +1130,12 @@ bool isConnectionHeader(char *text, Element *data) {
     if (!isOWS(text+count, &count, data, false)) { return false; }
 
     updateLength(data, count);
+    *curr += count;
     return true;
 }
 
 // Expect-header = "Expect" ":" OWS Expect OWS
-bool isExpectHeader(char *text, Element *data) {
+bool isExpectHeader(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Expect-header", text, strlen(text));
     data->fils = el;
     data = data->fils;
@@ -1157,11 +1161,12 @@ bool isExpectHeader(char *text, Element *data) {
     if (!isOWS(text+count, &count, data, false)) { return false; }
 
     updateLength(data, count);
+    *curr += count;
     return true;
 }
 
 // Host-header = "Host" ":" OWS Host OWS
-bool isHostHeader(char *text, Element *data) {
+bool isHostHeader(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Host-header", text, strlen(text));
     data->fils = el;
     data = data->fils;
@@ -1185,47 +1190,44 @@ bool isHostHeader(char *text, Element *data) {
     data = data->frere;
     if (!isOWS(text+count, &count, data, false)) { return false; }
 
-    updateLength(data, count);
+    updateLength(data, count); 
+    *curr += count;
     return true;
 }
 
-bool verifHeaderField(Element *data){
-    bool res = false;
-
-    Element *el = malloc(sizeof(Element));
-    el->key = "header_field";
-    el->word = data->word;
+// header-field =  Connection-header / Content-Length-header / Content-Type-header / Cookie-header / Transfer-Encoding-header / Expect-header / Host-header / ( field-name ":" OWS field-value OWS )
+bool isHeaderField(char *text, size_t *curr, Element *data){
+    Element *el = addEl("header-field", text, strlen(text));
     data->fils = el;
     data = data->fils;
 
-    if (isCookieHeader(data->word, data)) {
-        res = true;
+    size_t count = 0;
+    if (strncmp(text, "Connection", 10) == 0) {
+        if (!isConnectionHeader(text, &count, data)) { return false; }
     }
-
-    // if (isConnectionHeader(text, curr, head)) {
-    //     res = true;
-    // } else if (isContentLengthHeader(text, curr, head)) {
-    //     res = true;
-    // } else if (isContentTypeHeader(text, curr, head)) {
-    //     res = true;
-    // } else if (isCookieHeader(text, curr, head)) {
-    //     res = true;
-    // } else if (isTransferEncodingHeader(text, curr, head)) {
-    //     res = true;
-    // } else if (isExpectHeader(text, curr, head)) {
-    //     res = true;
-    // } else if (isHostHeader(text, curr, head)) {
-    //     res = true;
-    // } else {
-    //     if (!isFieldName(text, curr, head)) { return false; }
-    //     if (!isColon(text, curr, head)) { return false; }
-    //     if (!isOWS(text, curr, head)) { return false; }
-    //     if (!isFieldValue(text, curr, head)) { return false; }
-    //     if (!isOWS(text, curr, head)) { return false; }
-    //     res = true;
+    else if (strncmp(text, "Content-Length", 14) == 0) {
+        if (!isContentLengthHeader(text, &count, data)) { return false; }
+    }
+    else if (strncmp(text, "Content-Type", 12) == 0) {
+        if (!isContentTypeHeader(text, &count, data)) { return false; }
+    }
+    else if (strncmp(text, "Cookie", 6) == 0) {
+        if (!isCookieHeader(text, &count, data)) { return false; }
+    }
+    // else if (strncmp(text, "Transfer-Encoding", 17) == 0) {
+    //     if (!isTransferEncodingHeader(text, &count, data)) { return false; }
     // }
+    else if (strncmp(text, "Expect", 6) == 0) {
+        if (!isExpectHeader(text, &count, data)) { return false; }
+    }
+    else if (strncmp(text, "Host", 4) == 0) {
+        if (!isHostHeader(text, &count, data)) { return false; }
+    }
+    else { if(!isFieldName(text, &count, data)) { return false; } }
 
-    return res;
+    updateLength(data, count);
+    *curr += count;
+    return true;
 }
 
 
@@ -1247,7 +1249,7 @@ int main(void) {
     if ((read = getline(&line, &len, ftest)) != -1) {
         message->word = line;
         message->length = read;
-        int output = verifHeaderField(message);
+        int output = isHeaderField(message->word, 0, message);
         printf("%d\n", output);
 
         printArbre(message, 0);
