@@ -49,6 +49,7 @@ HTAB :
 #define STAR 42         // *
 #define PLUS 43         // +
 #define SLASH 47        // /
+#define BACKSLASH 92    // '\'
 #define CIRCONFLEXE 94  // ^
 #define BARRE 124       // |
 #define VAGUE 126       // ~
@@ -413,11 +414,54 @@ bool isQdText(char *text, size_t *curr, Element *data) {
 
 // quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )
 bool isQuotedPair(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("quoted-pair", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    size_t count = 0;
+    if (*(text+count) == BACKSLASH) {
+        Element *el = addEl("__backslash", text+count, 1);
+        data->fils = el;
+        data = data->fils;
+        count += 1;
+    } else { return false; }
+
+    if (*(text+count) == HTAB || *(text+count) == SP || (*(text+count) >= EXCLAMATION && *(text+count) <= VAGUE) || isObsText(*(text+count))) {
+        Element *sub;
+        if (*(text+count) == HTAB) { sub = addEl("__htab", text+count, 1); }
+        else if (*(text+count) == SP) { sub = addEl("__sp", text+count, 1); }
+        else if (*(text+count) >= EXCLAMATION && *(text+count) <= VAGUE) { sub = addEl("__vchar", text+count, 1); }
+        else { sub = addEl("obs-text", text+count, 1); }
+        data->frere = sub;
+        data = data->frere;
+        count += 1;
+    } else { return false; }
+
+    updateLength(data, count);
+    *curr += count;
     return true;
 }
 
 // quoted-string = DQUOTE *( qdtext / quoted-pair ) DQUOTE
 bool isQuotedString(char *text, size_t *curr, Element *data) {
+    Element *el = addEl("quoted-string", text, strlen(text));
+    data->frere = el;
+    data = data->frere;
+
+    size_t count = 0;
+    if (!isDQUOTE(*text, data, true)) { return false; }
+    count += 1;
+    data = data->fils;
+
+    while(isQdText(text+count, &count, data) || isQuotedPair(text+count, &count, data)) {
+        data = data->frere;
+    }
+
+    if (!isDQUOTE(*(text+count), data, false)) { return false; }
+    count += 1;
+
+    updateLength(data, count);
+    *curr += count;
     return true;
 }
 
