@@ -412,7 +412,7 @@ bool isQdText(char *text, size_t *curr, Element *data) {
     data = data->frere;
     
     *curr += 1;
-    return (text == HTAB || text == SP || text == EXCLAMATION || (text >= HASHTAG && text <= OBRACKET));
+    return (*text == HTAB || *text == SP || *text == EXCLAMATION || (*text >= HASHTAG && *text <= OBRACKET));
 }
 
 // quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )
