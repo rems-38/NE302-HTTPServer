@@ -407,9 +407,12 @@ bool isCookieString(char *text, size_t *curr, Element *data) {
 
 // qdtext = HTAB / SP / "!" / %x23-5B ; '#'-'[' / %x5D-7E ; ']'-'~' / obs-text
 bool isQdText(char *text, size_t *curr, Element *data) {
-    // ça veut dire quoi les 2 ; au milieu ?!
-    // return (text == HTAB || text == SP || text == EXCLAMATION || (text >= HASHTAG && text <= 91) || (text >= 93 && text <= 126));
-    return true;
+    Element *el = addEl("qdtext", text, 1);
+    data->frere = el;
+    data = data->frere;
+    
+    *curr += 1;
+    return (text == HTAB || text == SP || text == EXCLAMATION || (text >= HASHTAG && text <= OBRACKET));
 }
 
 // quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )
