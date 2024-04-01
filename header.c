@@ -145,7 +145,7 @@ bool isToken(char *text, size_t *curr, Element *data, bool is_fils) {
 // obs-text = %x80-FF
 bool isObsText(char text) {
     // d'après gcc la condition est toujours FALSE et TRUE en même temps
-    // je comprends pas trop mais ok
+    // je comprends pas trop mais 
     return (text >= 128 && text <= 255);
 }
 
@@ -401,24 +401,6 @@ bool isCookieString(char *text, size_t *curr, Element *data) {
     updateLength(data, count);
 
     *curr += count;
-    return true;
-}
-
-// Cookie-header = "Cookie:" OWS cookie-string OWS
-bool isCookieHeader(char *text, Element *data) {
-    if (!strcmp(text, "Cookie:")) { return false; }
-
-    Element *cookie = addEl("Cookie", text, 7);
-    data->fils = cookie;
-    data = data->fils;
-
-    size_t count = 7;
-    if(!isOWS(text+count, &count, data, false)) {return false; }
-    data = data->frere;
-    if (!isCookieString(text+count, &count, data)) { return false; }
-    data = data->frere;
-    if(!isOWS(text+count, &count, data, false)) {return false; }
-
     return true;
 }
 
@@ -1040,15 +1022,41 @@ bool isExpect(char *text, size_t *curr, Element *data) {
     return true;
 }
 
-// Content-Length-header = "Content-Length" ":" OWS Content-Length OWS
-bool isContentLengthHeader(char *text, Element *data) {
-    if (!strcmp(text, "Content-Length")) { return false; }
-
-    Element *el = addEl("Content-Length-header", text, 14);
+// Cookie-header = "Cookie:" OWS cookie-string OWS
+bool isCookieHeader(char *text, Element *data) {
+    Element *el = addEl("Cookie", text, strlen(text));
     data->fils = el;
     data = data->fils;
 
-    size_t count = 14;
+    size_t count = 0;
+    if (!strcmp(text, "Cookie:")) { return false; }
+    el = addEl("case_insensitive_string", text, 7);
+    data->fils = el;
+    data = data->fils;
+    count += 7;
+
+    if(!isOWS(text+count, &count, data, false)) {return false; }
+    data = data->frere;
+    if (!isCookieString(text+count, &count, data)) { return false; }
+    data = data->frere;
+    if(!isOWS(text+count, &count, data, false)) {return false; }
+
+    return true;
+}
+
+// Content-Length-header = "Content-Length" ":" OWS Content-Length OWS
+bool isContentLengthHeader(char *text, Element *data) {
+    Element *el = addEl("Content-Length-header", text, strlen(text));
+    data->fils = el;
+    data = data->fils;
+
+    size_t count = 0;
+    if (!strcmp(text, "Content-Length")) { return false; }
+    el = addEl("case_insensitive_string", text, 14);
+    data->fils = el;
+    data = data->fils;
+    count += 14;
+
     if (*(text+count) == COLON) {
         Element *el = addEl("__colon", text+count, 1);
         data->frere = el;
@@ -1067,13 +1075,17 @@ bool isContentLengthHeader(char *text, Element *data) {
 
 // Content-Type-header = "Content-Type" ":" OWS Content-Type OWS
 bool isContentTypeHeader(char *text, Element *data) {
-    if (!strcmp(text, "Content-Type")) { return false; }
-
-    Element *el = addEl("Content-Type-header", text, 12);
+    Element *el = addEl("Content-Type-header", text, strlen(text));
     data->fils = el;
     data = data->fils;
 
-    size_t count = 12;
+    size_t count = 0;
+    if (!strcmp(text, "Content-Type")) { return false; }
+    el = addEl("case_insensitive_string", text, 12);
+    data->fils = el;
+    data = data->fils;
+    count += 12;
+
     if (*(text+count) == COLON) {
         Element *el = addEl("__colon", text+count, 1);
         data->frere = el;
@@ -1092,13 +1104,17 @@ bool isContentTypeHeader(char *text, Element *data) {
 
 // Connection-header = "Connection" ":" OWS Connection OWS
 bool isConnectionHeader(char *text, Element *data) {
-    if (!strcmp(text, "Connection")) { return false; }
-
-    Element *el = addEl("Connection-header", text, 10);
+    Element *el = addEl("Connection-header", text, strlen(text));
     data->fils = el;
     data = data->fils;
 
-    size_t count = 10;
+    size_t count = 0;
+    if (!strcmp(text, "Connection")) { return false; }
+    el = addEl("case_insensitive_string", text, 10);
+    data->fils = el;
+    data = data->fils;
+    count += 10;
+
     if (*(text+count) == COLON) {
         Element *el = addEl("__colon", text+count, 1);
         data->frere = el;
@@ -1116,13 +1132,17 @@ bool isConnectionHeader(char *text, Element *data) {
 
 // Expect-header = "Expect" ":" OWS Expect OWS
 bool isExpectHeader(char *text, Element *data) {
-    if (!strcmp(text, "Expect")) { return false; }
-
-    Element *el = addEl("Expect-header", text, 6);
+    Element *el = addEl("Expect-header", text, strlen(text));
     data->fils = el;
     data = data->fils;
 
-    size_t count = 6;
+    size_t count = 0;
+    if (!strcmp(text, "Expect")) { return false; }
+    el = addEl("case_insensitive_string", text, 6);
+    data->fils = el;
+    data = data->fils;
+    count += 6;
+
     if (*(text+count) == COLON) {
         Element *el = addEl("__colon", text+count, 1);
         data->frere = el;
@@ -1142,13 +1162,17 @@ bool isExpectHeader(char *text, Element *data) {
 
 // Host-header = "Host" ":" OWS Host OWS
 bool isHostHeader(char *text, Element *data) {
-    if (!strcmp(text, "Host")) { return false; }
-
-    Element *el = addEl("Host-header", text, 4);
+    Element *el = addEl("Host-header", text, strlen(text));
     data->fils = el;
     data = data->fils;
 
-    size_t count = 4;
+    size_t count = 0;
+    if (!strcmp(text, "Host")) { return false; }
+    el = addEl("case_insensitive_string", text, 4);
+    data->fils = el;
+    data = data->fils;
+    count += 4;
+
     if (*(text+count) == COLON) {
         Element *el = addEl("__colon", text+count, 1);
         data->frere = el;
@@ -1174,7 +1198,7 @@ bool verifHeaderField(Element *data){
     data->fils = el;
     data = data->fils;
 
-    if (isHostHeader(data->word, data)) {
+    if (isCookieHeader(data->word, data)) {
         res = true;
     }
 
