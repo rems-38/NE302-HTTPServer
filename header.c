@@ -1277,6 +1277,37 @@ bool isHeaderField(char *text, size_t *curr, Element *data){
     return true;
 }
 
+// HTTP-message = start-line *( header-field CRLF ) CRLF [ message-body ]
+Element *isHTTPMessage(char *text) {
+    Element *data = addEl("HTTP-message", text, strlen(text));
+
+    size_t count = 0;
+    if (!isStartLine(text, &count, data)) { return NULL; }
+    data = data->frere;
+
+    while (false) { // j'ai pas la condition encore
+        if (!isHeaderField(text+count, &count, data)) { return NULL; }
+        data = data->frere;
+        if (*(text+count) == CR && *(text+count+1) == LF) {
+            Element *el = addEl("__crlf", text+count, 2);
+            data->frere = el;
+            data = data->frere;
+            count += 2;
+        } else { return NULL; }
+    }
+
+    if (*(text+count) == CR && *(text+count+1) == LF) {
+        Element *el = addEl("__crlf", text+count, 2);
+        data->frere = el;
+        data = data->frere;
+        count += 2;
+    } else { return NULL; }
+
+    if (isMessageBody(text+count, &count, data)) { ; }
+
+    return data;
+}
+
 
 int main(void) {
     
