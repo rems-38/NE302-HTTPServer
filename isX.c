@@ -82,7 +82,6 @@ int OWSCH(char *text){ //OWS ConnectionHeader
     }
     else if(text[i] == EXCLAMATION || text[i] == HASHTAG || text[i] == DOLLAR || text[i] == POURCENT || text[i] == ESP || text[i] == SQUOTE || text[i] == STAR || text[i] == PLUS || text[i] == DASH || text[i] == DOT || text[i] == CIRCONFLEXE || text[i] == UNDERSCORE || text[i] == 96 || text[i] == BARRE || text[i] == VAGUE || isAlpha(text[i]) || isDigit(text[i])){
         //cas OWS connection-option = token = t-char
-        //printf("dans OWS text+i : -%s-\n",text+i);
         return 2;
     }
     else { return 4; } //cas erreur
@@ -522,8 +521,8 @@ bool isMediaType(char *text, size_t *curr, Element *data) {
     if (!isSubType(text+count, &count, data)) { return false; }
     data = data->frere;
 
-    while (*(text+count) == SP || *(text+count) == HTAB) {
-        if (!isOWS(text+count, &count, data, false)) { return false; }
+    while (*(text+count) == SP || *(text+count) == HTAB || *(text+count) == SEMICOLON) {
+        if (!isOWS(text+count, &count, data, false)) { ; }
         data = data->frere;
         if (*(text+count) == SEMICOLON) {
             Element *el = addEl("__semicolon", text+count, 1);
@@ -531,7 +530,7 @@ bool isMediaType(char *text, size_t *curr, Element *data) {
             data = data->frere;
             count += 1;
         } else { return false; }
-        if (!isOWS(text+count, &count, data, false)) { return false; }
+        if (!isOWS(text+count, &count, data, false)) { ; }
         data = data->frere;
         if (!isParameter(text+count, &count, data)) { return false; }
         data = data->frere;
@@ -548,8 +547,11 @@ bool isContentType(char *text, size_t *curr, Element *data) {
     data->frere = el;
     data = data->frere;
 
-    bool res = isMediaType(text, curr, data);
-    updateLength(data,*curr);
+    size_t count = 0;
+    bool res = isMediaType(text, &count, data);
+
+    updateLength(data, count);
+    *curr += count;
     return res;
 }
 
@@ -591,7 +593,10 @@ bool isConnectionOption(char *text, size_t *curr, Element *data, bool is_fils) {
         data = data->frere;
     }
 
-    return isToken(text, curr, data, true);
+    if (!isToken(text, curr, data, true)) { return false; }
+
+    updateLength(data, *curr);
+    return true;
 }
 
 // Connection = *( "," OWS ) connection-option *( OWS "," [ OWS connection-option ] )
@@ -1133,7 +1138,6 @@ int OWSTEH(char *text){ //OWS TransferEncodingHeader
     }
     else if(!strncmp(text+i,"chuncked",8) || !strncmp(text+i,"compress",8) || !strncmp(text+i,"deflate",7) || !strncmp(text+i,"gzip",4)){
         //cas OWS transfert-coding
-        //printf("dans OWS text+i : -%s-\n",text+i);
         return 2;
     }
     else { return 4; } //cas erreur
@@ -1164,24 +1168,21 @@ bool isTransferEncoding(char *text, size_t *curr, Element *data){
     data = data->frere ; //transfert-coding devient la tete
 
     int boucle = OWSTEH(text+count);
-    //printf("boucle : %d\n",boucle);
+
     if(boucle == 2 || boucle == 4){ //si on n'a pas OWS "," ou OWS CRLF
         return false;
     }
-    //printf("ici\n");
+    
     while(boucle == 1){ //on entre si : OWS","
         isOWS(text+count, &count, data, false); //ajout de OWS (on sait qu'il est la grace a OWS())
         data = data->frere; //OWS devient la tete
-        //printf("Ajout de OWS\n");
         
         Element *el = addEl("__comma", text+count, 1);  //ajout de ","
         data->frere = el;
         data = data->frere;
-        //printf("Ajout de ','\n");
         count += 1;
          
         boucle = OWSTEH(text+count); //si 1 on reboucle, si 3 on sort de la boucle
-        //printf("recalcul de boucle : %d\n",boucle);
         if(boucle == 2){ //OWS transfert-coding
             isOWS(text+count, &count, data, false); //ajout de OWS (on sait qu'il est la grace a OWS())
             data = data->frere; //OWS devient la tete
@@ -1190,7 +1191,6 @@ bool isTransferEncoding(char *text, size_t *curr, Element *data){
             data = data->frere; //trasfert-coding devient la tete
 
             boucle = OWSTEH(text+count); //si 1 on reboucle, si 3 on sort sinon :
-            //printf("rerecalcul de boucle qui commence à -%c-: %d\n",*(text+count),boucle);
             if(boucle == 4 || boucle == 2){ //OWS transfert-conding ne peut etre suivi que de OWS',' ou de OWS CRLF
                 return false;
             }
@@ -1219,7 +1219,6 @@ bool isTransferEncodingHeader(char *text, size_t *curr, Element *data){
     data = data->fils; //la tete devient el2
     
     size_t count = 17;
-    //printf("text : %c\n",*(text+count)); 
 
     if (*(text+count) == COLON){
         Element *el = addEl("__colon", text+count, 1);
@@ -1271,6 +1270,7 @@ bool isContentLengthHeader(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Content-Length-header", text, strlen(text));
     data->fils = el;
     data = data->fils;
+    Element *save = data;
 
     size_t count = 0;
     if (!strcmp(text, "Content-Length")) { return false; }
@@ -1291,7 +1291,7 @@ bool isContentLengthHeader(char *text, size_t *curr, Element *data) {
     data = data->frere;
     if (!isOWS(text+count, &count, data, false)) { return false; }
 
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
@@ -1332,6 +1332,7 @@ bool isConnectionHeader(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Connection-header", text, strlen(text));
     data->fils = el;
     data = data->fils;
+    Element *save = data;
 
     size_t count = 0;
     if (!strcmp(text, "Connection")) { return false; }
@@ -1352,7 +1353,7 @@ bool isConnectionHeader(char *text, size_t *curr, Element *data) {
     data = data->frere; //a rajouter non
     if (!isOWS(text+count, &count, data, false)) { return false; }
 
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
@@ -1421,8 +1422,9 @@ bool isHostHeader(char *text, size_t *curr, Element *data) {
 // header-field =  Connection-header / Content-Length-header / Content-Type-header / Cookie-header / Transfer-Encoding-header / Expect-header / Host-header / ( field-name ":" OWS field-value OWS )
 bool isHeaderField(char *text, size_t *curr, Element *data){
     Element *el = addEl("header-field", text, strlen(text));
-    data->fils = el;
-    data = data->fils;
+    data->frere = el;
+    data = data->frere;
+    Element *save = data;
 
     size_t count = 0;
     if (strncmp(text, "Connection", 10) == 0) {
@@ -1448,7 +1450,7 @@ bool isHeaderField(char *text, size_t *curr, Element *data){
     }
     else { if(!isFieldName(text, &count, data)) { return false; } }
 
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
@@ -1467,15 +1469,11 @@ bool isRequestLine(char *text, size_t *curr, Element *head)
     tmp = tmp->fils; // method devient la tete
     Element *save = tmp;
 
-    //printf("valeur curr sortie de méthode : %ld\n", *curr);
-
     if (!isSP(text[*curr], curr, tmp))
     {
         res = false;
     }
     tmp = tmp->frere; // SP devient la tete
-
-    //printf("valeur curr après SP : %ld\n", *curr);
 
     if (!isRequestTarget(text, curr, tmp))
     {
@@ -1524,8 +1522,6 @@ bool isRequestTarget(char *text, size_t *curr, Element *head){ // request-target
     size_t curr_mem = *curr;            //sauvegarde de curr pour pouvoir définir la taille de request-target ensuite
     Element *tmp = malloc(sizeof(Element));
 
-    printf("valeur curr début RequestTarget : %ld\n",*curr);
-
     if(isOriginForm(text, curr, tmp)){res = true;}
     Element *el = addEl("request-target", text+curr_mem, (*curr)-curr_mem); 
     head->frere = el; //request target devient le frere de SP          // maintenant qu'on a la longueur de request-target on peut l'ajouter à l'arbre
@@ -1536,7 +1532,6 @@ bool isRequestTarget(char *text, size_t *curr, Element *head){ // request-target
 
 bool isOriginForm(char *text, size_t *curr, Element *head)
 { // origin-form = absolute-path [ "?" query ]
-    //printf("valeur curr début OriginForm : %ld\n", *curr);
     size_t curr_mem = *curr;
     Element *tmp = malloc(sizeof(Element));
     Element *c = malloc(sizeof(Element));
@@ -1546,14 +1541,12 @@ bool isOriginForm(char *text, size_t *curr, Element *head)
     }
     c = tmp->fils;
     // [ "?" query ]
-    //printf("debut optionnel originForm\n");
 
     if(*(text+(*curr)) == '?'){
         Element *pont = addEl("__ponct",text + (*curr), 1);
         c->frere = pont;
         c = c->frere;
         *curr += 1;
-        //printf("avant query, text :%s, curr: %ld\n", text + (*curr), *curr);
         if (!isQuery(text, curr, c)){
             return false;
         }
@@ -1570,14 +1563,11 @@ bool isQuery(char *text, size_t *curr, Element *head)
 { // query = *( pchar / "/" / "?" )
     bool boucle = true;
     size_t curr_comp = *curr;
-    //printf("curr mem : %ld", curr_comp);
-    //printf("curr: %ld\n", *curr);
     Element *tmp = malloc(sizeof(Element));
     Element *c = malloc(sizeof(Element));
     Element *p = malloc(sizeof(Element));
     Element *save = c;
 
-    //printf("avant boucle query, text : %s, curr : %ld, char: %c\n", text, *curr, *(text+(*curr)-1));
     while (boucle)
     {
         if (*(text + (*curr)) == '/')
@@ -1589,12 +1579,10 @@ bool isQuery(char *text, size_t *curr, Element *head)
         }
         else if (*(text+(*curr)) == '?')
         {
-            //printf("query ? , curr : %ld\n", *curr);
             tmp = addEl("__ponct", "?", 1);
             c->frere = tmp;
             c = c->frere;
             *curr += 1;
-            //printf("curr: %ld\n", *curr);
         }
         else if (isPchar(text, curr, p))
         {
@@ -1606,8 +1594,6 @@ bool isQuery(char *text, size_t *curr, Element *head)
             boucle = false;
         }
     }
-    //printf("curr: %ld\n", *curr);
-    //printf("text: %s, curr-curr: %ld\n", text+(curr_comp), (*curr) - curr_comp);
     Element *el = addEl("query", text+(curr_comp), (*curr) - curr_comp);
     head->frere = el;
     el->fils = save->frere;
@@ -1617,7 +1603,6 @@ bool isQuery(char *text, size_t *curr, Element *head)
 
 bool isAbsolutePath(char *text, size_t *curr, Element *head)
 { // absolute-path = 1*( "/" segment )
-    //printf("valeur curr début absolute-path : %ld\n", *curr);
     Element *tmp = malloc(sizeof(Element));
     Element *c = malloc(sizeof(Element));
     Element *save = c; // head->fils = addEl("absolute-path", text, 0);
@@ -1625,7 +1610,6 @@ bool isAbsolutePath(char *text, size_t *curr, Element *head)
     size_t curr_mem = *curr;
     size_t icurr = 0;
     bool boucle = true;
-    // printf("txt avant boucle  : %s, curseur : %ld\n", text, (*curr));
     while (boucle)
     {
 
@@ -1653,7 +1637,6 @@ bool isAbsolutePath(char *text, size_t *curr, Element *head)
 
         icurr++;
     }
-    //printf("sortie absolute-path\n");
 
     if (icurr == 0)
     {
@@ -1675,9 +1658,7 @@ bool isSegment(char *text, size_t *curr, Element *head){ // segment = *pchar    
     Element *save=c;
     
     size_t curr_mem = *curr;
-    //printf("Dans isSegment text vaut : -%s-",text);
     while(boucle){
-        //printf("caractère : %s\n curseur : %ld\n",text,*curr);
         if(isPchar(text,curr,tmp)){
             c->frere = tmp; //->fils;
             c = c->frere;
@@ -1686,7 +1667,6 @@ bool isSegment(char *text, size_t *curr, Element *head){ // segment = *pchar    
             boucle = false;
         }
     }
-    //printf("sortie de la boucle segment\n");
     Element *el = addEl("segment", text+curr_mem,(*curr)-curr_mem);
     head->frere = el; // segment devient le frere de head="/"
     el->fils = save->frere->fils;
@@ -1700,10 +1680,8 @@ bool isPchar(char *text, size_t *curr, Element *head)
 
     Element *tmp = malloc(sizeof(Element));
     Element *el;
-    //printf("text dans pchar : %s, curr :%ld\n", text+(*curr), *curr);
     if (isUnreservedBis(*(text+(*curr)), tmp))
     {
-        //printf("valeur text pchar/unreserved : %s\n", text);
         el = addEl("pchar", text+(*curr), 1);
         head->fils = el;
         el->fils = tmp->fils;
@@ -1712,7 +1690,6 @@ bool isPchar(char *text, size_t *curr, Element *head)
     }
     else if (isSubDelimsBis(*(text + (*curr)), tmp))
     {
-        //printf("subDelims\n");
         el = addEl("pchar", text+(*curr), 1);
         head->fils = el;
         el->fils = tmp->fils;
@@ -1721,7 +1698,6 @@ bool isPchar(char *text, size_t *curr, Element *head)
     }
     else if (isPctEncodedBis(text + (*curr), curr, tmp))
     {
-        //printf("valeur text pchar/pct : %s, curr :%ld\n", text + (*curr), *curr);
         el = addEl("pchar", text + (*curr), 3);
         head->fils = el;
         el->fils = tmp->fils;
@@ -1748,7 +1724,6 @@ bool isPchar(char *text, size_t *curr, Element *head)
 }
 
 bool isUnreservedBis(char text, Element *head){    //unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
-    //printf("Dans isUreserverd text vaux : %c\n",text);
     head->fils = addEl("unreserved",&text,1);
     return (isAlpha(text)||isDigit(text)||text==DASH||text == DOT||text == UNDERSCORE||text == VAGUE);  
 }
@@ -1784,9 +1759,11 @@ bool isSubDelimsBis(char text, Element *head){ // sub-delims = "!" / "$" / "&" /
 }
 
 bool isHTTPVersion(char *text, size_t *curr, Element *head){ //HTTP-version = HTTP-name "/" DIGIT "." DIGIT
-    head->frere = addEl("HTTP-version", text, 8); //HTTP-version devient la tete
+    head->frere = addEl("HTTP-version", text+(*curr), 8); //HTTP-version devient la tete
     head = head->frere; ///je fais des fils  a SP
+    Element *save = head;
 
+    size_t count = 0;
     if(!isHTTPname(text+(*curr))){
         return false;
     }
@@ -1794,6 +1771,7 @@ bool isHTTPVersion(char *text, size_t *curr, Element *head){ //HTTP-version = HT
     head->fils = addEl("HTTP-name",text+(*curr), 4);
     head = head->fils; // head deviens HTTP-name
     *curr += 4;
+    count += 4;
 
     if (!(*(text+(*curr)) == '/')){
         return false;
@@ -1802,6 +1780,7 @@ bool isHTTPVersion(char *text, size_t *curr, Element *head){ //HTTP-version = HT
     head->frere = addEl("ponct", text+(*curr), 1);
     head = head->frere; // head deviens ponct 
     *curr += 1;
+    count += 1;
 
     if(!isDigit(*(text+(*curr)))){
         return false;
@@ -1810,6 +1789,7 @@ bool isHTTPVersion(char *text, size_t *curr, Element *head){ //HTTP-version = HT
     head->frere = addEl("DIGIT",text+(*curr), 1);
     head = head->frere; //head devient DIGIT
     *curr += 1;
+    count += 1;
 
     if (!(*(text+(*curr)) == '.')){
         return false;
@@ -1818,6 +1798,7 @@ bool isHTTPVersion(char *text, size_t *curr, Element *head){ //HTTP-version = HT
     head->frere = addEl("ponct",text+(*curr), 1);
     head = head->frere;
     *curr += 1;
+    count += 1;
 
     if(!isDigit(*(text+(*curr)))){
         return false;
@@ -1825,7 +1806,9 @@ bool isHTTPVersion(char *text, size_t *curr, Element *head){ //HTTP-version = HT
 
     head->frere = addEl("DIGIT",text+(*curr), 1);
     *curr += 1;
+    count += 1;
 
+    updateLength(save, count);
     return true;
 }
 
@@ -1864,6 +1847,7 @@ bool isStartLine(char *text, size_t *curr, Element *head){ //start-line = reques
 // HTTP-message = start-line *( header-field CRLF ) CRLF [ message-body ]
 Element *isHTTPMessage(char *text, ssize_t len) {
     Element *data = addEl("HTTP-message", text, len);
+    Element *head = data;
 
     size_t count = 0;
     if (!isStartLine(text, &count, data)) { return NULL; }
@@ -1871,8 +1855,12 @@ Element *isHTTPMessage(char *text, ssize_t len) {
 
     bool loop = true;
     while (loop) {
-        if (!isHeaderField(text+count, &count, data)) { loop = false; }
-        data = data->frere;
+        Element *save = data;
+        if (!isHeaderField(text+count, &count, data)) {
+            loop = false;
+            data = save;
+            break;
+        } else { data  = data->frere; }
         if (*(text+count) == CR && *(text+count+1) == LF) {
             Element *el = addEl("__crlf", text+count, 2);
             data->frere = el;
@@ -1890,5 +1878,5 @@ Element *isHTTPMessage(char *text, ssize_t len) {
 
     if (isMessageBody(text+count, &count, data)) { ; }
 
-    return data;
+    return head;
 }
