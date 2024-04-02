@@ -1,0 +1,7 @@
+9I / HTTP/6.5
+Host:   [::B:5F:43A:07:B7:5.29.82.86]:9
+VLpc:	X
+Connection:	 ,				 	  	  	 		  ,		, 	eyE	 ,		 	 ,		  xDZ~Zx&Sdu	 	 	 	, 	 	,Fd4h		  ,  		 		 		 1	 		, 	  !OcIh			
+Host:	  	 [5A:3::6A:8F:5F:76.124.254.0]						 	 					  	 
+Host: 			[::193.27.29.111]	     	 		
+

@@ -1,0 +1,6 @@
+G4 /wx HTTP/4.7
+Cookie: 		 U=S!; a1MTDZiQeKLfL="<0~I"	 	
+Connection:       y   				,	 	,    	fi^^ 	 	 	
+Host:		[::0D:207.219.99.143]:55						
+Host:			4.228.236.86: 
+

@@ -1,0 +1,6 @@
+t /csg//hjN%FE HTTP/4.0
+Connection:,  		 , 		 ,   		, 	 	 ,	,	 ,		   RiM+		 		,	   	b 	, 	  			# 	 	,					 ,K9w 	 	 		  
+Transfer-Encoding: ,	 	 ,		 ,	   ,	,,   ,				,	 	 		,, 	 , 	 ,	 	compress 	  						  ,			o; 	    		  		  	  	 	  	1F   	=	"zdo\¦í\oòk\ÑK³§\2™\y" 
+Host:		 	[::6:FEF:E:9:5:250.133.3.9]:53432
+
+è{

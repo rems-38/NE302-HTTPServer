@@ -1,0 +1,7 @@
+'G /g1HK%FDHmv/Z?w-v HTTP/2.6
+.k~K5fEh!D:  
+Y3tf#:-Ý HÂ 	£	    
+Transfer-Encoding:deflate 	,,	  
+Host:		 [::A:8:149.255.251.4]			
+Host:     	 	245.236.0.12:71
+

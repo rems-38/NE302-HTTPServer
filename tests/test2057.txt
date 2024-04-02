@@ -1,0 +1,3 @@
+wiGP /t?W%EB HTTP/4.2
+Host:0.241.32.252 	
+

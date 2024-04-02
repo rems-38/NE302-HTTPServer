@@ -1,0 +1,12 @@
+BU //%03@1bR/C_%237%26/48%08NfcpU%01*?V%22%7E%53@ HTTP/1.2
+Transfer-Encoding:	, gzip 	 ,   +tV~1Zyi;  		 O0J= "" 	,	 	 2  ;	i`yK  	 =	"7"		
+Host:[1:1:6:ED:D1D6:4:9:9E]
+Cookie:	q='|HzvaeTC+; *="klEHl"; Okx=; !=; B$1=""; 8daTBk'^VmI=nn
+Cookie: 		 	n="M"; `z*e="X51:kx48"; T=C2_%pkz|; U76="J"		  	
+Content-Type:			 nEaJ/PWw			
+Connection:  ,	  		 		 	   	,CcTJ,	,^Xd			 	  		,_l-07 ,	,  	 		
+Transfer-Encoding: 		  ,    	,	   	 , , 9;		 	Fi5	=""	 ;	  		R 					 	 	 	  	 			=		"";			Iv =	  ""			; 		NF= "\ê" 	;mz=""	   	 		  ;lXnq$	   =6Vy+TQ  		;    		.Vrkz	  	 =	   	 		FJ+Psn	  	; 			 sW  		= "Œ¿"	 	 	; 		K=  "\§\ï\(\¡\Ë"; uV8 =		 		   			 			"\²\ºµ&\õ" ; 			  	  	 CgbmH9^.FldK~uHB	 	=	"þÀí‘<\š"	;  	u2E=	 "\‰Ü\Ög\µ\…\'\D"	 	   	  ;		+RYO37VWIB 				=   			k#			; 	  		D  =		h|nmA  	   ;	D= 		  	  	"" 	  	 		,wMD2N5e 	;  nA$q		= 	 	"\'\*\7K"   ,._V;  	  a		    =    "§\*\"	;	   			   	 62SqDoTCD=  "RØ\þ]"  	  ;  V=	    bp	;  xyKm=		WE6v  	 ;						a  			 		  		 	=			  "\Ÿ«"			;		   	 	CO'=	"T&pàŸaÆ\Z;™\‰c\£";				 			j  					= ""	,
+Host:   233.106.6.238:44339
+Cookie:	 	 7=30; pAXYr=
+Transfer-Encoding: 	,	  , 	,  ,  	, 	, 	 ,		,		 			  ,	   	 					 deflate ,0	 		 	   	   	    ;eq1  	 = 	 "";	G		  ="(";	fZw1s8pUy= 		  	   				 "\V«"	 	; 	  wV=  ""	 , 	
+

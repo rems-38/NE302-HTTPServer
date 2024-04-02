@@ -1,0 +1,5 @@
+r0 / HTTP/5.8
+Connection:	   	,	  	,  	 	,LH	
+Host: [E::6D:1:0.9.220.82]	 	
+
+=xyéµà?${[

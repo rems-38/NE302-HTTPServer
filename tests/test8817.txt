@@ -1,0 +1,6 @@
+QyOS /t/-Fe.NFxMHH@sk HTTP/0.3
+Host:	[vAB49B2A.pm]:2386 	     
+c:		 g 	  	 U		   	
+Host:		    	[::2:546B:6:C:6:203.238.97.225]:29
+Expect: 	 100-continue	  
+

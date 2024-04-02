@@ -1,0 +1,4 @@
+FhMI^ /wV?Gilw HTTP/9.2
+Host:  	 	     					68.222.134.28
+Connection:*	, ,	C	
+

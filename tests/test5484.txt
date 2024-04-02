@@ -1,0 +1,8 @@
+. /?h HTTP/9.5
+bt: 		 	  	 	 	   		   
+Host:  		50.39.146.7:0
+Host: 	 [::F:1:50:0:C:FE:7]		 	
+T:+			 	    	‰—VΩì	hÂ   ê 
+Connection:  		, L	  		  ,Cgb		 , 	  	 	J'	 	 
+Connection:	,k,,		 		   
+

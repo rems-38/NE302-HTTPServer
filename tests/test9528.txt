@@ -1,0 +1,8 @@
+5R /u?1%CF HTTP/1.0
+Transfer-Encoding:	 	, 	compress  	, ,,,   	
+Content-Length:84	
+Host:	  	 	  		 [::301:1:7B:4:A:212.9.4.9]			   
+Transfer-Encoding:	 	 a ;	 	 t_		   		= 	"’eê\?á"		  ; w9Qv="¢\S"	;   		     	 					%#	     =		  "\)\à" 	  		  						 		;7	  		  	  =k;0ANgJ^joKxVTHG^   	   			= 	"r"  	 ;   	 If=	       "≈â_)ë¢ö§"		;	X+8Ml!5A|zNF3=	 		 		"";2FH|="\}\‰"	 ;	 	  	 8XwE7y  =			  	 	  	 	"ZãY\˙\ı";4Ael~	 		 = ""	,		,	 	%;				7Jht!		  	=	""  ;-ewDGC       		=			"", 
+Host:   [86E4::6:0FD3:5:0:5:E361]:7
+Host: 	[::369D:540A:EA9A:49.217.5.5]:31 		
+

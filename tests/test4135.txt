@@ -1,0 +1,6 @@
+n /O%2BU?%C5 HTTP/1.7
+Host:					r:	
+Transfer-Encoding:,  	 	compress,^  	,		,		  	,deflate 	 ,		  ,		   	compress,	  
+Host:[vC4.x;]:5222 		  	
+
+<

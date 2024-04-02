@@ -1,0 +1,3 @@
+SY // HTTP/1.7
+Expect:	100-continue		
+

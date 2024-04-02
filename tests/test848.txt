@@ -1,0 +1,6 @@
+Xs ///Tq?L HTTP/9.6
+Host:		1.255.214.51:30 	
+Transfer-Encoding:  				, 	   compress	 	,  , 				,,  	%SnNg	 ;_ 			  	  	   = 	 XckGASMCc7 	 	 	    ;fqAAw 			 =    	 			  	   "h"	 ,		0xD5			 	;O=		 			 "»\iC\ÇvàŽ\÷"	 		  		;  	 	 +Qq9~y^ 	="\³" 	
+Expect:  100-continue
+Transfer-Encoding:   	,V;	 ywL= e		;   PP	 	="\s\ú€" 				 	 	;	o2HBk	=		 	"Í»Å\–"  ;HA3E|U#EL=""	  ;		Sl2W|pY 		=      		 	"\z\l\L"	
+

@@ -1,0 +1,10 @@
+Dp / HTTP/9.3
+Transfer-Encoding: 		,, 	   ,	I	 	 	, 		 		, chunked		
+Host:[::ED:D5E:398]:6514 	
+Host: 			 240.185.6.254	
+7'p:	j			  			 	
+Content-Type:	2d/h6jY*fT
+Content-Type:$Me_/A$S
+Transfer-Encoding:		 	,deflate 
+Content-Type:				 '/fs1yIw&5  	
+

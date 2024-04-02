@@ -1,0 +1,3 @@
+Sg2 /B?pT2bi HTTP/5.2
+Host:	[vC4B0EF.qzGk]:256 		
+

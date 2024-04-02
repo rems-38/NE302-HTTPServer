@@ -1,0 +1,6 @@
+P4hML /:o,/ HTTP/3.5
+W:	  			  	 	    		  	  
+Host:	 	 [::B:52:AF9:E:0]:969
+Transfer-Encoding:	 5				 ;4e7 =  "ѕ'Пл\Т"	 ;	 d=	 	 	"Aю\е";   		Vn =		X8,  
+Expect: 100-continue
+

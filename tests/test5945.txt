@@ -1,0 +1,7 @@
+~ //F HTTP/8.3
+Host:		 		P,v%8At0%2D2  
+zI:				
+Expect:	 	100-continue
+Host:			250.250.1.253:0 	 	     
+Content-Type:	 	rNP/F ;	 		WQM="\U";	^D=ZTX_!I 	 ;	QA0SE=""
+

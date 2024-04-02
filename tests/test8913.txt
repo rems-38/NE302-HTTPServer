@@ -1,0 +1,9 @@
+`Cu+q-wrH*nN /kz-/$/ HTTP/9.0
+Expect:  100-continue  
+Cookie:L=IUc; *5="c"; Q=  
+Host: 			 [C:E::8B:5:8:99.225.235.36]
+Transfer-Encoding:	   		 	+b 	 	 	,	    a,	  		 h    ; o$t-_~ 	=	 	kH8+Jas%L0	 	  	;		 			 		  	D=	"\·\é\∂⁄⁄"	 	     		 		 ; a		="‚" 	 ;		yn1r^+l		=  	"°\ê\~";3 	     		 			   ="\ÔáÚ\ﬁ\î4ê™"; 		 	  	pRhm+Y4.lSOL#		 ="Éu\4"; nSSX1			  	= ""	;	p  	=   	 6TfAf3rLLpm6!V			 
+Host:   [8:ED:4E::3C:019:84.196.165.202]:1346484912 		    
+Content-Type:	HU/hIpn|L;%Sc="\Y\†";	  ^4Z0s#RR.="";	D#2="¡" 	; 			  Y4="\8\Ÿ\/\ï◊\i" 	  				;   	 	   'RU="";	9="\#Û\…X%\™\π"
+lD'&: 		   	 	
+

@@ -1,0 +1,15 @@
+BHt~ /G//T=IcE&J4)(?jX HTTP/5.1
+3:	ˇ	 
+Cookie:	  	 	 ~D=K; L^i_-="R" 	
+Host:	 
+Connection: 			 je6		 
+Transfer-Encoding:	u 	;  e81 = 	"";	  XNit=		 "r\‹\ù\V" 	   	  	;	 	r4 	=	 	""; 	sd= "\g\+\XA\¥"
+Content-Type: h-ty/$F; 	 R="·;\Ÿ" 	 	;	 $s9.=""  	;			|a`J5y=GB ;#L="3\„;" ; 	  s.="\ê";		SO="Í"  ;Qf|Im=0	 ;	|="n\FÅ"	;	I0j="•¸Ü‘"  
+Host:	 [::B275:1:93:57:255.74.217.230]  
+Cookie:*d=""; W="1ApbiG" 
+Transfer-Encoding: chunked 
+Transfer-Encoding:		     	  		,2&b'DIFX7PbQKE ;*T 	 	 		 =""	 ,
+Host: 		209.45.10.8:  		   
+Host:	 [::1:03F:7:D21:BE6:216.9.255.9]:046			
+
+c

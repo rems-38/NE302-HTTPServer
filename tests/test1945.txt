@@ -1,0 +1,4 @@
+K&cQ /. HTTP/0.6
+Content-Type:	 				i/2		   
+Host:	  %74	
+

@@ -1,0 +1,6 @@
+UR /2( HTTP/9.1
+Content-Type:v/8 		 		  	;	P=e.EcXO72Vj 		;   tyn~U~="ˆ\—\u\6Žbg"	 	     	
+Connection:	      , 					,   w
+Host:	[6:0:A1:E:FD4:4:1E7A:D] 	
+Host:  	[9::1:246.3.202.121] 
+

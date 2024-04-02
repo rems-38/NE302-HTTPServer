@@ -1,0 +1,3 @@
+g /?%FC HTTP/0.9
+Content-Length:	950		 			
+
