@@ -1658,10 +1658,18 @@ bool isSegment(char *text, size_t *curr, Element *head){ // segment = *pchar    
     Element *save=c;
     
     size_t curr_mem = *curr;
+    bool fst = true;
     while(boucle){
         if(isPchar(text,curr,tmp)){
-            c->frere = tmp; //->fils;
-            c = c->frere;
+            if(fst){
+                c->fils = tmp->fils;
+                c = c->fils;
+                fst = false;
+            }
+            else{
+                c->frere = tmp->fils;
+                c = c->frere;
+            }
         }
         else{
             boucle = false;
@@ -1669,7 +1677,7 @@ bool isSegment(char *text, size_t *curr, Element *head){ // segment = *pchar    
     }
     Element *el = addEl("segment", text+curr_mem,(*curr)-curr_mem);
     head->frere = el; // segment devient le frere de head="/"
-    el->fils = save->frere->fils;
+    el->fils = save->fils;
     
     return true;
 }
