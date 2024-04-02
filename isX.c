@@ -935,6 +935,8 @@ bool isIPLiteral(char *text, size_t *curr, Element *data) {
 
 // pct-encoded = "%" HEXDIG HEXDIG
 bool isPctEncoded(char *text, size_t *curr, Element *data) {
+    // regarder pour ne pas faire ça
+    // car appel dans le while de isRegName ajoutera un fils même si false...
     Element *el = addEl("pct-encoded", text, strlen(text));
     data->fils = el;
     data = data->fils;
@@ -968,7 +970,8 @@ bool isRegName(char *text, size_t *curr, Element *data) {
 
     size_t count = 0;
     bool fst = true;
-    while (!(isUnreserved(*(text+count)) || isSubDelims(*(text+count)) || isPctEncoded(text+count, &count, data))) {
+
+    while (isUnreserved(*(text+count)) || isSubDelims(*(text+count)) || isPctEncoded(text+count, &count, data)) {
         Element *sub;
         if (isUnreserved(*(text+count))) { sub = addEl("__unreserved", text+count, 1); count++; }
         else if (isSubDelims(*(text+count))) { sub = addEl("__subdelims", text+count, 1); count++; }
@@ -997,7 +1000,7 @@ bool ishost(char *text, size_t *curr, Element *data) {
 
     size_t count = 0;
     bool rtn = false;
-    if (isIPLiteral(text, &count, data)) { rtn = true; }
+    if (*text == OBRACKET) { if (isIPLiteral(text, &count, data)) { rtn = true; } }
     else if (isIPv4address(text, &count, data)) { rtn = true; }
     else if (isRegName(text, &count, data)) { rtn = true; }
 
