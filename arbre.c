@@ -28,5 +28,8 @@ Element *addEl(char *key, char *word, size_t length) {
 
 void updateLength(Element *data, size_t length) {
     data->length = length;
-    strncpy(data->word, data->word, length);
+    char *tmp = malloc(length);
+    strncpy(tmp, data->word, length);
+    strncpy(data->word, tmp, length);
+    free(tmp);
 }

@@ -126,10 +126,9 @@ bool isToken(char *text, size_t *curr, Element *data, bool is_fils) {
 }
 
 // obs-text = %x80-FF
-bool isObsText(char text) {
-    // d'après gcc la condition est toujours FALSE et TRUE en même temps
-    // je comprends pas trop mais 
-    return (text >= 128 && text <= 255);
+bool isObsText(unsigned char text) {
+    // return (text >= 128 && text <= 255);
+    return (text >= 128);
 }
 
 // field-name = token
