@@ -1323,8 +1323,8 @@ Element *isHTTPMessage(char *text) {
     Element *data = addEl("HTTP-message", text, strlen(text));
 
     size_t count = 0;
-    if (!isStartLine(text, &count, data)) { return NULL; }
-    data = data->frere;
+    // if (!isStartLine(text, &count, data)) { return NULL; }
+    // data = data->frere;
 
     while (false) { // j'ai pas la condition encore
         if (!isHeaderField(text+count, &count, data)) { return NULL; }
@@ -1344,7 +1344,7 @@ Element *isHTTPMessage(char *text) {
         count += 2;
     } else { return NULL; }
 
-    if (isMessageBody(text+count, &count, data)) { ; }
+    // if (isMessageBody(text+count, &count, data)) { ; }
 
     return data;
 }
@@ -1365,10 +1365,11 @@ int main(void) {
         return -1;
     }
 
+    size_t count = 0;
     if ((read = getline(&line, &len, ftest)) != -1) {
         message->word = line;
         message->length = read;
-        int output = isHeaderField(message->word, 0, message);
+        int output = isHeaderField(message->word, &count, message);
         printf("%d\n", output);
 
         printArbre(message, 0);
