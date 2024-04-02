@@ -1174,6 +1174,7 @@ bool isConnectionHeader(char *text, size_t *curr, Element *data) {
     if (!isOWS(text+count, &count, data, false)) { return false; }
     data = data->frere;
     if (!isConnection(text+count, &count, data)) { return false; }
+    data = data->frere; //a rajouter non
     if (!isOWS(text+count, &count, data, false)) { return false; }
 
     updateLength(data, count);

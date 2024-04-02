@@ -38,11 +38,12 @@ bool isOWS(char *text, size_t *curr, Element *data, bool is_fils) { //import
     Element *el = addEl("OWS", text, strlen(text));
     if (is_fils) {
         data->fils = el;
-        data = data->fils;
+        data = data->fils; //OWS devient la tete
     } else {
         data->frere = el;
-        data = data->frere;
+        data = data->frere; //idem
     }
+    Element *save = data;
 
     size_t count = 0;
     Element *sub;
@@ -60,8 +61,8 @@ bool isOWS(char *text, size_t *curr, Element *data, bool is_fils) { //import
         }
         count++;
     }
-    
-    updateLength(data, count);
+    //printf("J'actualise la taille dans OWS : %ld \n",count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
@@ -80,27 +81,34 @@ bool isTransferCoding(char *text, size_t *curr, Element *data, bool is_fils){
         data = data->frere; //idem
     }
 
+    size_t n = 0;
     if(!strncmp(text,"chuncked",8)) {
+        n = 8;
         Element *sub = addEl("case_insensitive_string","chuncked",8);
         data->fils = sub;
         *curr+=8;
     }
     else if(!strncmp(text,"compress",8)) {
+        n = 8;
         Element *sub = addEl("case_insensitive_string","compress",8);
         data->fils = sub;
         *curr+=8;
     }
     else if(!strncmp(text,"deflate",7)) {
+        n = 7;
         Element *sub = addEl("case_insensitive_string","deflate",7);
         data->fils = sub;
         *curr+=7;
     }
     else if(!strncmp(text,"gzip",4)) {
+        n = 4;
         Element *sub = addEl("case_insensitive_string","gzip",4);
         data->fils = sub;
         *curr+=4;
     }
     else {return false;}
+
+    updateLength(data,n);
 
     return true;
 }
@@ -114,12 +122,12 @@ int OWS(char *text){
     if(text[i] == COMMA) {
         return 1; //cas OWS","
     }
-    else if(text[i] == 'c' && text[i+1] == 'l'){ //cas OWS CRLF : on sort de Transfert-Encoding
+    else if(text[i] == CR && text[i+1] == LF){ //cas OWS CRLF : on sort de Transfert-Encoding
         return 3;
     }
     else if(!strncmp(text+i,"chuncked",8) || !strncmp(text+i,"compress",8) || !strncmp(text+i,"deflate",7) || !strncmp(text+i,"gzip",4)){
         //cas OWS transfert-coding
-        printf("dans OWS text+i : -%s-\n",text+i);
+        //printf("dans OWS text+i : -%s-\n",text+i);
         return 2;
     }
     else { return 4; } //cas erreur
@@ -150,24 +158,24 @@ bool isTransferEncoding(char *text, size_t *curr, Element *data){
     data = data->frere ; //transfert-coding devient la tete
 
     int boucle = OWS(text+count);
-    printf("boucle : %d\n",boucle);
+    //printf("boucle : %d\n",boucle);
     if(boucle == 2 || boucle == 4){ //si on n'a pas OWS "," ou OWS CRLF
         return false;
     }
-    printf("ici\n");
+    //printf("ici\n");
     while(boucle == 1){ //on entre si : OWS","
         isOWS(text+count, &count, data, false); //ajout de OWS (on sait qu'il est la grace a OWS())
         data = data->frere; //OWS devient la tete
-        printf("Ajout de OWS\n");
+        //printf("Ajout de OWS\n");
         
         Element *el = addEl("__comma", text+count, 1);  //ajout de ","
         data->frere = el;
         data = data->frere;
-        printf("Ajout de ','\n");
+        //printf("Ajout de ','\n");
         count += 1;
          
         boucle = OWS(text+count); //si 1 on reboucle, si 3 on sort de la boucle
-        printf("recalcul de boucle : %d\n",boucle);
+        //printf("recalcul de boucle : %d\n",boucle);
         if(boucle == 2){ //OWS transfert-coding
             isOWS(text+count, &count, data, false); //ajout de OWS (on sait qu'il est la grace a OWS())
             data = data->frere; //OWS devient la tete
@@ -176,7 +184,7 @@ bool isTransferEncoding(char *text, size_t *curr, Element *data){
             data = data->frere; //trasfert-coding devient la tete
 
             boucle = OWS(text+count); //si 1 on reboucle, si 3 on sort sinon :
-            printf("rerecalcul de boucle qui commence à -%c-: %d\n",*(text+count),boucle);
+            //printf("rerecalcul de boucle qui commence à -%c-: %d\n",*(text+count),boucle);
             if(boucle == 4 || boucle == 2){ //OWS transfert-conding ne peut etre suivi que de OWS',' ou de OWS CRLF
                 return false;
             }
@@ -195,7 +203,7 @@ bool isTransferEncodingHeader(char *text, Element *data){
 
     if (!strcmp(text, "Transfer-Encoding")) {return false;}  //ok 
 
-    Element *el = addEl("Transfer-Encoding-header", text, 25); //nombre a changer
+    Element *el = addEl("Transfer-Encoding-header", text, strlen(text)); //nombre a changer
     data->fils = el;
     data = data->fils; //la tete devient el
 
@@ -230,9 +238,7 @@ bool isTransferEncodingHeader(char *text, Element *data){
 
 bool verifHeaderField(Element *data){
     bool res = false;
-    Element *el = malloc(sizeof(Element));
-    el->key = "header_field";
-    el->word = data->word; //le mot ne s'affiche pas avec le printarbre
+    Element *el = addEl("header_field",data->word,strlen(data->word));
     data->fils = el;
     data = data->fils;
 
