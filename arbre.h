@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-//include la structure Element ??
 typedef struct Element {
     char *key;
     char *word;

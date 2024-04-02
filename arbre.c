@@ -1,13 +1,5 @@
 #include "arbre.h"
 
-/*typedef struct Element {
-    char *key;
-    char *word;
-    size_t length;
-    struct Element *fils;
-    struct Element *frere;
-} Element;*/
-
 void printArbre(Element *head, int level) {
     if (head == NULL) { return; }
     for (int i = 0; i < level; i++) { printf("\t"); }
@@ -16,7 +8,6 @@ void printArbre(Element *head, int level) {
         printf("%c", head->word[j]);
     }
     printf("\n");
-    // sleep(1);
     printArbre(head->fils, level+1);
     printArbre(head->frere, level);
 }
@@ -36,6 +27,6 @@ Element *addEl(char *key, char *word, size_t length) {
 }
 
 void updateLength(Element *data, size_t length) {
-  data->length = length;
-  strncpy(data->word, data->word, length);
+    data->length = length;
+    strncpy(data->word, data->word, length);
 }

@@ -1,1 +1,0 @@
-Cookie: 	 coucou=#salut:je+ok; test="value" 	

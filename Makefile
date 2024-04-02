@@ -1,17 +1,19 @@
-main : main.o verifMessage.o isX.o arbre.o
-	gcc -Wall -Wextra -g -o $@ $^
+CC = gcc
+FLAGS = -Wall -Wextra -g
 
-arbre.o : arbre.c arbre.h
-	gcc -Wall -Wextra -g -c $<
+main : main.o isX.o arbre.o
+	$(CC) $(FLAGS) $^ -o $@
+	
+
+main.o : main.c isX.h arbre.h
+	$(CC) $(FLAGS) -c $^
 
 isX.o : isX.c isX.h arbre.h
-	gcc -Wall -Wextra -g -c $<
+	$(CC) $(FLAGS) -c $^
 
-verifMessage.o : verifMessage.c verifMessage.h isX.h arbre.h
-	gcc -Wall -Wextra -g -c $<
+arbre.o : arbre.c arbre.h
+	$(CC) $(FLAGS) -c $^
 
-main.o : main.c verifMessage.h isX.h arbre.h
-	gcc -Wall -Wextra -g -c $<
 
 clean : 
-	rm -rf *.o main
+	rm -rf *.o *.gch main
