@@ -860,6 +860,7 @@ bool isH16(char *text, size_t *curr, Element *data, bool is_fils) {
     return (count >= 1 && count <= 4);
 }
 
+
 // ls32 = ( h16 ":" h16 ) / IPv4address
 bool isLS32(char *text, size_t *curr, Element *data) {
     Element *el = addEl("ls32", text, strlen(text));
