@@ -1,9 +1,6 @@
 #include "api.h"
 #include "isX.h"
 
-struct Element *data; //racine de l'arbre
-
-
 void *getRootTree(){
     extern Element *head;
     return head;
@@ -17,23 +14,40 @@ _Token *searchTree(void *start,char *name){
     
     struct _token *tree;
 
-    struct _token *racine = tree; // on veut conserver le début de l'arbre
-
-
-    if(start == NULL){ // on partira du principe qu'on part toujours de la racine
+    if(start == NULL){ // on de la racine de l'arbre
         start = getRootTree();
     }
 
-    while(!(data->frere==NULL && data->fils==NULL)){
-        while(data->frere != NULL){
-            if(strcmp(data->word,name)){
-                tree->node = data;
-                tree = tree->next;
-            }
-            else{
+    struct Element *data = &start; // on part de l'element data qui pointe vers start
 
-            }
+
+    if (strcmp(data->word,name)){
+        tree->node = &data; // ajouter le noeud à l'arbre
+        tree = tree->next;  
+    }
+
+    // On explore l'arbre
+
+    if(data->fils == NULL && data->frere == NULL){
+        return tree;
+    }
+
+    else if(data->fils==NULL){
+        tree = searchTree(data->frere,name);
+    }
+
+    else if (data->frere==NULL){
+        tree = searchTree(data->fils,name);
+    }
+    else{
+        struct _token *tree1 = searchTree(data->frere,name);
+        struct _token *tree2 = searchTree(data->fils,name);
+        tree = tree1;
+        struct _token *fin_tree1 = tree1;
+        while (fin_tree1-> next != NULL){ // trouver la fin de tree1 pour joindre tree1 et tree2
+            fin_tree1 = fin_tree1 -> next;
         }
+        fin_tree1->next = tree2;
     }
 }
 
@@ -41,18 +55,33 @@ _Token *searchTree(void *start,char *name){
 // Fonction qui supprime et libere la liste chainée de reponse. 
 
 void purgeElement(_Token **r){
-    struct _token *prec = *r;
+    struct _token *prec = (*r);
     while((*r)->next != NULL){
-        r = (*r)->next;
+        (*r) = (*r)->next;
         free(prec);
-        prec = *r;
+        prec = (*r);
     }
 }
 
 
 // Fonction qui supprime et libere toute la mémoire associée à l'arbre .
 
-void purgeTree(void *root){}
+void purgeTree(void *root){
+    struct Element *data = &root;
+    if(data->fils == NULL && data->frere != NULL){
+        purgeTree(data->frere);
+        free(data);
+    }
+    else if(data->frere == NULL && data->fils != NULL){
+        purgeTree(data->fils);
+        free(data);
+    }
+    else if(data->fils != NULL && data->frere != NULL){
+        purgeTree(data->frere);
+        purgeTree(data->fils);
+        free(data);
+    }
+}
 
 
 int parseur(char *req, int len){
