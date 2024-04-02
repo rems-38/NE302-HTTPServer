@@ -1867,7 +1867,7 @@ Element *isHTTPMessage(char *text, ssize_t len) {
 
     size_t count = 0;
     if (!isStartLine(text, &count, data)) { return NULL; }
-    data = data->frere;
+    data = data->fils;
 
     bool loop = true;
     while (loop) {

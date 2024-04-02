@@ -10,22 +10,25 @@ int main(int argc, char *argv[]) {
 
     FILE *ftest = fopen(argv[1], "r");
     char *line = NULL;
-    size_t len = 0;
-    ssize_t read;
+    int len = 0;
 
     if (ftest == NULL) {
         printf("Impossible d'ouvrir le fichier %s\n", argv[1]);
         return -1;
     }
 
-    if ((read = getline(&line, &len, ftest)) != -1) {
-        Element *req = isHTTPMessage(line, read);
+    // ----------------------------------------------------------
+    // /!\ TROUVER FUNCTION QUI LIT TOUT LE FICHIER D'UN COUP !!
+    // ----------------------------------------------------------
+    
+    // if ((line = fgets(&line, len, ftest)) != NULL) {
+    //     Element *req = isHTTPMessage(line, len);
 
-        if (req == NULL) {
-            printf("Erreur dans la lecture du message\n");
-            exit(1);
-        } else { printArbre(req, 0); }
-    }
+    //     if (req == NULL) {
+    //         printf("Erreur dans la lecture du message\n");
+    //         exit(1);
+    //     } else { printArbre(req, 0); }
+    // }
 
     fclose(ftest);
     if (line) free(line);
