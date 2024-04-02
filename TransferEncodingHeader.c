@@ -113,7 +113,7 @@ bool isTransferCoding(char *text, size_t *curr, Element *data, bool is_fils){
     return true;
 }
 
-int OWS(char *text){
+int OWSTEH(char *text){ //OWS TransferEncodingHeader
     size_t i = 0;
     while(text[i] == SP || text[i] == HTAB){
         i++;
@@ -158,7 +158,7 @@ bool isTransferEncoding(char *text, size_t *curr, Element *data){
     if (!isTransferCoding(text+count, &count, data, !fst)){return false;}
     data = data->frere ; //transfert-coding devient la tete
 
-    int boucle = OWS(text+count);
+    int boucle = OWSTEH(text+count);
     //printf("boucle : %d\n",boucle);
     if(boucle == 2 || boucle == 4){ //si on n'a pas OWS "," ou OWS CRLF
         return false;
@@ -175,7 +175,7 @@ bool isTransferEncoding(char *text, size_t *curr, Element *data){
         //printf("Ajout de ','\n");
         count += 1;
          
-        boucle = OWS(text+count); //si 1 on reboucle, si 3 on sort de la boucle
+        boucle = OWSTEH(text+count); //si 1 on reboucle, si 3 on sort de la boucle
         //printf("recalcul de boucle : %d\n",boucle);
         if(boucle == 2){ //OWS transfert-coding
             isOWS(text+count, &count, data, false); //ajout de OWS (on sait qu'il est la grace a OWS())
@@ -184,7 +184,7 @@ bool isTransferEncoding(char *text, size_t *curr, Element *data){
             isTransferCoding(text+count, &count, data,false); //ajout de transfert-coding
             data = data->frere; //trasfert-coding devient la tete
 
-            boucle = OWS(text+count); //si 1 on reboucle, si 3 on sort sinon :
+            boucle = OWSTEH(text+count); //si 1 on reboucle, si 3 on sort sinon :
             //printf("rerecalcul de boucle qui commence à -%c-: %d\n",*(text+count),boucle);
             if(boucle == 4 || boucle == 2){ //OWS transfert-conding ne peut etre suivi que de OWS',' ou de OWS CRLF
                 return false;

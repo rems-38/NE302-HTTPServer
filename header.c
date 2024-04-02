@@ -95,8 +95,14 @@ bool isOWS(char *text, size_t *curr, Element *data, bool is_fils) { //import
     return true;
 }
 
+bool isAlpha(char text){
+    return (text >= AMAJ && text <= ZMAJ) || (text >= AMIN && text <= ZMIN);
+}
+bool isDigit(char text) {
+    return (text >= ZERO && text <= NINE);
+}
 
-int OWS(char *text){
+int OWSCH(char *text){ //OWS ConnectionHeader
     size_t i = 0;
     while(text[i] == SP || text[i] == HTAB){
         i++;
@@ -108,20 +114,15 @@ int OWS(char *text){
     else if(text[i] == CR && text[i+1] == LF){ //cas OWS CRLF : on sort de Transfert-Encoding
         return 3;
     }
-    else if(!strncmp(text+i,"chuncked",8) || !strncmp(text+i,"compress",8) || !strncmp(text+i,"deflate",7) || !strncmp(text+i,"gzip",4)){
-        //cas OWS transfert-coding
+    else if(text[i] == EXCLAMATION || text[i] == HASHTAG || text[i] == DOLLAR || text[i] == POURCENT || text[i] == ESP || text[i] == SQUOTE || text[i] == STAR || text[i] == PLUS || text[i] == DASH || text[i] == DOT || text[i] == CIRCONFLEXE || text[i] == UNDERSCORE || text[i] == 96 || text[i] == BARRE || text[i] == VAGUE || isAlpha(text[i]) || isDigit(text[i])){
+        //cas OWS connection-option = token = t-char
         //printf("dans OWS text+i : -%s-\n",text+i);
         return 2;
     }
     else { return 4; } //cas erreur
 }
 
-bool isAlpha(char text){
-    return (text >= AMAJ && text <= ZMAJ) || (text >= AMIN && text <= ZMIN);
-}
-bool isDigit(char text) {
-    return (text >= ZERO && text <= NINE);
-}
+
 // tchar = ("!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA)
 bool isTchar(char text){ 
     return (text == EXCLAMATION || text == HASHTAG || text == DOLLAR || text == POURCENT || text == ESP || text == SQUOTE || text == STAR || text == PLUS || text == DASH || text == DOT || text == CIRCONFLEXE || text == UNDERSCORE || text == 96 || text == BARRE || text == VAGUE || isAlpha(text) || isDigit(text)) ;
@@ -649,7 +650,7 @@ bool isConnection(char *text, size_t *curr, Element *data) {
     if (!isConnectionOption(text+count, &count, data, !fst)) { return false; }
     data = data->frere;
 
-    int boucle = OWS(text+count);
+    int boucle = OWSCH(text+count);
     if(boucle == 2 || boucle == 4){ //si on n'a pas OWS "," ou OWS CRLF
         return false;
     }
@@ -663,17 +664,16 @@ bool isConnection(char *text, size_t *curr, Element *data) {
         data = data->frere;
         count += 1;
          
-        boucle = OWS(text+count); //si 1 on reboucle, si 3 on sort de la boucle
-        if(boucle == 2){ //OWS transfert-coding
+        boucle = OWSCH(text+count); //si 1 on reboucle, si 3 on sort de la boucle
+        if(boucle == 2){ //OWS connection-option
             isOWS(text+count, &count, data, false); //ajout de OWS (on sait qu'il est la grace a OWS())
             data = data->frere; //OWS devient la tete
 
-            isConnectionOption(text+count, &count, data,false); //ajout de transfert-coding
-            data = data->frere; //trasfert-coding devient la tete
+            isConnectionOption(text+count, &count, data,false); //ajout de connection-option
+            data = data->frere; //connection-option devient la tete
 
-            boucle = OWS(text+count); //si 1 on reboucle, si 3 on sort sinon :
-            //printf("rerecalcul de boucle qui commence à -%c-: %d\n",*(text+count),boucle);
-            if(boucle == 4 || boucle == 2){ //OWS transfert-conding ne peut etre suivi que de OWS',' ou de OWS CRLF
+            boucle = OWSCH(text+count); //si 1 on reboucle, si 3 on sort sinon :
+            if(boucle == 4 || boucle == 2){ //OWS connection-option ne peut etre suivi que de OWS',' ou de OWS CRLF
                 return false;
             }
         }
