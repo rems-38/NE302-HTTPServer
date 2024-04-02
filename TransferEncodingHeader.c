@@ -209,6 +209,7 @@ bool isTransferEncodingHeader(char *text, Element *data){
     Element *el = addEl("Transfer-Encoding-header", text, strlen(text)); //nombre a changer
     data->fils = el;
     data = data->fils; //la tete devient el
+    Element *save = data;
 
     Element *el2 = addEl("case_insensitive_string","Transfer-Encoding",17);
     data->fils = el2;
@@ -233,6 +234,7 @@ bool isTransferEncodingHeader(char *text, Element *data){
 
     if(!isOWS(text+count, &count, data, false)) {return false;} 
 
+    updateLength(save,count);
     
     return true;
 }

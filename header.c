@@ -526,7 +526,9 @@ bool isSubType(char *text, size_t *curr, Element *data) {
     data->frere = el;
     data = data->frere;
 
-    return isToken(text, curr, data, true);
+    bool res =  isToken(text, curr, data, true);
+    updateLength(data,*curr);
+    return res;
 }
 
 // type = token
@@ -535,7 +537,9 @@ bool isType(char *text, size_t *curr, Element *data) {
     data->fils = el;
     data = data->fils;
 
-    return isToken(text, curr, data, true);
+    bool res = isToken(text, curr, data, true);
+    updateLength(data,*curr);
+    return res;
 }
 
 // media-type = type "/" subtype *( OWS ";" OWS parameter )
@@ -543,6 +547,7 @@ bool isMediaType(char *text, size_t *curr, Element *data) {
     Element *el = addEl("media-type", text, strlen(text));
     data->fils = el;
     data = data->fils;
+    Element *save = data;
 
     size_t count = 0;
     if (!isType(text, &count, data)) { return false; }
@@ -571,7 +576,7 @@ bool isMediaType(char *text, size_t *curr, Element *data) {
         data = data->frere;
     }
 
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
@@ -582,7 +587,9 @@ bool isContentType(char *text, size_t *curr, Element *data) {
     data->frere = el;
     data = data->frere;
 
-    return isMediaType(text, curr, data);
+    bool res = isMediaType(text, curr, data);
+    updateLength(data,*curr);
+    return res;
 }
 
 // Content-Length = 1*DIGIT
@@ -592,6 +599,7 @@ bool isContentLength(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Content-Length", text, strlen(text));
     data->frere = el;
     data = data->frere;
+    Element *save = data;
 
     if (!isDigit(*(text+count))) { return false; }
     while (isDigit(*(text+count))) {
@@ -606,7 +614,7 @@ bool isContentLength(char *text, size_t *curr, Element *data) {
         count += 1;
     }
 
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
@@ -1155,6 +1163,7 @@ bool isContentLengthHeader(char *text, size_t *curr, Element *data) {
     if (!isOWS(text+count, &count, data, false)) { return false; }
     data = data->frere;
     if (!isContentLength(text+count, &count, data)) { return false; }
+    data = data->frere;
     if (!isOWS(text+count, &count, data, false)) { return false; }
 
     updateLength(data, count);
@@ -1167,6 +1176,7 @@ bool isContentTypeHeader(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Content-Type-header", text, strlen(text));
     data->fils = el;
     data = data->fils;
+    Element *save = data;
 
     size_t count = 0;
     if (!strcmp(text, "Content-Type")) { return false; }
@@ -1187,7 +1197,7 @@ bool isContentTypeHeader(char *text, size_t *curr, Element *data) {
     data = data->frere;
     if (!isOWS(text+count, &count, data, false)) { return false; }
 
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
