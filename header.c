@@ -62,15 +62,16 @@ HTAB :
 
 
 // OWS = *( SP / HTAB )
-bool isOWS(char *text, size_t *curr, Element *data, bool is_fils) {
+bool isOWS(char *text, size_t *curr, Element *data, bool is_fils) { //import
     Element *el = addEl("OWS", text, strlen(text));
     if (is_fils) {
         data->fils = el;
-        data = data->fils;
+        data = data->fils; //OWS devient la tete
     } else {
         data->frere = el;
-        data = data->frere;
+        data = data->frere; //idem
     }
+    Element *save = data;
 
     size_t count = 0;
     Element *sub;
@@ -88,12 +89,32 @@ bool isOWS(char *text, size_t *curr, Element *data, bool is_fils) {
         }
         count++;
     }
-    
-    updateLength(data, count);
+
+    updateLength(save, count);
     *curr += count;
     return true;
 }
 
+
+int OWS(char *text){
+    size_t i = 0;
+    while(text[i] == SP || text[i] == HTAB){
+        i++;
+    }
+
+    if(text[i] == COMMA) {
+        return 1; //cas OWS","
+    }
+    else if(text[i] == CR && text[i+1] == LF){ //cas OWS CRLF : on sort de Transfert-Encoding
+        return 3;
+    }
+    else if(!strncmp(text+i,"chuncked",8) || !strncmp(text+i,"compress",8) || !strncmp(text+i,"deflate",7) || !strncmp(text+i,"gzip",4)){
+        //cas OWS transfert-coding
+        //printf("dans OWS text+i : -%s-\n",text+i);
+        return 2;
+    }
+    else { return 4; } //cas erreur
+}
 
 bool isAlpha(char text){
     return (text >= AMAJ && text <= ZMAJ) || (text >= AMIN && text <= ZMIN);
@@ -610,6 +631,7 @@ bool isConnection(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Connection", text, strlen(text));
     data->frere = el;
     data = data->frere;
+    Element *save = data;
 
     bool fst = false;
     if (*(text+count) == COMMA) {
@@ -625,24 +647,42 @@ bool isConnection(char *text, size_t *curr, Element *data) {
     }
     
     if (!isConnectionOption(text+count, &count, data, !fst)) { return false; }
+    data = data->frere;
 
-    while (*(text+count) == SP || *(text+count) == HTAB) {
-        if (!isOWS(text+count, &count, data, false)) { return false; }
+    int boucle = OWS(text+count);
+    if(boucle == 2 || boucle == 4){ //si on n'a pas OWS "," ou OWS CRLF
+        return false;
+    }
+   
+    while(boucle == 1){ //on entre si : OWS","
+        isOWS(text+count, &count, data, false); //ajout de OWS (on sait qu'il est la grace a OWS())
+        data = data->frere; //OWS devient la tete
+        
+        Element *el = addEl("__comma", text+count, 1);  //ajout de ","
+        data->frere = el;
         data = data->frere;
-        if (*(text+count) == COMMA) {
-            Element *el = addEl("__comma", text+count, 1);
-            data->frere = el;
-            data = data->frere;
-            count += 1;
-            if (*(text+count) == SP || *(text+count) == HTAB) {
-                if (!isOWS(text+count, &count, data, false)) { return false; }
-                data = data->frere;
-                if (!isConnectionOption(text+count, &count, data, false)) { return false; }
+        count += 1;
+         
+        boucle = OWS(text+count); //si 1 on reboucle, si 3 on sort de la boucle
+        if(boucle == 2){ //OWS transfert-coding
+            isOWS(text+count, &count, data, false); //ajout de OWS (on sait qu'il est la grace a OWS())
+            data = data->frere; //OWS devient la tete
+
+            isConnectionOption(text+count, &count, data,false); //ajout de transfert-coding
+            data = data->frere; //trasfert-coding devient la tete
+
+            boucle = OWS(text+count); //si 1 on reboucle, si 3 on sort sinon :
+            //printf("rerecalcul de boucle qui commence à -%c-: %d\n",*(text+count),boucle);
+            if(boucle == 4 || boucle == 2){ //OWS transfert-conding ne peut etre suivi que de OWS',' ou de OWS CRLF
+                return false;
             }
+        }
+        else if(boucle == 4){ //cas d'erreur
+            return false;
         }
     }
 
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }

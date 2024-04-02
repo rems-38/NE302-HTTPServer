@@ -140,6 +140,7 @@ bool isTransferEncoding(char *text, size_t *curr, Element *data){
     Element *el = addEl("Transfer-Encoding",text,strlen(text));
     data->frere = el;
     data = data->frere; //transfer-encoding devient la tete
+    Element *save = data;
 
     bool fst = false; //pour savoir si protocol va etre fils direct de Transfert-Encoding
     if (*(text+count) == COMMA) {
@@ -193,6 +194,8 @@ bool isTransferEncoding(char *text, size_t *curr, Element *data){
             return false;
         }
     }
+
+    updateLength(save,count);
     *curr += count;
     return true;    
 }
