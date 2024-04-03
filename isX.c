@@ -13,14 +13,6 @@ bool isTchar(char text){ // tchar = ("!" / "#" / "$" / "%" / "&" / "'" / "*" / "
     return (text == EXCLAMATION || text == HASHTAG || text == DOLLAR || text == POURCENT || text == ESP || text == SQUOTE || text == STAR || text == PLUS || text == DASH || text == DOT || text == CIRCONFLEXE || text == UNDERSCORE || text == FQUOTE || text == BARRE || text == VAGUE || isAlpha(text) || isDigit(text)) ;
 }
 
-bool isOCTET(char text){
-    for(int i=0; i<8 ; i++){
-        if(!(text+i == 1 || text+i == 0)){
-            return false;
-        }
-    }
-    return true;
-}
 
 bool isHEXDIG(char text){ // HEXDIG  =  DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
     return((text>=ZERO && text<=NINE) || (text>=AMAJ && text<=FMAJ));
@@ -1865,6 +1857,20 @@ bool isHTTPVersion(char *text, size_t *curr, Element *head){ //HTTP-version = HT
 
 bool isHTTPname(char *text){ //HTTP-name = HTTP
     return strcmp(text,"HTTP");
+}
+
+
+bool isStartLine(char *text, size_t *curr, Element *head){ //start-line = request-line
+    bool res = false;
+
+    Element *tmp = malloc(sizeof(Element));
+    //head->fils = tmp;                                 // on créer maintenant l'élément qu'on donne a isRequestLine 
+    if(isRequestLine(text, curr, tmp)){res = true;}
+    // mettre le if avant pour avoir curr pour la taille dans la start-line ??
+    Element *el = addEl("start-line", text, *curr); //quelle valeure mettre pour length??
+    head->fils = el;
+    el->fils = tmp->fils;
+    return res;
 }
 
 bool isMessageBody(char *text, Element *head){
