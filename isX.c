@@ -232,7 +232,10 @@ bool isFieldValue(char *text, size_t *curr, Element *data) {
     size_t count = 0;
     bool i = true; // true : ajout fils / false : ajout frere
 
-    while (isFieldContent((text+count), &count, data, i) || isObsFold((text+count), &count, data, i)){
+    while (isFieldContent((text+count), &count, data, i) || (*(text+count) == CR && *(text+count+1) == LF && (*(text+count+2) == SP ||*(text+count+2) == SP))){
+        if(*(text+count) == CR){
+            isObsFold((text+count), &count, data, i);
+        }
         if (i == true){
             data = data->fils;
             i = false;
