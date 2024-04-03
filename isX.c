@@ -1867,31 +1867,35 @@ bool isHTTPname(char *text){ //HTTP-name = HTTP
     return strcmp(text,"HTTP");
 }
 
-bool isMessageBody(char *text, size_t *curr, Element *head){
-    
-    Element *el = addEl("message-body",text,8);
-    head -> fils = el;
+bool isMessageBody(char *text, Element *head){
+    printf("text : -%s- et strlen : %ld \n",text,strlen(text));
+    if(strlen(text) > 0){ //presence du message-body
+        printf("je suis dans le message body\n");
+        Element *el = addEl("message-body",text,strlen(text));
+        head -> frere = el; 
+        head = head->frere; //message-body devient la tete
 
-    if(!isOCTET(*(text+(*curr)))){
-        return false;
+        bool fils = true; //il faut ajouter le 1er en tant que fils de message-body puis les autres en tant que frere des octets précédents
+        size_t count = 0;
+        while(count < strlen(text)){
+            if(fils == true){
+                Element *sub = addEl("octet",text+count,1);
+                head->fils = sub;
+                head = head->fils;
+                fils = false;
+            }
+            else{
+                Element *sub = addEl("octet",text+count,1);
+                head->frere = sub;
+                head = head->frere;
+            }
+            count++;
+            //*curr++;
+        }
+
+        return true;
     }
-
-    *curr += 8;
-
-    return true;
-}
-
-bool isStartLine(char *text, size_t *curr, Element *head){ //start-line = request-line
-    bool res = false;
-
-    Element *tmp = malloc(sizeof(Element));
-    //head->fils = tmp;                                 // on créer maintenant l'élément qu'on donne a isRequestLine 
-    if(isRequestLine(text, curr, tmp)){res = true;}
-    // mettre le if avant pour avoir curr pour la taille dans la start-line ??
-    Element *el = addEl("start-line", text, *curr); //quelle valeure mettre pour length??
-    head->fils = el;
-    el->fils = tmp->fils;
-    return res;
+    else{ return true; }
 }
 
 
@@ -1923,11 +1927,11 @@ Element *isHTTPMessage(char *text, ssize_t len) {
     if (*(text+count) == CR && *(text+count+1) == LF) {
         Element *el = addEl("__crlf", text+count, 2);
         data->frere = el;
-        data = data->frere;
+        data = data->frere; //crlf devient la tete
         count += 2;
     } else { return NULL; }
 
-    if (isMessageBody(text+count, &count, data)) { ; }
+    isMessageBody(text+count, data); //pas besoin de curr en paramètre car il s'agit de la fin du message
 
     return head;
 }

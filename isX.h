@@ -50,7 +50,6 @@
 bool isAlpha(char text);
 bool isDigit(char text);
 bool isTchar(char text);
-bool isOCTET(char text);
 bool isHEXDIG(char text);
 bool isSP(char text, size_t *curr, Element *head);
 bool isOWS(char *text, size_t *curr, Element *data, bool is_fils);
@@ -120,6 +119,6 @@ bool isPctEncodedBis(char *text, size_t *curr, Element *head);
 bool isSubDelimsBis(char text, Element *head);
 bool isHTTPVersion(char *text, size_t *curr, Element *head);
 bool isHTTPname(char *text);
-bool isMessageBody(char *text, size_t *curr, Element *head);
+bool isMessageBody(char *text, Element *head);
 bool isStartLine(char *text, size_t *curr, Element *head);
 Element *isHTTPMessage(char *text, ssize_t len);
