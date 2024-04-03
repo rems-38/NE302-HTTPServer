@@ -161,10 +161,16 @@ bool isFieldVchar(char text, Element *data) {
 }
 
 // field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
-bool isFieldContent(char *text, size_t *curr, Element *data) {
+bool isFieldContent(char *text, size_t *curr, Element *data, bool is_fils) {
     Element *el = addEl("field-content", text, strlen(text));
-    data->fils = el;
-    data = data->fils;
+    if (is_fils) {
+        data->fils = el;
+        data = data->fils;
+    } else {
+        data->frere = el;
+        data = data->frere;
+    }
+    Element *save = data;
 
     size_t count = 0;
     if (!isFieldVchar(*text, data)) { return false; }
@@ -183,16 +189,22 @@ bool isFieldContent(char *text, size_t *curr, Element *data) {
         count++;
     }
 
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
 
 // obs-fold = CRLF 1*( SP / HTAB )
-bool isObsFold(char *text, size_t *curr, Element *data) {
+bool isObsFold(char *text, size_t *curr, Element *data, bool is_fils) {
     Element *el = addEl("obs-fold", text, strlen(text));
-    data->fils = el;
-    data = data->fils;
+    if (is_fils) {
+        data->fils = el;
+        data = data->fils;
+    } else {
+        data->frere = el;
+        data = data->frere;
+    }
+    Element *save = data;
 
     size_t count = 0;
     if (*text == CR && (*text+1) == LF) {
@@ -213,7 +225,7 @@ bool isObsFold(char *text, size_t *curr, Element *data) {
         count++;
     }
 
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
@@ -223,14 +235,22 @@ bool isFieldValue(char *text, size_t *curr, Element *data) {
     Element *el = addEl("field-value", text, strlen(text));
     data->frere = el;
     data = data->frere;
+    Element *save = data;
 
     size_t count = 0;
-    // while (isFieldContent(*(text+count), &count, data) || isObsFold(*(text+count), &count, data)) {
-    //     if 
-    // }
-    // à compléter : faire gaffe au pointeur vers count, pas incrémenter 2 fois lors de la vérif du if...
+    bool i = true; // true : ajout fils / false : ajout frere
 
-    updateLength(data, count);
+    while (isFieldContent((text+count), &count, data, i) || isObsFold((text+count), &count, data, i)){
+        if (i == true){
+            data = data->fils;
+            i = false;
+        }
+        else{
+            data = data->frere;
+        }
+    }
+
+    updateLength(save, count);
     *curr += count;
     return true;
 }
@@ -1451,7 +1471,27 @@ bool isHeaderField(char *text, size_t *curr, Element *data){
     else if (strncmp(text, "Host", 4) == 0) {
         if (!isHostHeader(text, &count, data)) { return false; }
     }
-    else { if(!isFieldName(text, &count, data)) { return false; } }
+    else { 
+        if(!isFieldName(text, &count, data)) { 
+            return false; 
+        } 
+
+        if (*(text+count) == COLON){
+            Element *el = addEl("__colon", text+count, 1);
+            data->fils->frere = el;
+            data = data->fils->frere; //la tete devient ":"
+            count += 1;
+        } 
+        else {return false;}
+
+        if(!isOWS(text+count, &count, data, false)) {return false;} 
+        data = data->frere;   //la tete devient OWS
+
+        if(!isFieldValue(text+count, &count, data)) {return false;}
+        data = data->frere;
+
+        if(!isOWS(text+count, &count, data, false)) {return false;}
+    }
 
     updateLength(save, count);
     *curr += count;

@@ -31,10 +31,10 @@ int main(int argc, char *argv[]) {
     if (line != NULL) {
         Element *req = isHTTPMessage(line, len);
 
-        if (req == NULL) {
+        /*if (req == NULL) {
             printf("Erreur dans la lecture du message\n");
             exit(1);
-        } else { printArbre(req, 0); }
+        } else { */printArbre(req, 0); //}
     }
 
     fclose(ftest);
