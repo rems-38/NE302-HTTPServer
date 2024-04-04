@@ -33,7 +33,7 @@ _Token *searchTree(void *start,char *name){
     struct Element *data = (struct Element *)start; // on part de l'element data qui pointe vers start
 
 
-    if (strcmp(data->word,name)){
+    if (strcmp(data->key,name)==0){
         tree->node = &data; // ajouter le noeud à l'arbre
         tree = tree->next;  
     }
@@ -46,10 +46,12 @@ _Token *searchTree(void *start,char *name){
 
     else if(data->fils==NULL){
         tree = searchTree(data->frere,name);
+        return tree;
     }
 
     else if (data->frere==NULL){
         tree = searchTree(data->fils,name);
+        return tree;
     }
     else{
         struct _token *tree1 = searchTree(data->frere,name);
@@ -60,6 +62,7 @@ _Token *searchTree(void *start,char *name){
             fin_tree1 = fin_tree1 -> next;
         }
         fin_tree1->next = tree2;
+        return tree;
     }
     return NULL;
 }
@@ -95,7 +98,7 @@ void purgeElement(_Token **r){
 // Fonction qui supprime et libere toute la mémoire associée à l'arbre.
 
 void purgeTree(void *root){
-    struct Element *data = root;
+    struct Element *data = (struct Element *)root;
     if(data->fils == NULL && data->frere != NULL){
         purgeTree(data->frere);
         free(data);
@@ -128,7 +131,7 @@ int parseur(char *req, int len){
 }
 
 int main(){ //test
-    char *text = "VWbG1 /m/JeAk HTTP/0.8\r\n";
+    char *text = "VWbG1 /m/JeAk HTTP/0.8\r\n\r\n";
     parseur(text,strlen(text));
 
     struct Element *phrase = malloc(sizeof(Element));
@@ -152,12 +155,13 @@ int main(){ //test
     complement->key = "complement";
     complement->word = "Pierre";
 
-    //struct Element *racine = getRootTree();
-    //printf("racine : %s",racine->key);
+    struct Element *racine = getRootTree();
+    printf("racine : %s\n",racine->key);
 
-    //_Token *data = searchTree((void*)phrase,"verbe");
-    //struct Element *conversion = (struct Element *) data->node;
-    //printf("%s",conversion->word);
+    _Token *data = searchTree((void*)phrase,"verbe");
+    struct Element *conversion = data->node;
+    char *word=conversion->word; //SEGFAULT ici
+    printf("word %s\n",word);
 
     int *len = malloc(sizeof(int));
 
