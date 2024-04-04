@@ -57,7 +57,7 @@ int OWSCH(char *text);
 bool isToken(char *text, size_t *curr, Element *data, bool is_fils);
 bool isObsText(unsigned char text);
 bool isFieldName(char *text, size_t *curr, Element *data);
-bool isFieldVchar(char text, Element *data);
+bool isFieldVchar(char text, Element *data, bool is_fils);
 bool isFieldContent(char *text, size_t *curr, Element *data, bool is_fils);
 bool isObsFold(char *text, size_t *curr, Element *data, bool is_fils);
 bool isFieldValue(char *text, size_t *curr, Element *data);

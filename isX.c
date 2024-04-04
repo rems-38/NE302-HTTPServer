@@ -129,17 +129,24 @@ bool isFieldName(char *text, size_t *curr, Element *data) {
     data->fils = el;
     data = data->fils;
 
-    if (!isToken(text, curr, data, true)) { return false; }
+    size_t count =0;
+    if (!isToken(text, &count, data, true)) { return false; }
 
-    updateLength(data, *curr);
+    updateLength(data, count);
+    *curr +=count;
     return true;
 }
 
 // field-vchar = VCHAR / obs-text
-bool isFieldVchar(char text, Element *data) {
+bool isFieldVchar(char text, Element *data, bool is_fils) {
     Element *el = addEl("field-vchar", &text, 1);
-    data->frere = el;
-    data = data->frere;
+    if (is_fils) {
+        data->fils = el;
+        data = data->fils;
+    } else {
+        data->frere = el;
+        data = data->frere;
+    }
 
     Element *sub;
     if (text >= EXCLAMATION && text <= VAGUE) { sub = addEl("__vchar", &text, 1); }
@@ -147,7 +154,7 @@ bool isFieldVchar(char text, Element *data) {
     else { return false; }
 
     data->fils = sub;
-    data = data->fils;
+    //data = data->fils;
 
     return true;
 }
@@ -165,20 +172,28 @@ bool isFieldContent(char *text, size_t *curr, Element *data, bool is_fils) {
     Element *save = data;
 
     size_t count = 0;
-    if (!isFieldVchar(*text, data)) { return false; }
+    if (!isFieldVchar(*text, data, true)) { return false; }
     count++;
+    data = data->fils; //tete : vchar
 
-    if (*(text+count) == SP || *(text+count) == HTAB) {
-        while(*(text+count) == SP || *(text+count) == HTAB) {
+    Element *tmp = malloc(sizeof(Element));
+    Element *save1 = tmp;
+    bool i = true;
+
+    if ((*(text+count) == SP || *(text+count) == HTAB) && i) {
+        while((*(text+count) == SP || *(text+count) == HTAB) && i ) {
             Element *sub;
             if (*(text+count) == SP) { sub = addEl("__sp", text+count, 1); }
             else { sub = addEl("__htab", text+count, 1); }
-            data->frere = sub;
-            data = data->frere;
+            tmp->frere = sub;
+            tmp = tmp->frere;
             count++;
         }
-        if (!isFieldVchar(*(text+count), data)) { return false; }
-        count++;
+        if (!isFieldVchar(*(text+count), tmp, false)) { i = false; }
+        else{
+            count++;
+            data->frere = save1->frere;
+        }
     }
 
     updateLength(save, count);
@@ -199,14 +214,14 @@ bool isObsFold(char *text, size_t *curr, Element *data, bool is_fils) {
     Element *save = data;
 
     size_t count = 0;
-    if (*text == CR && (*text+1) == LF) {
+    if (*(text+count) == CR && *(text+count+1) == LF) {
         Element *el = addEl("__crlf", text, 2);
         data->fils = el;
         data = data->fils;
         count += 2;
     } else { return false; }
 
-    if (*(text+count) != SP || *(text+count) != HTAB) { return false; }
+    if (*(text+count) != SP && *(text+count) != HTAB) { return false; }
     while (*(text+count) == SP || *(text+count) == HTAB) {
         Element *sub;
         if (*(text+count) == SP) { sub = addEl("__sp", text+count, 1); }
@@ -232,9 +247,13 @@ bool isFieldValue(char *text, size_t *curr, Element *data) {
     size_t count = 0;
     bool i = true; // true : ajout fils / false : ajout frere
 
-    while (isFieldContent((text+count), &count, data, i) || (*(text+count) == CR && *(text+count+1) == LF && (*(text+count+2) == SP ||*(text+count+2) == SP))){
-        if(*(text+count) == CR){
+    while ( (*(text+count) >= EXCLAMATION && *(text+count) <= VAGUE) || (*(text+count) == CR && *(text+count+1) == LF && (*(text+count+2) == SP ||*(text+count+2) == HTAB))){
+        if(*(text+count) == CR && *(text+count+1) == LF && (*(text+count+2) == SP ||*(text+count+2) == HTAB)){
             isObsFold((text+count), &count, data, i);
+            
+        }
+        else {
+            isFieldContent((text+count), &count, data, i);
         }
         if (i == true){
             data = data->fils;
