@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (line != NULL) {
+        printf("count : %d",count);
         Element *req = isHTTPMessage(line, count);
 
         if (req == NULL) {

@@ -46,6 +46,7 @@
 #define LF 10           // \n
 #define CR 13
 
+
 bool isAlpha(char text);
 bool isDigit(char text);
 bool isTchar(char text);
@@ -56,7 +57,7 @@ int OWSCH(char *text);
 bool isToken(char *text, size_t *curr, Element *data, bool is_fils);
 bool isObsText(unsigned char text);
 bool isFieldName(char *text, size_t *curr, Element *data);
-bool isFieldVchar(char text, Element *data);
+bool isFieldVchar(char text, Element *data, bool is_fils);
 bool isFieldContent(char *text, size_t *curr, Element *data, bool is_fils);
 bool isObsFold(char *text, size_t *curr, Element *data, bool is_fils);
 bool isFieldValue(char *text, size_t *curr, Element *data);
@@ -120,4 +121,4 @@ bool isHTTPVersion(char *text, size_t *curr, Element *head);
 bool isHTTPname(char *text);
 bool isMessageBody(char *text, Element *head);
 bool isStartLine(char *text, size_t *curr, Element *head);
-struct Element *isHTTPMessage(char *text, ssize_t len);
+Element *isHTTPMessage(char *text, ssize_t len);

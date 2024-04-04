@@ -1,11 +1,22 @@
 #include "api.h"
 #include "isX.h"
 
-struct Element *line = NULL;
+/*
+typedef struct Element {
+    char *key;
+    char *word;
+    size_t length;
+    struct Element *fils;
+    struct Element *frere;
+} Element;
+*/
+
+
+struct Element *line;
 
 // Fonction qui retourne un pointeur (type opaque) vers la racine de l'arbre construit. 
 void *getRootTree(){
-    return line;
+    return (void *)line;
 }
 
 // Fonction qui recherche dans l'arbre tous les noeuds dont l'etiquette est egale à la chaine de caractères en argument.   
@@ -19,7 +30,7 @@ _Token *searchTree(void *start,char *name){
         start = getRootTree();
     }
 
-    struct Element *data = start; // on part de l'element data qui pointe vers start
+    struct Element *data = (struct Element *)start; // on part de l'element data qui pointe vers start
 
 
     if (strcmp(data->word,name)){
@@ -66,7 +77,7 @@ char *getElementTag(void *node,int *len){
 char *getElementValue(void *node,int *len){
     struct Element *data = node;
     *len = data -> length;
-    return data->key;
+    return data->word;
 }
 
 // Fonction qui supprime et libere la liste chainée de reponse. 
@@ -103,6 +114,7 @@ void purgeTree(void *root){
 
 int parseur(char *req, int len){
 
+    line = malloc(sizeof(Element));
     line = isHTTPMessage(req, len);
 
     if (line == NULL) {
@@ -116,10 +128,41 @@ int parseur(char *req, int len){
 }
 
 int main(){ //test
-    char *text = "GET / HTTP/1.1\r\nUser-Agent: Wget/1.16 (linux-gnu)\r\nAccept: */*\r\nHost: www.google.com\r\nConnection: Keep-Alive\r\n";
-    parseur(text,153);
+    char *text = "VWbG1 /m/JeAk HTTP/0.8\r\n";
+    parseur(text,strlen(text));
 
-    searchTree(line,"pchar");
+    struct Element *phrase = malloc(sizeof(Element));
+    struct Element *sujet = malloc(sizeof(Element));
+    struct Element *verbe = malloc(sizeof(Element));
+    struct Element *complement = malloc(sizeof(Element));
+
+    phrase->key = "phrase";
+    phrase->word = "je m'appelle Pierre";
+    phrase->length = 7;
+
+    phrase->fils = sujet;
+    sujet->key = "sujet";
+    sujet->word = "je";
+
+    sujet->frere = verbe;
+    verbe->key = "verbe";
+    verbe->word = "m'appelle";
+
+    verbe->frere = complement;
+    complement->key = "complement";
+    complement->word = "Pierre";
+
+    //struct Element *racine = getRootTree();
+    //printf("racine : %s",racine->key);
+
+    //_Token *data = searchTree((void*)phrase,"verbe");
+    //struct Element *conversion = (struct Element *) data->node;
+    //printf("%s",conversion->word);
+
+    int *len = malloc(sizeof(int));
+
+    printf("Tag : %s\n",getElementTag((void *)phrase,len));
+    printf("Value : %s\n",getElementValue((void *)phrase,len));
 
     return 0;
 }
