@@ -22,19 +22,23 @@ int main(int argc, char *argv[]) {
 
     ssize_t read = 0;
     int count = 0;
+    bool fst, snd = false;
     while((read = getline(&tmp, &len, ftest)) != -1) {
+        if (fst == false && snd == false) { fst = true; }
+        else if (fst == true && snd == false) { snd = true; continue; }
+    
         strcpy(line+count, tmp); 
-        fseek(ftest, 0, read);
         count += read;
+        fseek(ftest, count-1, SEEK_SET);
     }
 
     if (line != NULL) {
         Element *req = isHTTPMessage(line, len);
 
-        /*if (req == NULL) {
+        if (req == NULL) {
             printf("Erreur dans la lecture du message\n");
             exit(1);
-        } else { */printArbre(req, 0); //}
+        } else { printArbre(req, 0); }
     }
 
     fclose(ftest);
