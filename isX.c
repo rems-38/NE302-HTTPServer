@@ -774,8 +774,8 @@ bool isDecOctet(char *text, size_t *curr, Element *data, bool is_fils) {
     size_t count = 0;
     if (*text == '2' && *(text+1) == '5' && *(text+2) >= ZERO && *(text+2) <= ZERO+5) {
         Element *el = addEl("__digit", text, 1);
-        data->frere = el;
-        data = data->frere;
+        data->fils = el;
+        data = data->fils;
         if (*(text+1) == '5') {
             Element *el = addEl("__digit", text+1, 1);
             data->frere = el;
@@ -790,8 +790,8 @@ bool isDecOctet(char *text, size_t *curr, Element *data, bool is_fils) {
     }
     else if (*text == '2' && *(text+1) >= ZERO && *(text+1) <= ZERO+4 && isDigit(*(text+2))) {
         Element *el = addEl("__digit", text, 1);
-        data->frere = el;
-        data = data->frere;
+        data->fils = el;
+        data = data->fils;
         if (*(text+1) >= ZERO && *(text+1) <= ZERO+4) {
             Element *el = addEl("__digit", text+1, 1);
             data->frere = el;
@@ -806,8 +806,8 @@ bool isDecOctet(char *text, size_t *curr, Element *data, bool is_fils) {
     }
     else if (*text == '1' && isDigit(*(text+1))) {
         Element *el = addEl("__digit", text, 1);
-        data->frere = el;
-        data = data->frere;
+        data->fils = el;
+        data = data->fils;
         for (int i = 0; i < 2; i++) {
             if (!isDigit(*(text+i+1))) { return false; }
             Element *el = addEl("__digit", text+i+1, 1);
@@ -816,10 +816,10 @@ bool isDecOctet(char *text, size_t *curr, Element *data, bool is_fils) {
         }
         count = 3;
     }
-    else if (*text >= ZERO+1 && *text <= NINE) {
+    else if (*text >= ZERO+1 && *text <= NINE && isDigit(*(text+1))) {
         Element *el = addEl("__digit", text, 1);
-        data->frere = el;
-        data = data->frere;
+        data->fils = el;
+        data = data->fils;
         if (isDigit(*(text+1))) {
             Element *el = addEl("__digit", text+1, 1);
             data->frere = el;
@@ -829,8 +829,8 @@ bool isDecOctet(char *text, size_t *curr, Element *data, bool is_fils) {
     }
     else if (isDigit(*text)) {
         Element *el = addEl("__digit", text, 1);
-        data->frere = el;
-        data = data->frere;
+        data->fils = el;
+        data = data->fils;
         count = 1;
     }
     
@@ -853,12 +853,14 @@ bool isIPv4address(char *text, size_t *curr, Element *data) {
         if (i ==0) { data = data->fils; }
         else { data = data->frere; }
         
-        if (*(text+count) == DOT) {
+        if(i != 3){
+            if (*(text+count) == DOT) {
             Element *el = addEl("__dot", text+count, 1);
             data->frere = el;
             data = data->frere;
             count += 1;
-        } else { return false; }
+            } else { return false; }
+        }
     }
 
     updateLength(save, count);
@@ -1068,6 +1070,7 @@ bool isPort(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Port", text, strlen(text));
     data->frere = el;
     data = data->frere;
+    Element *save = data;
 
     while (isDigit(*(text+count))) {
         Element *el = addEl("__digit", text+count, 1);
@@ -1081,7 +1084,7 @@ bool isPort(char *text, size_t *curr, Element *data) {
         count += 1;
     }
 
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
