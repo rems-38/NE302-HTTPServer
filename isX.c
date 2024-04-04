@@ -769,6 +769,7 @@ bool isDecOctet(char *text, size_t *curr, Element *data, bool is_fils) {
         data->frere = el;
         data = data->frere;
     }
+    Element *save = data;
 
     size_t count = 0;
     if (*text == '2' && *(text+1) == '5' && *(text+2) >= ZERO && *(text+2) <= ZERO+5) {
@@ -833,7 +834,7 @@ bool isDecOctet(char *text, size_t *curr, Element *data, bool is_fils) {
         count = 1;
     }
     
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
@@ -842,7 +843,8 @@ bool isDecOctet(char *text, size_t *curr, Element *data, bool is_fils) {
 bool isIPv4address(char *text, size_t *curr, Element *data) {
     Element *el = addEl("IPv4address", text, strlen(text));
     data->fils = el;
-    data = data->fils;  
+    data = data->fils;
+    Element *save = data;  
 
     size_t count = 0;
     for (size_t i = 0; i < 4; i++) {
@@ -859,7 +861,7 @@ bool isIPv4address(char *text, size_t *curr, Element *data) {
         } else { return false; }
     }
 
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
@@ -973,6 +975,7 @@ bool isPctEncoded(char *text, size_t *curr, Element *data) {
     Element *el = addEl("pct-encoded", text, strlen(text));
     data->fils = el;
     data = data->fils;
+    Element *save = data;
 
     size_t count = 0;
     if (*(text+count) == POURCENT) {
@@ -990,7 +993,7 @@ bool isPctEncoded(char *text, size_t *curr, Element *data) {
         count += 1;
     }
 
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
@@ -1000,15 +1003,16 @@ bool isRegName(char *text, size_t *curr, Element *data) {
     Element *el = addEl("reg-name", text, strlen(text));
     data->fils = el;
     data = data->fils;
+    Element *save = data;
 
     size_t count = 0;
     bool fst = true;
 
-    while (isUnreserved(*(text+count)) || isSubDelims(*(text+count)) || isPctEncoded(text+count, &count, data)) {
+    while (isUnreserved(*(text+count)) || isSubDelims(*(text+count)) || (*(text+count)==POURCENT)) {
         Element *sub;
         if (isUnreserved(*(text+count))) { sub = addEl("__unreserved", text+count, 1); count++; }
         else if (isSubDelims(*(text+count))) { sub = addEl("__subdelims", text+count, 1); count++; }
-        else { sub = addEl("__pctencoded", text-count, 3); } // - car déjà augmenter lors de l'appel dans le while si true
+        else { isPctEncoded(text+count, &count, data); } // - car déjà augmenter lors de l'appel dans le while si true
 
         if (fst) {
             data->fils = sub;
@@ -1020,7 +1024,7 @@ bool isRegName(char *text, size_t *curr, Element *data) {
         fst = false;
     }
 
-    updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
@@ -1089,6 +1093,7 @@ bool isHost(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Host", text, strlen(text));
     data->frere = el;
     data = data->frere;
+    Element *save = data;
 
     if (!isUriHost(text, &count, data)) { return false; }
     data = data->fils;
@@ -1100,7 +1105,7 @@ bool isHost(char *text, size_t *curr, Element *data) {
         if (!isPort(text+count, &count, data)) { return false; }
     }
 
-    // updateLength(data, count);
+    updateLength(save, count);
     *curr += count;
     return true;
 }
@@ -1430,6 +1435,7 @@ bool isHostHeader(char *text, size_t *curr, Element *data) {
     Element *el = addEl("Host-header", text, strlen(text));
     data->fils = el;
     data = data->fils;
+    Element *save = data;
 
     size_t count = 0;
     if (!strcmp(text, "Host")) { return false; }
@@ -1450,7 +1456,7 @@ bool isHostHeader(char *text, size_t *curr, Element *data) {
     data = data->frere;
     if (!isOWS(text+count, &count, data, false)) { return false; }
 
-    updateLength(data, count); 
+    updateLength(save, count); 
     *curr += count;
     return true;
 }
