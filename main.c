@@ -22,14 +22,10 @@ int main(int argc, char *argv[]) {
 
     ssize_t read = 0;
     int count = 0;
-    bool fst, snd = false;
     while((read = getline(&tmp, &len, ftest)) != -1) {
-        if (fst == false && snd == false) { fst = true; }
-        else if (fst == true && snd == false) { snd = true; continue; }
-    
         strcpy(line+count, tmp); 
+        fseek(ftest, 0, SEEK_CUR);
         count += read;
-        fseek(ftest, count-1, SEEK_SET);
     }
 
     if (line != NULL) {
