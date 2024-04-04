@@ -771,34 +771,21 @@ bool isDecOctet(char *text, size_t *curr, Element *data, bool is_fils) {
     }
 
     size_t count = 0;
-    if (isDigit(*text)) {
+    if (*text == '2' && *(text+1) == '5' && *(text+2) >= ZERO && *(text+2) <= ZERO+5) {
         Element *el = addEl("__digit", text, 1);
         data->frere = el;
         data = data->frere;
-        count = 1;
-    }
-    else if (*text >= ZERO+1 && *text <= NINE) {
-        Element *el = addEl("__digit", text, 1);
-        data->frere = el;
-        data = data->frere;
-        if (isDigit(*(text+1))) {
+        if (*(text+1) == '5') {
             Element *el = addEl("__digit", text+1, 1);
             data->frere = el;
             data = data->frere;
-            count = 2;
+            if (*(text+2) >= ZERO && *(text+2) <= ZERO+5) {
+                Element *el = addEl("__digit", text+2, 1);
+                data->frere = el;
+                data = data->frere;
+                count = 3;
+            } else { return false; }
         } else { return false; }
-    }
-    else if (*text == '1' && isDigit(*(text+1))) {
-        Element *el = addEl("__digit", text, 1);
-        data->frere = el;
-        data = data->frere;
-        for (int i = 0; i < 2; i++) {
-            if (!isDigit(*(text+i+1))) { return false; }
-            Element *el = addEl("__digit", text+i+1, 1);
-            data->frere = el;
-            data = data->frere;
-        }
-        count = 3;
     }
     else if (*text == '2' && *(text+1) >= ZERO && *(text+1) <= ZERO+4 && isDigit(*(text+2))) {
         Element *el = addEl("__digit", text, 1);
@@ -816,24 +803,36 @@ bool isDecOctet(char *text, size_t *curr, Element *data, bool is_fils) {
             } else { return false; }
         } else { return false; }
     }
-    else if (*text == '2' && *(text+1) == '5' && *(text+2) >= ZERO && *(text+2) <= ZERO+5) {
+    else if (*text == '1' && isDigit(*(text+1))) {
         Element *el = addEl("__digit", text, 1);
         data->frere = el;
         data = data->frere;
-        if (*(text+1) == '5') {
+        for (int i = 0; i < 2; i++) {
+            if (!isDigit(*(text+i+1))) { return false; }
+            Element *el = addEl("__digit", text+i+1, 1);
+            data->frere = el;
+            data = data->frere;
+        }
+        count = 3;
+    }
+    else if (*text >= ZERO+1 && *text <= NINE) {
+        Element *el = addEl("__digit", text, 1);
+        data->frere = el;
+        data = data->frere;
+        if (isDigit(*(text+1))) {
             Element *el = addEl("__digit", text+1, 1);
             data->frere = el;
             data = data->frere;
-            if (*(text+2) >= ZERO && *(text+2) <= ZERO+5) {
-                Element *el = addEl("__digit", text+2, 1);
-                data->frere = el;
-                data = data->frere;
-                count = 3;
-            } else { return false; }
+            count = 2;
         } else { return false; }
-    }    
-    else { return false; }
-
+    }
+    else if (isDigit(*text)) {
+        Element *el = addEl("__digit", text, 1);
+        data->frere = el;
+        data = data->frere;
+        count = 1;
+    }
+    
     updateLength(data, count);
     *curr += count;
     return true;
