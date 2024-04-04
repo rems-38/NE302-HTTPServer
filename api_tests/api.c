@@ -1,8 +1,7 @@
 #include "api.h"
 #include "isX.h"
-#include "arbre.h"
 
-Element *line = NULL;
+struct Element *line = NULL;
 
 // Fonction qui retourne un pointeur (type opaque) vers la racine de l'arbre construit. 
 void *getRootTree(){
@@ -51,6 +50,7 @@ _Token *searchTree(void *start,char *name){
         }
         fin_tree1->next = tree2;
     }
+    return NULL;
 }
 
 // fonction qui renvoie un pointeur vers char indiquant l'etiquette du noeud. (le nom de la rulename, intermediaire ou terminal) 
@@ -81,7 +81,7 @@ void purgeElement(_Token **r){
 }
 
 
-// Fonction qui supprime et libere toute la mémoire associée à l'arbre .
+// Fonction qui supprime et libere toute la mémoire associée à l'arbre.
 
 void purgeTree(void *root){
     struct Element *data = root;
@@ -107,13 +107,19 @@ int parseur(char *req, int len){
 
     if (line == NULL) {
         printf("Erreur dans la lecture du message\n");
-        exit(1);
+        return -1;
     }
-    else { printArbre(line, 0); }
+    else { 
+        printArbre(line, 0);
+        return 0;
+        }
 }
 
 int main(){ //test
-    char *text = "GET / HTTP/1.1\r\nUser-Agent: Wget/1.16 (linux-gnu)\r\nAccept: */*\r\nHost: www.google.com\r\nConnection: Keep-Alive";
-    parseur(text,14);
+    char *text = "GET / HTTP/1.1\r\nUser-Agent: Wget/1.16 (linux-gnu)\r\nAccept: */*\r\nHost: www.google.com\r\nConnection: Keep-Alive\r\n";
+    parseur(text,153);
+
+    searchTree(line,"pchar");
+
     return 0;
 }
