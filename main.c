@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (line != NULL) {
-        Element *req = isHTTPMessage(line, len);
+        Element *req = isHTTPMessage(line, count);
 
         if (req == NULL) {
             printf("Erreur dans la lecture du message\n");
