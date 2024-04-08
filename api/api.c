@@ -22,49 +22,49 @@ void *getRootTree(){
 // Fonction qui recherche dans l'arbre tous les noeuds dont l'etiquette est egale à la chaine de caractères en argument.   
 // Par convention si start == NULL alors on commence à la racine 
 // sinon on effectue une recherche dans le sous-arbre à partir du noeud start 
-_Token *searchTree(void *start,char *name){
+_Token *searchTree(void *start,char *name){ // _Token == struct _token
     
-    struct _token *tree = malloc(sizeof(struct _token));
+    struct _token *chaine = malloc(sizeof(_Token));
+    struct _token *head = chaine;
 
-    if(start == NULL){ // on de la racine de l'arbre
+    if(start == NULL){ // on récupère la racine de l'arbre
         start = getRootTree();
     }
 
     struct Element *data = (struct Element *)start; // on part de l'element data qui pointe vers start
 
 
-    if (strcmp(data->key,name)==0){
-        tree->node = &data; // ajouter le noeud à l'arbre
-        tree = tree->next;  
+    if (strcmp(data->key,name) == 0){
+        chaine->node = &data; // ajouter le noeud à l'arbre
+        chaine = chaine->next;  
     }
 
     // On explore l'arbre
 
     if(data->fils == NULL && data->frere == NULL){
-        return tree;
+        return chaine;
     }
 
     else if(data->fils==NULL){
-        tree = searchTree(data->frere,name);
-        return tree;
+        chaine = searchTree(data->frere,name);
+        return chaine;
     }
 
     else if (data->frere==NULL){
-        tree = searchTree(data->fils,name);
-        return tree;
+        chaine = searchTree(data->fils,name);
+        return chaine;
     }
     else{
-        struct _token *tree1 = searchTree(data->frere,name);
-        struct _token *tree2 = searchTree(data->fils,name);
-        tree = tree1;
-        struct _token *fin_tree1 = tree1;
-        while (fin_tree1-> next != NULL){ // trouver la fin de tree1 pour joindre tree1 et tree2
-            fin_tree1 = fin_tree1 -> next;
+        struct _token *chaine1 = searchTree(data->frere,name);
+        struct _token *chaine2 = searchTree(data->fils,name);
+        chaine = chaine1;
+        struct _token *fin_chaine1 = chaine1;
+        while (fin_chaine1-> next != NULL){ // trouver la fin de chaine1 pour joindre chaine1 et chaine2
+            fin_chaine1 = fin_chaine1 -> next;
         }
-        fin_tree1->next = tree2;
-        return tree;
+        fin_chaine1->next = chaine2;
+        return chaine;
     }
-    return NULL;
 }
 
 // fonction qui renvoie un pointeur vers char indiquant l'etiquette du noeud. (le nom de la rulename, intermediaire ou terminal) 
@@ -89,6 +89,7 @@ void purgeElement(_Token **r){
     struct _token *prec = (*r);
     while((*r)->next != NULL){
         (*r) = (*r)->next;
+        free(prec->node);
         free(prec);
         prec = (*r);
     }
@@ -142,9 +143,12 @@ int parseur(char *req, int len){
 }
 
 int main(){ //test
+
+    // test parseur
     char *text = "VWbG1 /m/JeAk HTTP/0.8\r\n\r\n";
     parseur(text,strlen(text));
 
+    // arbre de test
     struct Element *phrase = malloc(sizeof(Element));
     struct Element *sujet = malloc(sizeof(Element));
     struct Element *verbe = malloc(sizeof(Element));
@@ -166,13 +170,10 @@ int main(){ //test
     complement->key = "complement";
     complement->word = "Pierre";
 
+    // test getRootTree(), getElementTag(), GetElementValue() et purgeTree()
+    /*
     struct Element *racine = getRootTree();
     printf("racine : %s\n",racine->key);
-
-    //_Token *data = searchTree((void*)phrase,"verbe");
-
-    //struct Element *conversion = data->node;
-    //printf("word %s\n",conversion->word);
 
     int *len = malloc(sizeof(int));
 
@@ -181,6 +182,14 @@ int main(){ //test
 
     purgeTree(getRootTree());
     printArbre(getRootTree(),0);
+    */
+
+   // test searchTree()
+
+    _Token *data = searchTree((void*)phrase,"verbe");// data non NULL
+
+    struct Element *conversion = data->node;
+    printf("word %s\n",conversion->word);
 
     return 0;
 }
