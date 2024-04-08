@@ -100,16 +100,27 @@ void purgeElement(_Token **r){
 void purgeTree(void *root){
     struct Element *data = (struct Element *)root;
     if(data->fils == NULL && data->frere != NULL){
-        purgeTree(data->frere);
+        purgeTree((void *)data->frere);
+        free(data->key);
+        free(data->word);
         free(data);
     }
     else if(data->frere == NULL && data->fils != NULL){
-        purgeTree(data->fils);
+        purgeTree((void *)data->fils);
+        free(data->key);
+        free(data->word);
         free(data);
     }
     else if(data->fils != NULL && data->frere != NULL){
-        purgeTree(data->frere);
-        purgeTree(data->fils);
+        purgeTree((void *)data->frere);
+        purgeTree((void *)data->fils);
+        free(data->key);
+        free(data->word);
+        free(data);
+    }
+    else{ // data->fils == NULL && data->frere == NULL
+        free(data->key);
+        free(data->word);
         free(data);
     }
 }
@@ -158,15 +169,18 @@ int main(){ //test
     struct Element *racine = getRootTree();
     printf("racine : %s\n",racine->key);
 
-    _Token *data = searchTree((void*)phrase,"verbe");
-    struct Element *conversion = data->node;
-    char *word=conversion->word; //SEGFAULT ici
-    printf("word %s\n",word);
+    //_Token *data = searchTree((void*)phrase,"verbe");
+
+    //struct Element *conversion = data->node;
+    //printf("word %s\n",conversion->word);
 
     int *len = malloc(sizeof(int));
 
     printf("Tag : %s\n",getElementTag((void *)phrase,len));
     printf("Value : %s\n",getElementValue((void *)phrase,len));
+
+    purgeTree(getRootTree());
+    printArbre(getRootTree(),0);
 
     return 0;
 }
