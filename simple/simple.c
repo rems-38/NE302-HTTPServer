@@ -4,8 +4,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "request.h"   
-#include "api.h"   
+#include "../librequest-0.5/api/request.h"   
+#include "../api/api.h"   
 
 #define REPONSEGOOD "HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: Keepalive\r\n\r\n"
 #define REPONSEBAD "HTTP/1.0 400 OK\r\n\r\n"

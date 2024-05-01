@@ -2,3 +2,4 @@ main
 **/sg
 **/*.o
 **/*.gch
+**/sock

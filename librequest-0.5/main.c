@@ -4,7 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "request.h"   
+#include "reponse.h"
 
 #define REPONSE "HTTP/1.0 200 OK\r\n\r\n"
 
@@ -14,9 +14,13 @@
 #define REPONSE1 "HTTP/1.0 200 OK\r\n"
 #define REPONSE2 "\r\n"
 
+
 int main(int argc, char *argv[])
 {
-	message *requete; 
+	message *requete;
+	
+	char *headers[] = {"Content-Type: text/html", "Content-Length: 0", "Connection: keep-alive"};
+	reponse repOk = {.code = 200, .info = "OK", .headers = headers};
 
 	while ( 1 ) {
 		// on attend la reception d'une requete HTTP requete pointera vers une ressource allouée par librequest. 
@@ -27,10 +31,21 @@ int main(int argc, char *argv[])
 		printf("Client [%d] [%s:%d]\n",requete->clientId,inet_ntoa(requete->clientAddress->sin_addr),htons(requete->clientAddress->sin_port));
 		printf("Contenu de la demande %.*s\n\n",requete->len,requete->buf);  
 
-		writeDirectClient(requete->clientId,REPONSE1,strlen(REPONSE1)); 
-		writeDirectClient(requete->clientId,REPONSE2,strlen(REPONSE2)); 
-		endWriteDirectClient(requete->clientId); 
-		requestShutdownSocket(requete->clientId); 
+		// message *reponse = malloc(sizeof(message));
+		// reponse->clientId = requete->clientId;
+		// reponse->len = strlen(REPONSE1) + strlen(REPONSE2);
+		// reponse->buf = malloc(reponse->len);
+		// strcpy(reponse->buf, REPONSE1);
+		// strcat(reponse->buf, REPONSE2);
+
+		// sendReponse(reponse);
+		
+		sendReponse(createMsgFromReponse(repOk, requete->clientId));
+		
+		// writeDirectClient(requete->clientId,REPONSE1,strlen(REPONSE1)); 
+		// writeDirectClient(requete->clientId,REPONSE2,strlen(REPONSE2)); 
+		// endWriteDirectClient(requete->clientId); 
+		// requestShutdownSocket(requete->clientId); 
 	// on ne se sert plus de requete a partir de maintenant, on peut donc liberer... 
 	freeRequest(requete); 
 	}
