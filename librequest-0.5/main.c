@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	message *requete;
 	
 	char *headers[] = {"Content-Type: text/html", "Content-Length: 0", "Connection: keep-alive"};
-	reponse repOk = {.code = 200, .info = "OK", .headers = headers};
+	reponse repOk = {.code = 200, .info = "OK", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
 
 	while ( 1 ) {
 		// on attend la reception d'une requete HTTP requete pointera vers une ressource allouée par librequest. 

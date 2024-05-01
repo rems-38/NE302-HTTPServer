@@ -9,7 +9,7 @@ message *createMsgFromReponse(reponse rep, unsigned int clientId) {
     char *code = malloc(sizeof(int));
     sprintf(code, "%d", rep.code);
     
-    // int bufSize = sizeof(int) + strlen(rep.info) + sizeof(rep.headers) / sizeof(char *);
+    // int bufSize = sizeof(int) + strlen(rep.info) + rep.headersCount;
     int bufSize = 150;
     char *buf = malloc(bufSize);
     strcpy(buf, "HTTP/1.0 ");
@@ -17,7 +17,7 @@ message *createMsgFromReponse(reponse rep, unsigned int clientId) {
     strcat(buf, " ");
     strcat(buf, rep.info);
     strcat(buf, "\r\n");
-    for (int i = 0; i < sizeof(rep.headers) / sizeof(char *); i++) {
+    for (int i = 0; i < rep.headersCount; i++) {
         strcat(buf, rep.headers[i]);
         strcat(buf, "\r\n");
     }
