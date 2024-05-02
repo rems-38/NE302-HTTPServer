@@ -2,13 +2,10 @@
 all : librequest.so sock 
 
 sock : librequest.so main.o reponse.o
-	gcc -g -o sock main.o reponse.o -L. -lrequest
+	gcc -g -fsanitize=address -o sock main.o reponse.o -L. -lrequest -lparser
 
 %.o: %.c 
-	gcc -fPIC -g -I../../abnf -I./api -c $< 
-
-main.o: main.c
-	gcc -fPIC -g -I./api -c $< 
+	gcc -fPIC -fsanitize=address -g -I../../abnf -I./api -I libparser -c $<
 
 #librequest.so : socket.o 
 #	ld -shared -Bsymbolic -Bsymbolic-function -soname librequest.so -o librequest.so ./parser/librequest.o ./socket.o 

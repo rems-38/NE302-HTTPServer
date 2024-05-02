@@ -7,4 +7,13 @@ typedef struct {
     int headersCount;
 } reponse;
 
+typedef struct listReponse listReponse;
+struct listReponse {
+    reponse current;
+    listReponse *next;
+};
+
 message *createMsgFromReponse(reponse rep, unsigned int clientId);
+listReponse *initReps();
+int getRepCode(message req);
+reponse generateReponse(message req);
