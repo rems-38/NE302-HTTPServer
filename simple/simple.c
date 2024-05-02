@@ -8,7 +8,7 @@
 #include "../api/api.h"   
 
 #define REPONSEGOOD "HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: Keepalive\r\n\r\n"
-#define REPONSEBAD "HTTP/1.0 400 OK\r\n\r\n"
+#define REPONSEBAD "HTTP/1.0 400 Bad Request\r\n\r\n"
 
 // ceci decrit la methode experimentale de renvoi de la reponse Cf API
 
