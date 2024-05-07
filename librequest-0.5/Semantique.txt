@@ -1,0 +1,18 @@
+Règles sémantiques de notre serveur HTTP :
+
+
+Si Method n'est pas supporté : 405 Method Not Allowed
+taille Method > max(taille Method serveur) : erreur 501 Not Implemented
+taille URI > max(taille URI serveur) : erreur 414 URI Too Long
+Request-Target : percent-Encoding + normalisation
+/... : existence du chemin dans le serveur + validité
+
+plusieurs Host | version 1.1 sans Host | valeur de Host invalide : erreur 400 Bad Request
+
+Message-body et Content-Type : intégrité + validité
+
+
+
+
+
+
