@@ -21,10 +21,23 @@ typedef struct Element {
     struct Element *frere;
 } Element;
 
+/*
+char* Scopy(char* src,int n){
+	char* dest = malloc(n);
+	for(int i = 0; i < n; i++){
+		dest[i] =  src[i];
+	}
+	return dest;
+}
+*/
 
 
 int main(int argc, char *argv[])
 {
+	//char* src = "testtest";
+	//char* dest = Scopy(src,3);
+	//printf("dest : %s\n",dest);
+
 	message *requete; 
 
 	while ( 1 ) {
@@ -34,14 +47,28 @@ int main(int argc, char *argv[])
 		// Affichage de debug 
 		printf("#########################################\nDemande recue depuis le client %d\n",requete->clientId); 
 		printf("Client [%d] [%s:%d]\n",requete->clientId,inet_ntoa(requete->clientAddress->sin_addr),htons(requete->clientAddress->sin_port));
-		printf("Contenu de la demande ''%.*s''\n\n",requete->len,requete->buf);  
+		printf("Contenu de la demande :\n''%.*s''\n\n",requete->len,requete->buf);  
 			
 		if ( parseur(requete->buf,requete->len) !=1 ) { 
 			
 			writeDirectClient(requete->clientId,REPONSEBAD,strlen(REPONSEBAD)); 
 		} 
 		else {
-			_Token* tok = searchTree(NULL,"request_target");
+			printf("Bonne requete\n");
+			_Token* hf = searchTree(NULL,"header_field");
+			int len;
+			while(hf != NULL){
+				char* value = getElementValue(hf->node,&len);
+				printf("--------------------\n");
+				//char* v;				//probleme affichage avec strncpy
+				//strncpy(v,value,len);
+				printf("taille %d : %s\n",len,value);
+				printf("--------------------\n\n");
+				hf = hf->next;
+			}	
+
+
+			/*_Token* tok = searchTree(NULL,"request_target");
 			int len;
 			char* request = getElementTag(tok->node,&len);
 			printf("taille1 : %d\n",len);
@@ -53,11 +80,8 @@ int main(int argc, char *argv[])
 			char* r2 = malloc(len);
 			strncpy(r2,r1,len); //gdb -> bonne valeur dans r2
 			//printf("RT : '%s'\n",r2); //mais printf ne fonctionne pas
-
+			*/
 			
-
-			//Element* el = getRootTree();
-			//printf("fils word : %s\n",el->fils->word);
 			writeDirectClient(requete->clientId,REPONSEGOOD,strlen(REPONSEGOOD)); 
 		}
 		endWriteDirectClient(requete->clientId); 
@@ -65,6 +89,7 @@ int main(int argc, char *argv[])
 	// on ne se sert plus de requete a partir de maintenant, on peut donc liberer... 
 	freeRequest(requete); 
 	}
+	
 	return (1);
 }
 
