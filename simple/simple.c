@@ -60,9 +60,9 @@ int main(int argc, char *argv[])
 			while(hf != NULL){
 				char* value = getElementValue(hf->node,&len);
 				printf("--------------------\n");
-				//char* v;				//probleme affichage avec strncpy
-				//strncpy(v,value,len);
-				printf("taille %d : %s\n",len,value);
+				char* v = malloc(len);				//probleme affichage avec strncpy
+				strncpy(v,value,len);
+				//printf("taille %d : %s\n",len,v);
 				printf("--------------------\n\n");
 				hf = hf->next;
 			}	
