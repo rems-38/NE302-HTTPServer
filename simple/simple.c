@@ -63,6 +63,9 @@ int main(int argc, char *argv[])
 				char* v = malloc(len);				//probleme affichage avec strncpy
 				strncpy(v,value,len);
 				//printf("taille %d : %s\n",len,v);
+				//if(strcmp("Host: 192.138.1.21:8080",v) == 0){ comparaison ne fionctionne pas
+					//printf("Host: 192.138.1.21:8080 ok\n");
+				//}
 				printf("--------------------\n\n");
 				hf = hf->next;
 			}	
