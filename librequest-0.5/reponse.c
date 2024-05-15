@@ -116,7 +116,7 @@ int getRepCode(message req) {
     if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0 || strcmp(method, "HEAD") == 0)) { return 405; }
     else if (len > LEN_METHOD) { return 501; }
 
-    if ((strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0) && (searchTree(tree,"message_body") == NULL)){ return 400; }
+    if ((strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0) && (searchTree(tree,"message_body") != NULL)){ return 400; }
 
     _Token *uriNode = searchTree(tree, "request_target");
     char *uriL = getElementValue(uriNode->node, &len);
