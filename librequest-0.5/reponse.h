@@ -1,19 +1,26 @@
 #include "request.h"
+#include "config.h"
+
 
 typedef struct {
     int code;
     char *info;
     char **headers;
     int headersCount;
-} reponse;
+} HttpCode;
 
-typedef struct listReponse listReponse;
-struct listReponse {
-    reponse current;
-    listReponse *next;
-};
+typedef struct {
+    HttpCode *table[NB_HTTP_CODES];
+} HTTPTable;
 
-message *createMsgFromReponse(reponse rep, unsigned int clientId);
-listReponse *initReps();
+
+uint32_t hash(uint32_t code, uint32_t nbTry);
+void initTable(HTTPTable *codes);
+void freeTable(HTTPTable *codes);
+void addTable(HTTPTable *codes, int code, char *info, char **headers, int headersCount);
+HTTPTable *loadTable();
+HttpCode *getTable(HTTPTable *codes, int code);
+
+message *createMsgFromReponse(HttpCode rep, unsigned int clientId);
 int getRepCode(message req);
-reponse generateReponse(message req);
+message *generateReponse(message req, int opt_code);

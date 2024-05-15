@@ -20,21 +20,15 @@ int main(int argc, char *argv[])
 		// Affichage de debug 
 		printf("#########################################\nDemande recue depuis le client %d\n",requete->clientId); 
 		printf("Client [%d] [%s:%d]\n",requete->clientId,inet_ntoa(requete->clientAddress->sin_addr),htons(requete->clientAddress->sin_port));
-		printf("Contenu de la demande %.*s\n\n",requete->len,requete->buf);  
+		printf("%.*s\n\n",requete->len,requete->buf);  
 
-		if (parseur(requete->buf, requete->len) != 1) {
-			char *headers[] = {"Content-Type: text/html", "Content-Length: 0", "Connection: keep-alive"};
-			reponse repBadRequest = {.code = 400, .info = "Bad Request", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-
-			message *msg = createMsgFromReponse(repBadRequest, requete->clientId);
-			printf("Reponse: %s\n", msg->buf);
-			sendReponse(msg); 
-		} else {
-			printf("HTTP Code : %d\n", getRepCode(*requete));
-			// message *msg = createMsgFromReponse(generateReponse(*requete), requete->clientId);
-			// printf("Reponse: %s\n", msg->buf);
-			// sendReponse(msg); 
-		}
+		message *msg;
+		if (parseur(requete->buf, requete->len) != 1) { msg = generateReponse(*requete, 400); }
+		else { msg = generateReponse(*requete, -1); }
+		printf("#########################################\nReponse envoyee au client %d\n",requete->clientId);
+		printf("Client [%d] [%s:%d]\n",requete->clientId,inet_ntoa(requete->clientAddress->sin_addr),htons(requete->clientAddress->sin_port));
+		printf("%.*s\n\n",msg->len,msg->buf);
+		sendReponse(msg); 
 
 		requestShutdownSocket(requete->clientId); 
 

@@ -1,127 +1,110 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 #include "reponse.h"
 #include "../api/api.h"
 #include "config.h"
 
-message *createMsgFromReponse(reponse rep, unsigned int clientId) {
-    message *msg = malloc(sizeof(message));
-    /*
-    char *code = malloc(sizeof(int));
-    sprintf(code, "%d", rep.code);
+
+uint32_t h1(uint32_t code) { return code % NB_HTTP_CODES; }
+uint32_t h2(uint32_t code) { return 1 + (code % (NB_HTTP_CODES - 1)); }
+uint32_t hash(uint32_t code, uint32_t nbTry) {
+    return (h1(code) + nbTry * h2(code)) % NB_HTTP_CODES;
+}
+
+void initTable(HTTPTable *codes) {
+    for (int i = 0; i < NB_HTTP_CODES; i++) { codes->table[i] = NULL; }
+}
+
+void freeTable(HTTPTable *codes) {
+    for (int i = 0; i < NB_HTTP_CODES; i++) {
+        if (codes->table[i] != NULL) {
+            free(codes->table[i]->info);
+            for (int j = 0; j < codes->table[i]->headersCount; j++) {
+                free(codes->table[i]->headers[j]);
+            }
+            free(codes->table[i]->headers);
+            free(codes->table[i]);
+        }
+    }
+}
+
+void addTable(HTTPTable *codes, int code, char *info, char **headers, int headersCount) {
+    HttpCode *el = malloc(sizeof(HttpCode));
+    el->code = code;
+    el->info = malloc(strlen(info) + 1);
+    strcpy(el->info, info);
+    el->headers = malloc(headersCount * sizeof(char *));
+    for (int i = 0; i < headersCount; i++) {
+        el->headers[i] = malloc(strlen(headers[i]) + 1);
+        strcpy(el->headers[i], headers[i]);
+    }
+    el->headersCount = headersCount;
+
+    int nbTry = 0;
+    while (codes->table[hash(code, nbTry)] != NULL) { nbTry++; }
+    codes->table[hash(code, nbTry)] = el;
+}
+
+HTTPTable *loadTable() {
+    HTTPTable *codes = malloc(sizeof(HTTPTable));
+    initTable(codes);
     
+    char *headers[] = {"Content-Type: text/html", "Content-Length: 0", "Connection: keep-alive"};
+    int headersCount = sizeof(headers) / sizeof(headers[0]);
+
+    addTable(codes, 200, "OK", headers, headersCount);
+    addTable(codes, 201, "Created", headers, headersCount);
+    addTable(codes, 202, "Accepted", headers, headersCount);
+    addTable(codes, 204, "No Content", headers, headersCount);
+    addTable(codes, 400, "Bad Request", headers, headersCount);
+    addTable(codes, 401, "Unauthorized", headers, headersCount);
+    addTable(codes, 403, "Forbidden", headers, headersCount);
+    addTable(codes, 404, "Not Found", headers, headersCount);
+    addTable(codes, 405, "Method Not Allowed", headers, headersCount);
+    addTable(codes, 414, "URI Too Long", headers, headersCount);
+    addTable(codes, 500, "Internal Server Error", headers, headersCount);
+    addTable(codes, 501, "Not Implemented", headers, headersCount);
+    addTable(codes, 503, "Service Unavailable", headers, headersCount);
+
+    return codes;
+}
+
+HttpCode *getTable(HTTPTable *codes, int code) {
+    int nbTry = 0;
+    while (codes->table[hash(code, nbTry)]->code != code) { nbTry++; }
+
+    return codes->table[hash(code, nbTry)];
+}
+
+
+message *createMsgFromReponse(HttpCode rep, unsigned int clientId) {
+    message *msg = malloc(sizeof(message));
+
     // Calcul de la taille nécessaire pour buf
-    int bufSize = strlen("HTTP/1.0 ") + strlen(code) + strlen(" ") + strlen(rep.info) + strlen("\r\n");
+    int bufSize = strlen("HTTP/1.0 ") + 3 + strlen(" ") + strlen(rep.info) + strlen("\r\n"); // 3 : taille d'une code (200, 404, ...)
     for (int i = 0; i < rep.headersCount; i++) {
         bufSize += strlen(rep.headers[i]) + strlen("\r\n");
     }
     bufSize += strlen("\r\n");
 
-    char *buf = malloc(bufSize + 1);
-    strcpy(buf, "HTTP/1.0 ");
-    strcat(buf, code);
-    strcat(buf, " ");
-    strcat(buf, rep.info);
-    strcat(buf, "\r\n");
-    for (int i = 0; i < rep.headersCount; i++) {
-        strcat(buf, rep.headers[i]);
-        strcat(buf, "\r\n");
-
-        bufSize += strlen(rep.headers[i]) + strlen("\r\n");
-    }
-    strcat(buf, "\r\n");
-    
-    bufSize += strlen("HTTP/1.0 ") + strlen(code) + strlen(" ") + strlen(rep.info) + strlen("\r\n") + strlen("\r\n");
-
     msg->buf = malloc(bufSize + 1);
-    strcpy(msg->buf, buf);
+    sprintf(msg->buf, "HTTP/1.0 %d %s\n", rep.code, rep.info);
+    int len = strlen(msg->buf);
+    for (int i = 0; i < rep.headersCount; i++) {
+        sprintf(msg->buf+len, "%s\n", rep.headers[i]);
+        len += strlen(rep.headers[i]) + strlen("\n");
+    }
+    
     msg->len = bufSize;
     msg->clientId = clientId;
 
-    free(code);
-    free(buf);
-    */
     return msg;
-}
-
-listReponse *initReps() {
-    listReponse *reps = malloc(sizeof(listReponse));
-    listReponse *head = reps;
-
-    char *headers[] = {"Content-Type: text/html", "Content-Length: 0", "Connection: keep-alive"};
-    
-	reponse repOk = {.code = 200, .info = "OK", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-    reps->current = repOk;
-    reps->next = malloc(sizeof(listReponse));
-    reps = reps->next;
-    
-    reponse repCreated = {.code = 201, .info = "Created", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-    reps->current = repCreated;
-    reps->next = malloc(sizeof(listReponse));
-    reps = reps->next;
-    
-    reponse repAccepted = {.code = 202, .info = "Accepted", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-    reps->current = repAccepted;
-    reps->next = malloc(sizeof(listReponse));
-    reps = reps->next;
-    
-    reponse repNoContent = {.code = 204, .info = "No Content", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-    reps->current = repNoContent;
-    reps->next = malloc(sizeof(listReponse));
-    reps = reps->next;
-    
-    reponse repBadRequest = {.code = 400, .info = "Bad Request", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-    reps->current = repBadRequest;
-    reps->next = malloc(sizeof(listReponse));
-    reps = reps->next;
-    
-    reponse repUnauthorized = {.code = 401, .info = "Unauthorized", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-    reps->current = repUnauthorized;
-    reps->next = malloc(sizeof(listReponse));
-    reps = reps->next;
-    
-    reponse repForbidden = {.code = 403, .info = "Forbidden", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-    reps->current = repForbidden;
-    reps->next = malloc(sizeof(listReponse));
-    reps = reps->next;
-    
-    reponse repNotFound = {.code = 404, .info = "Not Found", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-    reps->current = repNotFound;
-    reps->next = malloc(sizeof(listReponse));
-    reps = reps->next;
-    
-    reponse repMethodNotAllowed = {.code = 405, .info = "Method Not Allowed", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-    reps->current = repMethodNotAllowed;
-    reps->next = malloc(sizeof(listReponse));
-    reps = reps->next;
-
-    reponse repURITooLong = {.code = 414, .info = "URI Too Long", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-    reps->current = repURITooLong;
-    reps->next = malloc(sizeof(listReponse));
-    reps = reps->next;
-    
-    reponse repInternalServerError = {.code = 500, .info = "Internal Server Error", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-    reps->current = repInternalServerError;
-    reps->next = malloc(sizeof(listReponse));
-    reps = reps->next;
-    
-    reponse repNotImplemented = {.code = 501, .info = "Not Implemented", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-    reps->current = repNotImplemented;
-    reps->next = malloc(sizeof(listReponse));
-    reps = reps->next;
-    
-    reponse repServiceUnavailable = {.code = 503, .info = "Service Unavailable", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
-    reps->current = repServiceUnavailable;
-    reps->next = malloc(sizeof(listReponse));
-    reps = reps->next;
-    
-    return head;
 }
 
 
 int getRepCode(message req) {
-    
     void *tree = getRootTree();
     int len;
 
@@ -130,7 +113,6 @@ int getRepCode(message req) {
     char *method = malloc(len + 1);
     strncpy(method, methodL, len);
     method[len] = '\0';
-    printf("Method: %s\n", method);
     if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0)) { return 405; }
 
 
@@ -139,27 +121,31 @@ int getRepCode(message req) {
     char *uri = malloc(len + 1);
     strncpy(uri, uriL, len);
     uri[len] = '\0';
-    printf("URI: %s\n", uri);
-    
+
     if (strcmp(uri, "/") == 0) {
         uri = realloc(uri, strlen("/index.html") + 1);
         strcpy(uri, "/index.html");
     }
-    printf("URI (new): %s\n", uri);
     char *path = malloc(strlen(SERVER_ROOT) + strlen(uri) + 1);
     strcpy(path, SERVER_ROOT);
     strcat(path, uri);
-    printf("Path: %s\n", path);
     FILE *file = fopen(path, "r");
     if (file == NULL) { return 404; }
 
     return 200;
 }
 
-reponse generateReponse(message req) {
+message *generateReponse(message req, int opt_code) {
+    HTTPTable *codes = loadTable();
 
-    int code = getRepCode(req);
-    listReponse *reps = initReps();
+    int code;
+    if (opt_code == -1) { code = getRepCode(req); }
+    else { code = opt_code; }
 
+    HttpCode *rep = getTable(codes, code);
+    message *msg = createMsgFromReponse(*rep, req.clientId);
 
+    freeTable(codes);
+
+    return msg;
 }
