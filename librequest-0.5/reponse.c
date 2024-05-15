@@ -127,17 +127,27 @@ int getRepCode(message req) {
         uri = realloc(uri, strlen("/index.html") + 1);
         strcpy(uri, "/index.html");
     }
+    for (int i = 0; i < len-1; i++) {
+        if (uri[i] == '.' && uri[i+1] == '.') { return 403; } // tentative de remonter à la racine du serveur
+    }
     char *path = malloc(strlen(SERVER_ROOT) + strlen(uri) + 1);
     strcpy(path, SERVER_ROOT);
     strcat(path, uri);
     FILE *file = fopen(path, "r");
     if (file == NULL) { return 404; }
-    
+
     _Token *versionNode = searchTree(tree, "HTTP_version");
     char *versionL = getElementValue(versionNode->node, &len);
     char majeur = versionL[5];
     char mineur = versionL[7];
     if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){return 505;}
+
+    _Token *HostNode = searchTree(tree, "Host");
+    if (HostNode->next != NULL) { return 400; } // plusieurs Host
+    if (majeur == 1 && mineur == 1 && HostNode == NULL) { return 400; } // HTTP/1.1 sans Host
+    char *hostL = getElementValue(HostNode->node, &len);
+    char *host = malloc(len + 1);
+
 
     return 200;
 }
