@@ -60,30 +60,17 @@ int main(int argc, char *argv[])
 			while(hf != NULL){
 				char* value = getElementValue(hf->node,&len);
 				printf("--------------------\n");
-				char* v = malloc(len);				//probleme affichage avec strncpy
+				char* v = malloc(len+1);	//len + 1 : pour la sentinelle
 				strncpy(v,value,len);
-				//printf("taille %d : %s\n",len,v);
-				//if(strcmp("Host: 192.138.1.21:8080",v) == 0){ comparaison ne fionctionne pas
-					//printf("Host: 192.138.1.21:8080 ok\n");
-				//}
+				v[len] = '\0';				//ajout de la sentienelle
+				printf("%s\n",v);
+				if(strcmp("Host: 192.138.1.21:8080",v) == 0){
+					printf("comparaison ok\n");
+				}
 				printf("--------------------\n\n");
 				hf = hf->next;
 			}	
 
-
-			/*_Token* tok = searchTree(NULL,"request_target");
-			int len;
-			char* request = getElementTag(tok->node,&len);
-			printf("taille1 : %d\n",len);
-			printf("RT : '%s'\n",request);
-			
-			char* r1 = getElementValue(tok->node,&len);
-			printf("RT : '%s'\n",r1);
-			printf("taille2 : %d\n",len);
-			char* r2 = malloc(len);
-			strncpy(r2,r1,len); //gdb -> bonne valeur dans r2
-			//printf("RT : '%s'\n",r2); //mais printf ne fonctionne pas
-			*/
 			
 			writeDirectClient(requete->clientId,REPONSEGOOD,strlen(REPONSEGOOD)); 
 		}
