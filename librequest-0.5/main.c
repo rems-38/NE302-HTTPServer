@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include "reponse.h"
 #include "../api/api.h"
+#include "config.h"
 
 
 int main(int argc, char *argv[])
@@ -29,9 +30,10 @@ int main(int argc, char *argv[])
 			printf("Reponse: %s\n", msg->buf);
 			sendReponse(msg); 
 		} else {
-			message *msg = createMsgFromReponse(generateReponse(*requete), requete->clientId);
-			printf("Reponse: %s\n", msg->buf);
-			sendReponse(msg); 
+			printf("HTTP Code : %d\n", getRepCode(*requete));
+			// message *msg = createMsgFromReponse(generateReponse(*requete), requete->clientId);
+			// printf("Reponse: %s\n", msg->buf);
+			// sendReponse(msg); 
 		}
 
 		requestShutdownSocket(requete->clientId); 

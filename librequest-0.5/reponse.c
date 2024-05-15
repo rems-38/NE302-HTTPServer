@@ -2,10 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "reponse.h"
+#include "../api/api.h"
+#include "config.h"
 
 message *createMsgFromReponse(reponse rep, unsigned int clientId) {
     message *msg = malloc(sizeof(message));
-    
+    /*
     char *code = malloc(sizeof(int));
     sprintf(code, "%d", rep.code);
     
@@ -39,7 +41,7 @@ message *createMsgFromReponse(reponse rep, unsigned int clientId) {
 
     free(code);
     free(buf);
-    
+    */
     return msg;
 }
 
@@ -93,6 +95,11 @@ listReponse *initReps() {
     reps->current = repMethodNotAllowed;
     reps->next = malloc(sizeof(listReponse));
     reps = reps->next;
+
+    reponse repURITooLong = {.code = 414, .info = "URI Too Long", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
+    reps->current = repURITooLong;
+    reps->next = malloc(sizeof(listReponse));
+    reps = reps->next;
     
     reponse repInternalServerError = {.code = 500, .info = "Internal Server Error", .headers = headers, .headersCount = sizeof(headers) / sizeof(headers[0])};
     reps->current = repInternalServerError;
@@ -115,12 +122,44 @@ listReponse *initReps() {
 
 int getRepCode(message req) {
     
+    void *tree = getRootTree();
+    int len;
+
+    _Token *methodNode = searchTree(tree, "method");
+    char *methodL = getElementValue(methodNode->node, &len);
+    char *method = malloc(len + 1);
+    strncpy(method, methodL, len);
+    method[len] = '\0';
+    printf("Method: %s\n", method);
+    if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0)) { return 405; }
 
 
+    _Token *uriNode = searchTree(tree, "request_target");
+    char *uriL = getElementValue(uriNode->node, &len);
+    char *uri = malloc(len + 1);
+    strncpy(uri, uriL, len);
+    uri[len] = '\0';
+    printf("URI: %s\n", uri);
+    
+    if (strcmp(uri, "/") == 0) {
+        uri = realloc(uri, strlen("/index.html") + 1);
+        strcpy(uri, "/index.html");
+    }
+    printf("URI (new): %s\n", uri);
+    char *path = malloc(strlen(SERVER_ROOT) + strlen(uri) + 1);
+    strcpy(path, SERVER_ROOT);
+    strcat(path, uri);
+    printf("Path: %s\n", path);
+    FILE *file = fopen(path, "r");
+    if (file == NULL) { return 404; }
+
+    return 200;
 }
 
 reponse generateReponse(message req) {
 
     int code = getRepCode(req);
+    listReponse *reps = initReps();
+
 
 }
