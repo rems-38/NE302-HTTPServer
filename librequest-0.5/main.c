@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 		printf("%.*s\n\n",requete->len,requete->buf);  
 
 		message *msg;
-		if (parseur(requete->buf, requete->len) != 1) { msg = generateReponse(*requete, 400); }
+		if (parseur(requete->buf, requete->len) != 1) { printf("Parser failed\n"); msg = generateReponse(*requete, 400); }
 		else { msg = generateReponse(*requete, -1); }
 		printf("#########################################\nReponse envoyee au client %d\n",requete->clientId);
 		printf("Client [%d] [%s:%d]\n",requete->clientId,inet_ntoa(requete->clientAddress->sin_addr),htons(requete->clientAddress->sin_port));

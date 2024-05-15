@@ -134,7 +134,9 @@ int getRepCode(message req) {
     char *path = malloc(strlen(SERVER_ROOT) + strlen(uri) + 1);
     strcpy(path, SERVER_ROOT);
     strcat(path, uri);
+    free(uri);
     FILE *file = fopen(path, "r");
+    free(path);
     if (file == NULL) { return 404; }
 
     _Token *versionNode = searchTree(tree, "HTTP_version");
@@ -146,8 +148,13 @@ int getRepCode(message req) {
     _Token *HostNode = searchTree(tree, "Host");
     if (majeur == 1 && mineur == 1 && HostNode == NULL) { return 400; } // HTTP/1.1 sans Host
     if ((HostNode != NULL) && (HostNode->next != NULL)) { return 400; } // plusieurs Host
-    char *hostL = getElementValue(HostNode->node, &len);
-    char *host = malloc(len + 1);
+    if (HostNode != NULL) {
+        char *hostL = getElementValue(HostNode->node, &len);
+        char *host = malloc(len + 1);
+
+
+        free(host);
+    }
 
 
     return 200;
