@@ -196,6 +196,9 @@ int getRepCode(message req) {
         free(host);
     }
 
+    _Token *C_LengthNode = searchTree(tree, "Content_Length_header");
+    _Token *T_EncodingNode = searchTree(tree, "Transfer_Encoding_header");
+    if(T_EncodingNode != NULL && C_LengthNode != NULL){return 400;}
 
     return 200;
 }
