@@ -151,8 +151,48 @@ int getRepCode(message req) {
     if (HostNode != NULL) {
         char *hostL = getElementValue(HostNode->node, &len);
         char *host = malloc(len + 1);
+        strncpy(host, hostL, len);
+        host[len] = '\0';
 
+        if(len > LEN_HOST){return 400;}
 
+        // déterminer la nature du host (dns ou ip)
+        int i=0;
+        int point = 0;
+        int d_point = 0;
+        while(host[i]!='\0'){
+            if(host[i]=='.'){point++;}
+            else if(host[i]==':'){d_point++;}
+        }
+
+        if(point<2 | point>3){return 400;}
+
+        if(point == 2){// nom de domaine
+            char *dns[3];
+            sscanf(host, "%s.%s.%s", dns[0], dns[1], dns[2]);
+            if (strcmp(dns[0],"www")!=0){return 400;}
+            if (strcmp(dns[2],"com")!=0 && strcmp(dns[2],"net")!=0 && strcmp(dns[2],"fr")!=0){return 400;}
+
+            int j=0;
+            while (dns[1][j] != '\0'){
+                if(!((dns[1][j]>=65 && dns[1][j]<=90) | (dns[1][j]>=97 && dns[1][j]<=122) | dns[1][j] == '-')){return 400;}
+            }
+            if (j>63){return 400;}
+        }
+
+        if (point == 3 && d_point == 0){// ip sans port
+            int ip[4];
+            sscanf(host, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]);
+            if((ip[0]>256|ip[0]<0) | (ip[1]>256|ip[1]<0) | (ip[2]>256|ip[2]<0) | (ip[3]>256|ip[3]<0)){return 400;} //ip invalide
+        }
+
+        if (point == 3 && d_point == 1){// ip avec port
+            int ip_port[5];
+            sscanf(host, "%d.%d.%d.%d:%d", &ip_port[0], &ip_port[1], &ip_port[2], &ip_port[3], &ip_port[4]);
+            if((ip_port[0]>256|ip_port[0]<0) | (ip_port[1]>256|ip_port[1]<0) | (ip_port[2]>256|ip_port[2]<0) | (ip_port[3]>256|ip_port[3]<0) | ip_port[4] != 8080){return 400;} //ip invalide
+        }
+        
+        
         free(host);
     }
 
