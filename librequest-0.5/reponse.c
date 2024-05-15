@@ -114,6 +114,7 @@ int getRepCode(message req) {
     strncpy(method, methodL, len);
     method[len] = '\0';
     if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0)) { return 405; }
+    else if (len > LEN_METHOD) { return 501; }
 
 
     _Token *uriNode = searchTree(tree, "request_target");
@@ -131,6 +132,8 @@ int getRepCode(message req) {
     strcat(path, uri);
     FILE *file = fopen(path, "r");
     if (file == NULL) { return 404; }
+    else if (len > LEN_URI) { return 414; }
+    
 
     return 200;
 }
