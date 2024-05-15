@@ -113,7 +113,7 @@ int getRepCode(message req) {
     char *method = malloc(len + 1);
     strncpy(method, methodL, len);
     method[len] = '\0';
-    if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0)) { return 405; }
+    if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0 || strcmp(method, "HEAD") == 0)) { return 405; }
     else if (len > LEN_METHOD) { return 501; }
 
 
@@ -122,7 +122,7 @@ int getRepCode(message req) {
     char *uri = malloc(len + 1);
     strncpy(uri, uriL, len);
     uri[len] = '\0';
-
+    if (len > LEN_URI) { return 414; }
     if (strcmp(uri, "/") == 0) {
         uri = realloc(uri, strlen("/index.html") + 1);
         strcpy(uri, "/index.html");
@@ -132,8 +132,12 @@ int getRepCode(message req) {
     strcat(path, uri);
     FILE *file = fopen(path, "r");
     if (file == NULL) { return 404; }
-    else if (len > LEN_URI) { return 414; }
     
+    _Token *versionNode = searchTree(tree, "HTTP_version");
+    char *versionL = getElementValue(versionNode->node, &len);
+    char majeur = versionL[5];
+    char mineur = versionL[7];
+    if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){return 505;}
 
     return 200;
 }
