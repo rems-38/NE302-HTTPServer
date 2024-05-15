@@ -67,6 +67,7 @@ HTTPTable *loadTable() {
     addTable(codes, 500, "Internal Server Error", headers, headersCount);
     addTable(codes, 501, "Not Implemented", headers, headersCount);
     addTable(codes, 503, "Service Unavailable", headers, headersCount);
+    addTable(codes, 505, "HTTP Version Not Supported", headers, headersCount);
 
     return codes;
 }
@@ -143,6 +144,7 @@ int getRepCode(message req) {
     char *versionL = getElementValue(versionNode->node, &len);
     char majeur = versionL[5];
     char mineur = versionL[7];
+    printf("%c, %c\n", majeur, mineur);
     if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){return 505;}
 
     _Token *HostNode = searchTree(tree, "Host");
@@ -210,6 +212,7 @@ message *generateReponse(message req, int opt_code) {
     if (opt_code == -1) { code = getRepCode(req); }
     else { code = opt_code; }
 
+    printf("%d\n", code);
     HttpCode *rep = getTable(codes, code);
     message *msg = createMsgFromReponse(*rep, req.clientId);
 
