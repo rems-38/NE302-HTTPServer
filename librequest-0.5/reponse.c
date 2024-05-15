@@ -116,6 +116,7 @@ int getRepCode(message req) {
     if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0 || strcmp(method, "HEAD") == 0)) { return 405; }
     else if (len > LEN_METHOD) { return 501; }
 
+    if ((strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0) && (searchTree(tree,"message_body") == NULL)){ return 400; }
 
     _Token *uriNode = searchTree(tree, "request_target");
     char *uriL = getElementValue(uriNode->node, &len);
@@ -143,8 +144,8 @@ int getRepCode(message req) {
     if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){return 505;}
 
     _Token *HostNode = searchTree(tree, "Host");
-    if (HostNode->next != NULL) { return 400; } // plusieurs Host
     if (majeur == 1 && mineur == 1 && HostNode == NULL) { return 400; } // HTTP/1.1 sans Host
+    if ((HostNode != NULL) && (HostNode->next != NULL)) { return 400; } // plusieurs Host
     char *hostL = getElementValue(HostNode->node, &len);
     char *host = malloc(len + 1);
 
