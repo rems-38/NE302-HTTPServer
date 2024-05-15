@@ -202,6 +202,22 @@ int getRepCode(message req) {
     _Token *T_EncodingNode = searchTree(tree, "Transfer_Encoding_header");
     if(T_EncodingNode != NULL && C_LengthNode != NULL){return 400;}
 
+/*
+    _Token *ConnectionNode = searchTree(tree, "Connection");
+    char *ConnectionL = getElementValue(ConnectionNode->node, &len);
+    if(strcmp(ConnectionL,"close") == 0){
+        //renvoyer close
+    }
+    else if(majeur == 1 && mineur == 1){
+        //garder connection ouverte
+    }
+    else if (majeur == 1 && mineur == 0 && (strcmp(ConnectionL,"keep-alive") == 0 || strcmp(ConnectionL,"Keep-Alive") == 0)){
+        //garder la connection ouverte
+    }
+    else {
+        //fermeture de la connection
+    }
+*/
     return 200;
 }
 
