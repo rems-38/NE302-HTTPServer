@@ -90,8 +90,7 @@ HttpCode *getTable(HTTPTable *codes, int code) {
 message *createMsgFromReponse(HttpCode rep, FILE *fout, unsigned int clientId) {
     message *msg = malloc(sizeof(message));
 
-    // Calcul de la taille nécessaire pour buf
-    int bufSize = strlen("HTTP/1.0 ") + 3 + strlen(" ") + strlen(rep.info) + strlen("\r\n"); // 3 : taille d'une code (200, 404, ...)
+    // Taille du fichier si existe
     size_t fileSize = 0;
     if (fout != NULL) {
         fseek(fout, 0, SEEK_END);
@@ -99,15 +98,20 @@ message *createMsgFromReponse(HttpCode rep, FILE *fout, unsigned int clientId) {
         fseek(fout, 0, SEEK_SET);
         bufSize += fileSize;
     }
+    
+    // Calcul de la taille nécessaire pour buf
+    int bufSize = strlen("HTTP/1.0 ") + 3 + strlen(" ") + strlen(rep.info) + strlen("\r\n"); // 3 : taille d'une code (200, 404, ...)
     for (int i = 0; i < rep.headersCount; i++) {
-        if (fileSize != 0 && strcmp(rep.headers[i].label, "Content-Length:") == 0) {
-            snprintf(rep.headers[i].value, 21, "%zu", fileSize);
-            rep.headers[i].len = strlen(rep.headers[i].value) + strlen(rep.headers[i].label) + 1;
-        }
+        //if (fileSize != 0 && strcmp(rep.headers[i].label, "Content-Length:") == 0) {
+            // snprintf(rep.headers[i].value, 21, "%zu", fileSize);
+            // rep.headers[i].len = strlen(rep.headers[i].value) + strlen(rep.headers[i].label) + 1;
+        //}
         bufSize += rep.headers[i].len + strlen("\r\n");
     }
     bufSize += 2 * strlen("\r\n");
     msg->buf = malloc(bufSize + 1);
+
+    // Transfert de la data
     sprintf(msg->buf, "HTTP/1.0 %d %s\n", rep.code, rep.info);
     int len = strlen(msg->buf);
     for (int i = 0; i < rep.headersCount; i++) {
