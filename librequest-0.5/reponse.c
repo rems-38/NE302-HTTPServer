@@ -80,7 +80,7 @@ HttpCode *getTable(HTTPTable *codes, int code) {
 }
 
 
-message *createMsgFromReponse(HttpCode rep, unsigned int clientId) {
+message *createMsgFromReponse(HttpCode rep, FILE *fout, unsigned int clientId) {
     message *msg = malloc(sizeof(message));
 
     // Calcul de la taille nécessaire pour buf
@@ -88,15 +88,29 @@ message *createMsgFromReponse(HttpCode rep, unsigned int clientId) {
     for (int i = 0; i < rep.headersCount; i++) {
         bufSize += strlen(rep.headers[i]) + strlen("\r\n");
     }
-    bufSize += strlen("\r\n");
-
+    bufSize += 2 * strlen("\r\n");
+    size_t fileSize = 0;
+    if (fout != NULL) {
+        fseek(fout, 0, SEEK_END);
+        fileSize = ftell(fout);
+        fseek(fout, 0, SEEK_SET);
+        bufSize += fileSize;
+    }
     msg->buf = malloc(bufSize + 1);
     sprintf(msg->buf, "HTTP/1.0 %d %s\n", rep.code, rep.info);
     int len = strlen(msg->buf);
     for (int i = 0; i < rep.headersCount; i++) {
-        sprintf(msg->buf+len, "%s\n", rep.headers[i]);
-        len += strlen(rep.headers[i]) + strlen("\n");
+        sprintf(msg->buf+len, "%s\r\n", rep.headers[i]);
+        len += strlen(rep.headers[i]) + strlen("\r\n");
     }
+    sprintf(msg->buf+len, "\r\n");
+    len += strlen("\r\n");
+
+    if (fout != NULL) {
+        fread(msg->buf+len, fileSize, 1, fout);
+        len += fileSize;
+    }
+    sprintf(msg->buf+len, "\r\n");
     
     msg->len = bufSize;
     msg->clientId = clientId;
@@ -105,7 +119,7 @@ message *createMsgFromReponse(HttpCode rep, unsigned int clientId) {
 }
 
 
-int getRepCode(message req) {
+int getRepCode(message req, FILE **fout) {
     void *tree = getRootTree();
     int len;
 
@@ -136,9 +150,9 @@ int getRepCode(message req) {
     strcpy(path, SERVER_ROOT);
     strcat(path, uri);
     free(uri);
-    FILE *file = fopen(path, "r");
+    *fout = fopen(path, "r"); // pas sur que ça marche, fout est peut etre pas gardé
     free(path);
-    if (file == NULL) { return 404; }
+    if (fout == NULL) { return 404; }
 
     _Token *versionNode = searchTree(tree, "HTTP_version");
     char *versionL = getElementValue(versionNode->node, &len);
@@ -172,6 +186,7 @@ int getRepCode(message req) {
 
         if(point == 2){// nom de domaine
             char *dns[3];
+            printf("nom de domaine\n");
             sscanf(host, "%s.%s.%s", dns[0], dns[1], dns[2]);
             if (strcmp(dns[0],"www")!=0){return 400;}
             if (strcmp(dns[2],"com")!=0 && strcmp(dns[2],"net")!=0 && strcmp(dns[2],"fr")!=0){return 400;}
@@ -185,12 +200,14 @@ int getRepCode(message req) {
 
         if (point == 3 && d_point == 0){// ip sans port
             int ip[4];
+            printf("ip sans port\n");
             sscanf(host, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]);
             if((ip[0]>256|ip[0]<0) | (ip[1]>256|ip[1]<0) | (ip[2]>256|ip[2]<0) | (ip[3]>256|ip[3]<0)){return 400;} //ip invalide
         }
 
         if (point == 3 && d_point == 1){// ip avec port
             int ip_port[5];
+            printf("ip avec port\n");
             sscanf(host, "%d.%d.%d.%d:%d", &ip_port[0], &ip_port[1], &ip_port[2], &ip_port[3], &ip_port[4]);
             if((ip_port[0]>256|ip_port[0]<0) | (ip_port[1]>256|ip_port[1]<0) | (ip_port[2]>256|ip_port[2]<0) | (ip_port[3]>256|ip_port[3]<0) | ip_port[4] != 8080){return 400;} //ip invalide
         }
@@ -226,12 +243,13 @@ message *generateReponse(message req, int opt_code) {
     HTTPTable *codes = loadTable();
 
     int code;
-    if (opt_code == -1) { code = getRepCode(req); }
+    FILE *fout = NULL;
+    if (opt_code == -1) { code = getRepCode(req, &fout); }
     else { code = opt_code; }
 
     printf("%d\n", code);
     HttpCode *rep = getTable(codes, code);
-    message *msg = createMsgFromReponse(*rep, req.clientId);
+    message *msg = createMsgFromReponse(*rep, fout, req.clientId);
 
     freeTable(codes);
 

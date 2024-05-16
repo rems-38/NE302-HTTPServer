@@ -21,6 +21,6 @@ void addTable(HTTPTable *codes, int code, char *info, char **headers, int header
 HTTPTable *loadTable();
 HttpCode *getTable(HTTPTable *codes, int code);
 
-message *createMsgFromReponse(HttpCode rep, unsigned int clientId);
-int getRepCode(message req);
+message *createMsgFromReponse(HttpCode rep, FILE *fout, unsigned int clientId);
+int getRepCode(message req, FILE **fout) ;
 message *generateReponse(message req, int opt_code);
