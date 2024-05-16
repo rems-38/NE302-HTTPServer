@@ -236,6 +236,8 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     
     if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){return 505;}
 
+    // Host
+
     _Token *HostNode = searchTree(tree, "Host");
     if (majeur == '1' && mineur == '1' && HostNode == NULL) { return 400; } // HTTP/1.1 sans Host
     if ((HostNode != NULL) && (HostNode->next != NULL)) { return 400; } // plusieurs Host
@@ -340,7 +342,46 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
 
     _Token *C_LengthNode = searchTree(tree, "Content_Length_header");
     _Token *T_EncodingNode = searchTree(tree, "Transfer_Encoding_header");
-    if(T_EncodingNode != NULL && C_LengthNode != NULL){return 400;}
+    _Token *Message_Body = searchTree(tree,"message_body");
+
+    // Content-Length
+
+    if(T_EncodingNode != NULL && C_LengthNode != NULL){return 400;} // Ne pas mettre s’il y a déjà Transfer-Encoding : 400
+
+    if(C_LengthNode != NULL && C_LengthNode->next != NULL){return 400;} // plusieurs content-length
+
+    if (C_LengthNode != NULL && C_LengthNode->next == NULL){ // si un seul Content-Length avec valeur invalide : 400
+        char *c_lengthL = getElementValue(HostNode->node, &len);
+        char *c_length = malloc(len + 1);
+        strncpy(c_length, c_lengthL, len);
+        c_length[len] = '\0';
+        if(c_length[0]== '0'){return 400;} // on ne veut pas de 0XXXX
+
+        for (int i=0; i<len ; i++){
+            if(!(c_length[i] >= '0' && c_length[i] <= '9')){return 400;} // valeur invalide (négative ou avec des caractères autres que des chiffres)
+        }
+
+        int content_l_value = atoi(c_length);
+        char *message_bodyL = getElementValue(HostNode->node, &len);
+        if(content_l_value != len){return 400;}// vérifier que c'est la taille du message body
+    }
+
+    // Transfer-Encoding
+
+    if (majeur == '1' && mineur == '1'){ // Ne pas traiter si HTTP 1.0
+        char *transfer_encodingL = getElementValue(HostNode->node, &len);
+        char *transfer_encoding = malloc(len + 1);
+        strncpy(transfer_encoding, transfer_encodingL, len);
+        transfer_encoding[len] = '\0';
+
+        if(!(strcmp(transfer_encoding,"chunked")==0 | strcmp(transfer_encoding,"gzip")==0 | strcmp(transfer_encoding,"deflate")==0 | strcmp(transfer_encoding,"compress")==0 |strcmp(transfer_encoding,"identity")==0 )) {return 400;} // vérifier que la valeur du champ est bien prise en charge
+        if(!(transfer_encodingL[len]=='\r' && transfer_encodingL[len+1]=='\n' && transfer_encodingL[len+2]=='\r' && transfer_encodingL[len+3]=='\n')){return 400;} // vérifier \r\n\r\n après la valeur du champ
+    }
+
+    // Message Body
+
+    if (Message_Body != NULL && C_LengthNode == NULL){return 411;} // Si Message Body mais pas Content-Length : 411 Length Required
+
 
 /*
     _Token *ConnectionNode = searchTree(tree, "Connection");
