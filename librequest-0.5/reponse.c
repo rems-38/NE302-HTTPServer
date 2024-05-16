@@ -201,6 +201,7 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     //percent-Encoding
     uri = percentEncoding(uri);
 
+    /*
     //Voir algo dans les rfc :
     for (int i = 0; i < len-1; i++) {
         if (uri[i] == '.' && uri[i+1] == '.') { return 403; } // tentative de remonter à la racine du serveur
@@ -225,6 +226,7 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
             }
         }
     }
+    */
 
     _Token *versionNode = searchTree(tree, "HTTP_version");
     char *versionL = getElementValue(versionNode->node, &len);
@@ -351,7 +353,7 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     if(C_LengthNode != NULL && C_LengthNode->next != NULL){return 400;} // plusieurs content-length
 
     if (C_LengthNode != NULL && C_LengthNode->next == NULL){ // si un seul Content-Length avec valeur invalide : 400
-        char *c_lengthL = getElementValue(HostNode->node, &len);
+        char *c_lengthL = getElementValue(C_LengthNode->node, &len);
         char *c_length = malloc(len + 1);
         strncpy(c_length, c_lengthL, len);
         c_length[len] = '\0';
@@ -362,14 +364,14 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
         }
 
         int content_l_value = atoi(c_length);
-        char *message_bodyL = getElementValue(HostNode->node, &len);
+        char *message_bodyL = getElementValue(Message_Body->node, &len);
         if(content_l_value != len){return 400;}// vérifier que c'est la taille du message body
     }
 
     // Transfer-Encoding
 
-    if (majeur == '1' && mineur == '1'){ // Ne pas traiter si HTTP 1.0
-        char *transfer_encodingL = getElementValue(HostNode->node, &len);
+    if (majeur == '1' && mineur == '1' && T_EncodingNode != NULL){ // Ne pas traiter si HTTP 1.0
+        char *transfer_encodingL = getElementValue(T_EncodingNode->node, &len);
         char *transfer_encoding = malloc(len + 1);
         strncpy(transfer_encoding, transfer_encodingL, len);
         transfer_encoding[len] = '\0';
