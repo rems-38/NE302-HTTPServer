@@ -13,3 +13,6 @@ GET / HTTP/1.1
 Host: www.example.com
 Transfer-Encoding: erreur
 
+GET / HTTP/1.1
+Host: www.example.com
+Content-Length: 125

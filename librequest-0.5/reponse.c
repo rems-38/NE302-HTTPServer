@@ -354,14 +354,18 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     if(C_LengthNode != NULL && C_LengthNode->next != NULL){return 400;} // plusieurs content-length
 
     if (C_LengthNode != NULL && C_LengthNode->next == NULL){ // si un seul Content-Length avec valeur invalide : 400
-        char *c_lengthL = getElementValue(C_LengthNode->node, &len);
-        char *c_length = malloc(len + 1);
-        strncpy(c_length, c_lengthL, len);
-        c_length[len] = '\0';
-        if(c_length[0]== '0'){return 400;} // on ne veut pas de 0XXXX
+        char *CL_text = getElementValue(C_LengthNode->node, &len); // nous renvoie "Content-Length : xxxxx" et pas "xxxxxx"
+        char c_length[len];
 
-        for (int i=0; i<len ; i++){
+        sscanf(CL_text, "%*s %s", c_length);
+
+        if(c_length[0]== '0'){return 400;} // on ne veut pas de 0XXXX
+        
+        int i=0;
+        while(c_length[i] != '\0'){
+            printf("c_length[%d] : %c\n",i,c_length[i]);
             if(!(c_length[i] >= '0' && c_length[i] <= '9')){return 400;} // valeur invalide (négative ou avec des caractères autres que des chiffres)
+            i++;
         }
         /*
         int content_l_value = atoi(c_length);
@@ -374,13 +378,9 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
 
     if (majeur == '1' && mineur == '1' && T_EncodingNode != NULL){ // Ne pas traiter si HTTP 1.0
         char *TE_text = getElementValue(T_EncodingNode->node, &len); // nous renvoie "Transfer-Encoding : xxxxx" et pas "xxxxxx"
-        char transfer_encodingL[8];
+        char transfer_encoding[len];
 
-        sscanf(TE_text, "%*s %s", transfer_encodingL);
-
-        char *transfer_encoding = malloc(len + 1);
-        strncpy(transfer_encoding, transfer_encodingL, len);
-        transfer_encoding[len] = '\0';
+        sscanf(TE_text, "%*s %s", transfer_encoding);
 
         if(!(strcmp(transfer_encoding,"chunked")==0 | strcmp(transfer_encoding,"gzip")==0 | strcmp(transfer_encoding,"deflate")==0 | strcmp(transfer_encoding,"compress")==0 |strcmp(transfer_encoding,"identity")==0 )) {return 400;} // vérifier que la valeur du champ est bien prise en charge
         if(!(TE_text[len]=='\r' && TE_text[len+1]=='\n' && TE_text[len+2]=='\r' && TE_text[len+3]=='\n')){return 400;} // vérifier \r\n\r\n après la valeur du champ
