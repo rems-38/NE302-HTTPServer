@@ -15,35 +15,41 @@ uint32_t hash(uint32_t code, uint32_t nbTry) {
 
 void initTable(HTTPTable *codes) {
     for (int i = 0; i < NB_HTTP_CODES; i++) { codes->table[i] = NULL; }
+    
+    Header headers[] = {
+        {"Content-Type:", ""},
+        {"Content-Length:", ""},
+        {"Connection:", ""}
+    };
+    int headersCount = sizeof(headers) / sizeof(headers[0]);
+
+    codes->headers = malloc(headersCount * sizeof(Header));
+    for (int i = 0; i < headersCount; i++) {
+        codes->headers[i].label = malloc(strlen(headers[i].label) + 1);
+        strcpy(codes->headers[i].label, headers[i].label);
+        codes->headers[i].value = malloc(strlen(headers[i].value) + 1);
+        strcpy(codes->headers[i].value, headers[i].value);
+    }
+    codes->headersCount = headersCount;
 }
 
 void freeTable(HTTPTable *codes) {
     for (int i = 0; i < NB_HTTP_CODES; i++) {
         if (codes->table[i] != NULL) {
             free(codes->table[i]->info);
-            free(codes->table[i]->headers);
             free(codes->table[i]);
         }
     }
+    free(codes->headers);
 }
 
-void addTable(HTTPTable *codes, int code, char *info, Header *headers, int headersCount) {
+void addTable(HTTPTable *codes, int code, char *info) {
     HttpCode *el = malloc(sizeof(HttpCode));
     
     el->code = code;
     
     el->info = malloc(strlen(info) + 1);
     strcpy(el->info, info);
-
-    el->headers = malloc(headersCount * sizeof(Header));
-    for (int i = 0; i < headersCount; i++) {
-        el->headers[i].label = malloc(strlen(headers[i].label) + 1);
-        strcpy(el->headers[i].label, headers[i].label);
-        el->headers[i].value = malloc(strlen(headers[i].value) + 1);
-        strcpy(el->headers[i].value, headers[i].value);
-        el->headers[i].len = headers[i].len;
-    }
-    el->headersCount = headersCount;
 
     int nbTry = 0;
     while (codes->table[hash(code, nbTry)] != NULL) { nbTry++; }
@@ -53,41 +59,41 @@ void addTable(HTTPTable *codes, int code, char *info, Header *headers, int heade
 HTTPTable *loadTable() {
     HTTPTable *codes = malloc(sizeof(HTTPTable));
     initTable(codes);
-    
-    Header headers[] = {
-        {"Content-Type:", "text/html", 23},
-        {"Content-Length:", "0", 18},
-        {"Connection:", "keep-alive", 22}
-    }; // 3e valeur correspond à taille du bloc
-    int headersCount = sizeof(headers) / sizeof(headers[0]);
 
-    addTable(codes, 200, "OK", headers, headersCount);
-    addTable(codes, 201, "Created", headers, headersCount);
-    addTable(codes, 202, "Accepted", headers, headersCount);
-    addTable(codes, 204, "No Content", headers, headersCount);
-    addTable(codes, 400, "Bad Request", headers, headersCount);
-    addTable(codes, 401, "Unauthorized", headers, headersCount);
-    addTable(codes, 403, "Forbidden", headers, headersCount);
-    addTable(codes, 404, "Not Found", headers, headersCount);
-    addTable(codes, 405, "Method Not Allowed", headers, headersCount);
-    addTable(codes, 414, "URI Too Long", headers, headersCount);
-    addTable(codes, 500, "Internal Server Error", headers, headersCount);
-    addTable(codes, 501, "Not Implemented", headers, headersCount);
-    addTable(codes, 503, "Service Unavailable", headers, headersCount);
-    addTable(codes, 505, "HTTP Version Not Supported", headers, headersCount);
+    addTable(codes, 200, "OK");
+    addTable(codes, 201, "Created");
+    addTable(codes, 202, "Accepted");
+    addTable(codes, 204, "No Content");
+    addTable(codes, 400, "Bad Request");
+    addTable(codes, 401, "Unauthorized");
+    addTable(codes, 403, "Forbidden");
+    addTable(codes, 404, "Not Found");
+    addTable(codes, 405, "Method Not Allowed");
+    addTable(codes, 414, "URI Too Long");
+    addTable(codes, 500, "Internal Server Error");
+    addTable(codes, 501, "Not Implemented");
+    addTable(codes, 503, "Service Unavailable");
+    addTable(codes, 505, "HTTP Version Not Supported");
 
     return codes;
 }
 
-HttpCode *getTable(HTTPTable *codes, int code) {
+HttpReponse *getTable(HTTPTable *codes, int code) {
+    HttpReponse *rep = malloc(sizeof(HttpReponse));
+
     int nbTry = 0;
     while (codes->table[hash(code, nbTry)]->code != code) { nbTry++; }
 
-    return codes->table[hash(code, nbTry)];
+    rep->code = codes->table[hash(code, nbTry)];
+    rep->httpminor = codes->httpminor;
+    rep->headers = codes->headers;
+    rep->headersCount = codes->headersCount;
+
+    return rep;
 }
 
 
-message *createMsgFromReponse(HttpCode rep, FILE *fout, unsigned int clientId) {
+message *createMsgFromReponse(HttpReponse rep, FILE *fout, unsigned int clientId) {
     message *msg = malloc(sizeof(message));
 
     // Taille du fichier si existe
@@ -99,24 +105,24 @@ message *createMsgFromReponse(HttpCode rep, FILE *fout, unsigned int clientId) {
     }
     
     // Calcul de la taille nécessaire pour buf
-    int bufSize = strlen("HTTP/1.0 ") + 3 + strlen(" ") + strlen(rep.info) + strlen("\r\n"); // 3 : taille d'une code (200, 404, ...)
+    int bufSize = strlen("HTTP/1.0 ") + 3 + strlen(" ") + strlen(rep.code->info) + strlen("\r\n"); // 3 : taille d'une code (200, 404, ...)
     for (int i = 0; i < rep.headersCount; i++) {
-        //if (fileSize != 0 && strcmp(rep.headers[i].label, "Content-Length:") == 0) {
-            // snprintf(rep.headers[i].value, 21, "%zu", fileSize);
-            // rep.headers[i].len = strlen(rep.headers[i].value) + strlen(rep.headers[i].label) + 1;
-        //}
-        bufSize += rep.headers[i].len + strlen("\r\n");
-    }
+        if (!(strcmp(rep.headers[i].value, "") == 0)) {
+            bufSize += strlen(rep.headers[i].label) + 1 + strlen(rep.headers[i].value) + strlen("\r\n"); // +1 pour le " "
+        }
+    }   
     bufSize += fileSize;
     bufSize += 2 * strlen("\r\n");
     msg->buf = malloc(bufSize + 1);
 
     // Transfert de la data
-    sprintf(msg->buf, "HTTP/1.0 %d %s\n", rep.code, rep.info);
+    sprintf(msg->buf, "HTTP/1.%d %d %s\n", rep.httpminor, rep.code->code, rep.code->info);
     int len = strlen(msg->buf);
     for (int i = 0; i < rep.headersCount; i++) {
-        sprintf(msg->buf+len, "%s %s", rep.headers[i].label, rep.headers[i].value);
-        len += rep.headers[i].len + strlen("\r\n");
+        if (!(strcmp(rep.headers[i].value, "") == 0)) {
+            sprintf(msg->buf+len, "%s %s\r\n", rep.headers[i].label, rep.headers[i].value);
+            len += strlen(rep.headers[i].label) + 1 + strlen(rep.headers[i].value) + strlen("\r\n");
+        }
     }
     sprintf(msg->buf+len, "\r\n");
     len += strlen("\r\n");
@@ -168,7 +174,7 @@ char* percentEncoding(char* uri){
 }
 
 
-int getRepCode(message req, FILE **fout) {
+int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     void *tree = getRootTree();
     int len;
 
@@ -206,12 +212,15 @@ int getRepCode(message req, FILE **fout) {
     *fout = fopen(path, "r"); // pas sur que ça marche, fout est peut etre pas gardé
     free(path);
     if (fout == NULL) { return 404; }
+    //else {
+        //for (int i = 0; i < codes->headersCount)
+    //}
 
     _Token *versionNode = searchTree(tree, "HTTP_version");
     char *versionL = getElementValue(versionNode->node, &len);
     char majeur = versionL[5];
     char mineur = versionL[7];
-    printf("%c, %c\n", majeur, mineur);
+    codes->httpminor = mineur - '0';
     if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){return 505;}
 
     _Token *HostNode = searchTree(tree, "Host");
@@ -297,11 +306,11 @@ message *generateReponse(message req, int opt_code) {
 
     int code;
     FILE *fout = NULL;
-    if (opt_code == -1) { code = getRepCode(req, &fout); }
+    if (opt_code == -1) { code = getRepCode(req, codes, &fout); }
     else { code = opt_code; }
 
     printf("%d\n", code);
-    HttpCode *rep = getTable(codes, code);
+    HttpReponse *rep = getTable(codes, code);
     message *msg = createMsgFromReponse(*rep, fout, req.clientId);
 
     freeTable(codes);
