@@ -133,6 +133,40 @@ message *createMsgFromReponse(HttpCode rep, FILE *fout, unsigned int clientId) {
     return msg;
 }
 
+int hexa(char c){
+    if(c >= 48 && c <= 57){ //chiffre   
+        return c-48;
+    }
+    else{ //lettre
+        return c-55;
+    }
+}
+
+
+char* percentEncoding(char* uri){
+    int len = strlen(uri);
+    int k = 0;
+    int j = 0;
+    char* dest = malloc(len + 1);
+
+    while(k < len){
+        if(uri[k] == '%'){
+            int HEX1 = hexa(uri[k+1]);
+            int HEX2 = hexa(uri[k+2]);
+            dest[j] = 16*HEX1 + HEX2;
+            k += 3;
+        }
+
+        else{
+            dest[j] = uri[k];
+            k++;
+        }
+        j++;
+    }
+    dest[j] = '\0';
+    return dest;
+}
+
 
 int getRepCode(message req, FILE **fout) {
     void *tree = getRootTree();
@@ -158,6 +192,10 @@ int getRepCode(message req, FILE **fout) {
         uri = realloc(uri, strlen("/index.html") + 1);
         strcpy(uri, "/index.html");
     }
+    //percent-Encoding
+    uri = percentEncoding(uri);
+
+    //Voir algo dans les rfc :
     for (int i = 0; i < len-1; i++) {
         if (uri[i] == '.' && uri[i+1] == '.') { return 403; } // tentative de remonter à la racine du serveur
     }
