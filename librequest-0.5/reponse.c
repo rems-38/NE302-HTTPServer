@@ -21,24 +21,27 @@ void freeTable(HTTPTable *codes) {
     for (int i = 0; i < NB_HTTP_CODES; i++) {
         if (codes->table[i] != NULL) {
             free(codes->table[i]->info);
-            for (int j = 0; j < codes->table[i]->headersCount; j++) {
-                free(codes->table[i]->headers[j]);
-            }
             free(codes->table[i]->headers);
             free(codes->table[i]);
         }
     }
 }
 
-void addTable(HTTPTable *codes, int code, char *info, char **headers, int headersCount) {
+void addTable(HTTPTable *codes, int code, char *info, Header *headers, int headersCount) {
     HttpCode *el = malloc(sizeof(HttpCode));
+    
     el->code = code;
+    
     el->info = malloc(strlen(info) + 1);
     strcpy(el->info, info);
-    el->headers = malloc(headersCount * sizeof(char *));
+
+    el->headers = malloc(headersCount * sizeof(Header));
     for (int i = 0; i < headersCount; i++) {
-        el->headers[i] = malloc(strlen(headers[i]) + 1);
-        strcpy(el->headers[i], headers[i]);
+        el->headers[i].label = malloc(strlen(headers[i].label) + 1);
+        strcpy(el->headers[i].label, headers[i].label);
+        el->headers[i].value = malloc(strlen(headers[i].value) + 1);
+        strcpy(el->headers[i].value, headers[i].value);
+        el->headers[i].len = headers[i].len;
     }
     el->headersCount = headersCount;
 
@@ -51,7 +54,11 @@ HTTPTable *loadTable() {
     HTTPTable *codes = malloc(sizeof(HTTPTable));
     initTable(codes);
     
-    char *headers[] = {"Content-Type: text/html", "Content-Length: 0", "Connection: keep-alive"};
+    Header headers[] = {
+        {"Content-Type:", "text/html", 23},
+        {"Content-Length:", "0", 18},
+        {"Connection:", "keep-alive", 22}
+    }; // 3e valeur correspond à taille du bloc
     int headersCount = sizeof(headers) / sizeof(headers[0]);
 
     addTable(codes, 200, "OK", headers, headersCount);
@@ -85,10 +92,6 @@ message *createMsgFromReponse(HttpCode rep, FILE *fout, unsigned int clientId) {
 
     // Calcul de la taille nécessaire pour buf
     int bufSize = strlen("HTTP/1.0 ") + 3 + strlen(" ") + strlen(rep.info) + strlen("\r\n"); // 3 : taille d'une code (200, 404, ...)
-    for (int i = 0; i < rep.headersCount; i++) {
-        bufSize += strlen(rep.headers[i]) + strlen("\r\n");
-    }
-    bufSize += 2 * strlen("\r\n");
     size_t fileSize = 0;
     if (fout != NULL) {
         fseek(fout, 0, SEEK_END);
@@ -96,12 +99,20 @@ message *createMsgFromReponse(HttpCode rep, FILE *fout, unsigned int clientId) {
         fseek(fout, 0, SEEK_SET);
         bufSize += fileSize;
     }
+    for (int i = 0; i < rep.headersCount; i++) {
+        if (fileSize != 0 && strcmp(rep.headers[i].label, "Content-Length:") == 0) {
+            snprintf(rep.headers[i].value, 21, "%zu", fileSize);
+            rep.headers[i].len = strlen(rep.headers[i].value) + strlen(rep.headers[i].label) + 1;
+        }
+        bufSize += rep.headers[i].len + strlen("\r\n");
+    }
+    bufSize += 2 * strlen("\r\n");
     msg->buf = malloc(bufSize + 1);
     sprintf(msg->buf, "HTTP/1.0 %d %s\n", rep.code, rep.info);
     int len = strlen(msg->buf);
     for (int i = 0; i < rep.headersCount; i++) {
-        sprintf(msg->buf+len, "%s\r\n", rep.headers[i]);
-        len += strlen(rep.headers[i]) + strlen("\r\n");
+        sprintf(msg->buf+len, "%s %s", rep.headers[i].label, rep.headers[i].value);
+        len += rep.headers[i].len + strlen("\r\n");
     }
     sprintf(msg->buf+len, "\r\n");
     len += strlen("\r\n");

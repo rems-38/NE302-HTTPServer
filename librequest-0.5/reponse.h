@@ -3,9 +3,15 @@
 
 
 typedef struct {
+    char *label;
+    char *value;
+    int len;
+} Header;
+
+typedef struct {
     int code;
     char *info;
-    char **headers;
+    Header *headers;
     int headersCount;
 } HttpCode;
 
@@ -17,7 +23,7 @@ typedef struct {
 uint32_t hash(uint32_t code, uint32_t nbTry);
 void initTable(HTTPTable *codes);
 void freeTable(HTTPTable *codes);
-void addTable(HTTPTable *codes, int code, char *info, char **headers, int headersCount);
+void addTable(HTTPTable *codes, int code, char *info, Header *headers, int headersCount);
 HTTPTable *loadTable();
 HttpCode *getTable(HTTPTable *codes, int code);
 
