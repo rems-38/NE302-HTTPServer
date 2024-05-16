@@ -96,7 +96,6 @@ message *createMsgFromReponse(HttpCode rep, FILE *fout, unsigned int clientId) {
         fseek(fout, 0, SEEK_END);
         fileSize = ftell(fout);
         fseek(fout, 0, SEEK_SET);
-        bufSize += fileSize;
     }
     
     // Calcul de la taille nécessaire pour buf
@@ -108,6 +107,7 @@ message *createMsgFromReponse(HttpCode rep, FILE *fout, unsigned int clientId) {
         //}
         bufSize += rep.headers[i].len + strlen("\r\n");
     }
+    bufSize += fileSize;
     bufSize += 2 * strlen("\r\n");
     msg->buf = malloc(bufSize + 1);
 
