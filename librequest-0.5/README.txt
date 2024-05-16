@@ -45,3 +45,5 @@ to get an exciting white html page.
 
 
 
+GET / HTTP/1.1
+Host: www.ok.com:8080

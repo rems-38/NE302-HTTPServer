@@ -213,7 +213,7 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     free(path);
     if (fout == NULL) { return 404; }
     else {
-        for (int i = 0; i < codes->headersCount) {
+        for (int i = 0; i < codes->headersCount; i++) {
             if (strcmp(codes->headers[i].label, "Content-Type")) {
                 ; // récupérer le type du fichier
                 // si accepter (comment?)
@@ -221,7 +221,7 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
             else if (strcmp(codes->headers[i].label, "Content-Length")) {
             char *fileSizeS = (char *)fileSize; // trouver comment mettre le int en char*
                 codes->headers[i].value = malloc(strlen(fileSizeS));
-                strcpy(codes->headers[i].value, fileSizeS)
+                strcpy(codes->headers[i].value, fileSizeS);
             }
         }
     }
@@ -230,21 +230,23 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     char *versionL = getElementValue(versionNode->node, &len);
     char majeur = versionL[5];
     char mineur = versionL[7];
+    printf("%c, %c\n", majeur, mineur);
+
     codes->httpminor = mineur - '0';
+    
     if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){return 505;}
 
     _Token *HostNode = searchTree(tree, "Host");
-    if (majeur == 1 && mineur == 1 && HostNode == NULL) { return 400; } // HTTP/1.1 sans Host
+    if (majeur == '1' && mineur == '1' && HostNode == NULL) { return 400; } // HTTP/1.1 sans Host
     if ((HostNode != NULL) && (HostNode->next != NULL)) { return 400; } // plusieurs Host
     if (HostNode != NULL) {
         char *hostL = getElementValue(HostNode->node, &len);
         char *host = malloc(len + 1);
         strncpy(host, hostL, len);
         host[len] = '\0';
-
         if(len > LEN_HOST){return 400;}
 
-        // déterminer la nature du host (dns ou ip)
+        // déterminer la nature du host (nom de domaine ou ip)
         int i=0;
         int point = 0;
         int d_point = 0;
@@ -256,25 +258,73 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
 
         if(point<2 | point>3){return 400;}
 
-        if(point == 2){// nom de domaine
-            char *dns[3];
-            printf("nom de domaine\n");
-            sscanf(host, "%s.%s.%s", dns[0], dns[1], dns[2]);
-            if (strcmp(dns[0],"www")!=0){return 400;}
-            if (strcmp(dns[2],"com")!=0 && strcmp(dns[2],"net")!=0 && strcmp(dns[2],"fr")!=0){return 400;}
+        if(point == 2 && d_point == 0){// nom de domaine sans port
+            char txt1[63],txt2[63],txt3[63];
 
-            int j=0;
-            while (dns[1][j] != '\0'){
-                if(!((dns[1][j]>=65 && dns[1][j]<=90) | (dns[1][j]>=97 && dns[1][j]<=122) | dns[1][j] == '-')){return 400;}
+            printf("nom de domaine sans port\n");
+            sscanf(host, "%[^.].%[^.].%s", txt1, txt2, txt3);
+            
+
+            i=0;
+            while (txt1[i] != '\0'){
+                if(!((txt1[i]>=65 && txt1[i]<=90) | (txt1[i]>=97 && txt1[i]<=122) | txt1[i] == '-')){return 400;}
+                i++;
             }
-            if (j>63){return 400;}
+            if (i>LEN_HOST_TXT){return 400;}
+
+            i=0;
+            while (txt2[i] != '\0'){
+                if(!((txt2[i]>=65 && txt2[i]<=90) | (txt2[i]>=97 && txt2[i]<=122) | txt2[i] == '-')){return 400;}
+                i++;
+            }
+            if (i>LEN_HOST_TXT){return 400;}
+
+            i=0;
+            while (txt3[i] != '\0'){
+                if(!((txt3[i]>=65 && txt3[i]<=90) | (txt3[i]>=97 && txt3[i]<=122) | txt3[i] == '-')){return 400;}
+                i++;
+            }
+            if (i>LEN_HOST_TXT){return 400;}
+
+        }
+
+        if(point == 2 && d_point == 1){// nom de domaine avec port
+            char txt1[63],txt2[63],txt3[63];
+            int port;
+
+            printf("nom de domaine sans port\n");
+            sscanf(host, "%[^.].%[^.].%[^:]:%d", txt1, txt2, txt3,&port);
+
+            i=0;
+            while (txt1[i] != '\0'){
+                if(!((txt1[i]>=65 && txt1[i]<=90) | (txt1[i]>=97 && txt1[i]<=122) | txt1[i] == '-')){return 400;}
+                i++;
+            }
+            if (i>LEN_HOST_TXT){return 400;}
+
+            i=0;
+            while (txt2[i] != '\0'){
+                if(!((txt2[i]>=65 && txt2[i]<=90) | (txt2[i]>=97 && txt2[i]<=122) | txt2[i] == '-')){return 400;}
+                i++;
+            }
+            if (i>LEN_HOST_TXT){return 400;}
+
+            i=0;
+            while (txt3[i] != '\0'){
+                if(!((txt3[i]>=65 && txt3[i]<=90) | (txt3[i]>=97 && txt3[i]<=122) | txt3[i] == '-')){return 400;}
+                i++;
+            }
+            if (i>LEN_HOST_TXT){return 400;}
+
+            if (port!=8080){return 400;}
+
         }
 
         if (point == 3 && d_point == 0){// ip sans port
             int ip[4];
             printf("ip sans port\n");
             sscanf(host, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]);
-            if((ip[0]>256|ip[0]<0) | (ip[1]>256|ip[1]<0) | (ip[2]>256|ip[2]<0) | (ip[3]>256|ip[3]<0)){return 400;} //ip invalide
+            if((ip[0]>256|ip[0]<0) | (ip[1]>256|ip[1]<0) | (ip[2]>256|ip[2]<0) | (ip[3]>256|ip[3]<0)){return 400;}
         }
 
         if (point == 3 && d_point == 1){// ip avec port
