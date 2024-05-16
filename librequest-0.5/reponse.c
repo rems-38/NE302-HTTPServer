@@ -17,9 +17,9 @@ void initTable(HTTPTable *codes) {
     for (int i = 0; i < NB_HTTP_CODES; i++) { codes->table[i] = NULL; }
     
     Header headers[] = {
-        {"Content-Type:", ""},
-        {"Content-Length:", ""},
-        {"Connection:", ""}
+        {"Content-Type", ""},
+        {"Content-Length", ""},
+        {"Connection", ""}
     };
     int headersCount = sizeof(headers) / sizeof(headers[0]);
 
@@ -108,7 +108,7 @@ message *createMsgFromReponse(HttpReponse rep, FILE *fout, unsigned int clientId
     int bufSize = strlen("HTTP/1.0 ") + 3 + strlen(" ") + strlen(rep.code->info) + strlen("\r\n"); // 3 : taille d'une code (200, 404, ...)
     for (int i = 0; i < rep.headersCount; i++) {
         if (!(strcmp(rep.headers[i].value, "") == 0)) {
-            bufSize += strlen(rep.headers[i].label) + 1 + strlen(rep.headers[i].value) + strlen("\r\n"); // +1 pour le " "
+            bufSize += strlen(rep.headers[i].label) + 2 + strlen(rep.headers[i].value) + strlen("\r\n"); // +2 pour le ": "
         }
     }   
     bufSize += fileSize;
@@ -120,8 +120,8 @@ message *createMsgFromReponse(HttpReponse rep, FILE *fout, unsigned int clientId
     int len = strlen(msg->buf);
     for (int i = 0; i < rep.headersCount; i++) {
         if (!(strcmp(rep.headers[i].value, "") == 0)) {
-            sprintf(msg->buf+len, "%s %s\r\n", rep.headers[i].label, rep.headers[i].value);
-            len += strlen(rep.headers[i].label) + 1 + strlen(rep.headers[i].value) + strlen("\r\n");
+            sprintf(msg->buf+len, "%s: %s\r\n", rep.headers[i].label, rep.headers[i].value);
+            len += strlen(rep.headers[i].label) + 2 + strlen(rep.headers[i].value) + strlen("\r\n");
         }
     }
     sprintf(msg->buf+len, "\r\n");
@@ -212,9 +212,19 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     *fout = fopen(path, "r"); // pas sur que ça marche, fout est peut etre pas gardé
     free(path);
     if (fout == NULL) { return 404; }
-    //else {
-        //for (int i = 0; i < codes->headersCount)
-    //}
+    else {
+        for (int i = 0; i < codes->headersCount) {
+            if (strcmp(codes->headers[i].label, "Content-Type")) {
+                ; // récupérer le type du fichier
+                // si accepter (comment?)
+            }
+            else if (strcmp(codes->headers[i].label, "Content-Length")) {
+            char *fileSizeS = (char *)fileSize; // trouver comment mettre le int en char*
+                codes->headers[i].value = malloc(strlen(fileSizeS));
+                strcpy(codes->headers[i].value, fileSizeS)
+            }
+        }
+    }
 
     _Token *versionNode = searchTree(tree, "HTTP_version");
     char *versionL = getElementValue(versionNode->node, &len);
