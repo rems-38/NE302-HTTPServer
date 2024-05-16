@@ -175,19 +175,21 @@ char* percentEncoding(char* uri){
 
 
 int getRepCode(message req, HTTPTable *codes, FILE **fout) {
+    
     void *tree = getRootTree();
     int len;
-
+    
     _Token *methodNode = searchTree(tree, "method");
     char *methodL = getElementValue(methodNode->node, &len);
     char *method = malloc(len + 1);
     strncpy(method, methodL, len);
     method[len] = '\0';
+    
     if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0 || strcmp(method, "HEAD") == 0)) { return 405; }
     else if (len > LEN_METHOD) { return 501; }
 
     if ((strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0) && (searchTree(tree,"message_body") != NULL)){ return 400; }
-
+    
     _Token *uriNode = searchTree(tree, "request_target");
     char *uriL = getElementValue(uriNode->node, &len);
     char *uri = malloc(len + 1);
@@ -198,18 +200,21 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
         uri = realloc(uri, strlen("/index.html") + 1);
         strcpy(uri, "/index.html");
     }
+    
     //percent-Encoding
     uri = percentEncoding(uri);
-
-    /*
+    
+    
     //Voir algo dans les rfc :
     for (int i = 0; i < len-1; i++) {
         if (uri[i] == '.' && uri[i+1] == '.') { return 403; } // tentative de remonter à la racine du serveur
     }
+    
     char *path = malloc(strlen(SERVER_ROOT) + strlen(uri) + 1);
     strcpy(path, SERVER_ROOT);
     strcat(path, uri);
     free(uri);
+    /*
     *fout = fopen(path, "r"); // pas sur que ça marche, fout est peut etre pas gardé
     free(path);
     if (fout == NULL) { return 404; }
@@ -265,7 +270,6 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
         if(point == 2 && d_point == 0){// nom de domaine sans port
             char txt1[63],txt2[63],txt3[63];
 
-            printf("nom de domaine sans port\n");
             sscanf(host, "%[^.].%[^.].%s", txt1, txt2, txt3);
             
 
@@ -296,7 +300,6 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
             char txt1[63],txt2[63],txt3[63];
             int port;
 
-            printf("nom de domaine sans port\n");
             sscanf(host, "%[^.].%[^.].%[^:]:%d", txt1, txt2, txt3,&port);
 
             i=0;
@@ -326,14 +329,12 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
 
         if (point == 3 && d_point == 0){// ip sans port
             int ip[4];
-            printf("ip sans port\n");
             sscanf(host, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]);
             if((ip[0]>256|ip[0]<0) | (ip[1]>256|ip[1]<0) | (ip[2]>256|ip[2]<0) | (ip[3]>256|ip[3]<0)){return 400;}
         }
 
         if (point == 3 && d_point == 1){// ip avec port
             int ip_port[5];
-            printf("ip avec port\n");
             sscanf(host, "%d.%d.%d.%d:%d", &ip_port[0], &ip_port[1], &ip_port[2], &ip_port[3], &ip_port[4]);
             if((ip_port[0]>256|ip_port[0]<0) | (ip_port[1]>256|ip_port[1]<0) | (ip_port[2]>256|ip_port[2]<0) | (ip_port[3]>256|ip_port[3]<0) | ip_port[4] != 8080){return 400;} //ip invalide
         }
@@ -362,22 +363,28 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
         for (int i=0; i<len ; i++){
             if(!(c_length[i] >= '0' && c_length[i] <= '9')){return 400;} // valeur invalide (négative ou avec des caractères autres que des chiffres)
         }
-
+        /*
         int content_l_value = atoi(c_length);
         char *message_bodyL = getElementValue(Message_Body->node, &len);
         if(content_l_value != len){return 400;}// vérifier que c'est la taille du message body
+        */
     }
 
     // Transfer-Encoding
 
     if (majeur == '1' && mineur == '1' && T_EncodingNode != NULL){ // Ne pas traiter si HTTP 1.0
-        char *transfer_encodingL = getElementValue(T_EncodingNode->node, &len);
+        char *TE_text = getElementValue(T_EncodingNode->node, &len); // nous renvoie "Transfer-Encoding : xxxxx" et pas "xxxxxx"
+        char transfer_encodingL[8];
+
+        sscanf(TE_text, "%*s %s", transfer_encodingL);
+
         char *transfer_encoding = malloc(len + 1);
         strncpy(transfer_encoding, transfer_encodingL, len);
         transfer_encoding[len] = '\0';
 
         if(!(strcmp(transfer_encoding,"chunked")==0 | strcmp(transfer_encoding,"gzip")==0 | strcmp(transfer_encoding,"deflate")==0 | strcmp(transfer_encoding,"compress")==0 |strcmp(transfer_encoding,"identity")==0 )) {return 400;} // vérifier que la valeur du champ est bien prise en charge
-        if(!(transfer_encodingL[len]=='\r' && transfer_encodingL[len+1]=='\n' && transfer_encodingL[len+2]=='\r' && transfer_encodingL[len+3]=='\n')){return 400;} // vérifier \r\n\r\n après la valeur du champ
+        if(!(TE_text[len]=='\r' && TE_text[len+1]=='\n' && TE_text[len+2]=='\r' && TE_text[len+3]=='\n')){return 400;} // vérifier \r\n\r\n après la valeur du champ
+        printf("OK\n");
     }
 
     // Message Body

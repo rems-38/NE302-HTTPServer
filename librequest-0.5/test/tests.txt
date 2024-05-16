@@ -1,0 +1,15 @@
+GET / HTTP/1.1
+Host: www.ok.com:8080
+
+GET / HTTP/1.1
+Host: 192.168.0.0:8080
+
+
+GET / HTTP/1.1
+Host: www.example.com
+Transfer-Encoding: chunked
+
+GET / HTTP/1.1
+Host: www.example.com
+Transfer-Encoding: erreur
+
