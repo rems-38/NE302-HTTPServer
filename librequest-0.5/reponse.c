@@ -165,6 +165,7 @@ int getRepCode(message req) {
         while(host[i]!='\0'){
             if(host[i]=='.'){point++;}
             else if(host[i]==':'){d_point++;}
+            i++;
         }
 
         if(point<2 | point>3){return 400;}
