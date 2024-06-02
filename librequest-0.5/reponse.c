@@ -174,6 +174,75 @@ char* percentEncoding(char* uri){
 }
 
 
+char* DotRemovalSegment(char* uri){
+    int n = strlen(uri);
+    
+    char* out = malloc(n+1);
+    int i = 0, j = 0;
+    while(i < n){
+        /*printf("\nout :");
+        for(int k = 0; k < j; k++){
+            printf("%c",out[k]);
+        }
+        printf("\turi :");
+        for(int k = i; k < n; k++){
+            printf("%c",uri[k]);
+        }*/
+        if(uri[i] == '.' && uri[i+1] == '.' && uri[i+2] == '/'){
+            i += 3; //enlever prefixe
+        }
+        else if(uri[i] == '.' && uri[i+1] == '/'){
+            i += 2; //enlever prefixe
+        }
+        else if(uri[i] == '/' && uri[i+1] == '.' && uri[i+2] == '.' && uri[i+3] == '/'){
+            i += 3;
+            //retirer le dernier /x de out:
+            while(out[j-1] != '/'){
+                //out[j] = '-';
+                j--;
+            }
+            j--;
+
+        }
+        else if(uri[i] == '/' && uri[i+1] == '.' && uri[i+2] == '.'){
+            i += 2;
+            //retirer le dernier /x de out:
+            while(out[j-1] != '/'){
+                //out[j] = '-';
+                j--;
+            }
+            j--;
+
+        }
+        else if(uri[i] == '/' && uri[i+1] == '.' && uri[i+2] == '/'){
+            i += 2; //remplacer par '/'
+        }
+        else if(uri[i] == '/' && uri[i+1] == '.'){
+            i += 1;
+            uri[i] = '/'; //rempalcer par '/'
+        }
+        else if(uri[i] == '.'){
+            i += 1; //retirer
+        }
+        else if(uri[i] == '.' && uri[i+1] == '.'){
+            i += 2; //retirer
+        }
+        else{
+            //placer /x dans out
+            int debut = 1;
+            
+            while((uri[i] != '/' || debut == 1) && i != n){
+                debut = 0;
+                out[j] = uri[i];
+                i++;
+                j++; 
+            }
+        }
+    }
+    out[j] = '\0';
+    return out;
+}
+
 int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     
     void *tree = getRootTree();
@@ -203,7 +272,7 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     
     //percent-Encoding
     uri = percentEncoding(uri);
-    
+    uri = DotRemovalSegment(uri);
     
     //Voir algo dans les rfc :
     for (int i = 0; i < len-1; i++) {
@@ -393,6 +462,8 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
 
 
 /*
+    // A METTRE DANS LA BONNE FONCTION
+
     _Token *ConnectionNode = searchTree(tree, "Connection");
     char *ConnectionL = getElementValue(ConnectionNode->node, &len);
     if(strcmp(ConnectionL,"close") == 0){
@@ -412,14 +483,14 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
 }
 
 message *generateReponse(message req, int opt_code) {
-    HTTPTable *codes = loadTable();
+    HTTPTable *codes = loadTable(); //initialisation de la table des codes possibles de retour
 
     int code;
     FILE *fout = NULL;
-    if (opt_code == -1) { code = getRepCode(req, codes, &fout); }
+    if (opt_code == -1) { code = getRepCode(req, codes, &fout); } //recherche du code à renvoyé
     else { code = opt_code; }
 
-    printf("%d\n", code);
+    printf("code : %d\n", code);
     HttpReponse *rep = getTable(codes, code);
     message *msg = createMsgFromReponse(*rep, fout, req.clientId);
 
