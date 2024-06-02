@@ -461,6 +461,32 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     if (Message_Body != NULL && C_LengthNode == NULL){return 411;} // Si Message Body mais pas Content-Length : 411 Length Required
 
 
+    // Accept-Encoding
+
+    _Token *Accept_Encoding = searchTree(tree,"Accept_Encoding_header");
+
+    if (Accept_Encoding != NULL){
+        if(Accept_Encoding -> next != NULL){return 400;}
+        char *AE_text = getElementValue(Accept_Encoding->node, &len);
+        char accept_encoding[len];
+        sscanf(AE_text, "%*s %s", accept_encoding);
+        printf("%s OU %s \n",AE_text,accept_encoding);
+
+        char **valeur;
+        int curseur_d = 0;
+        int curseur_f = 0;
+
+        while(valeur[curseur_d-2] != "\r\n"){
+            while(strcmp(valeur[curseur_d + curseur_f],", ") != 0 || strcmp(valeur[curseur_d + curseur_f],"\r\n") != 0){
+                curseur_f++;
+            }
+            if(strcmp(valeur[curseur_d:curseur_f],"gzip")!=0 && strcmp(valeur[curseur_d:curseur_f],"deflate")!=0 && strcmp(valeur[curseur_d:curseur_f],"br")!=0 && strcmp(valeur[curseur_d:curseur_f],"compress")!=0 && strcmp(valeur[curseur_d:curseur_f],"identity")!=0){return 400;}
+            curseur_d = curseur_f + 2;
+            curseur_f = 0;
+        }
+
+    }
+
 /*
     // A METTRE DANS LA BONNE FONCTION
 
