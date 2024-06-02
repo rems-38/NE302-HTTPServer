@@ -3,4 +3,4 @@
 #define LEN_URI 256
 #define LEN_HOST 253
 #define LEN_HOST_TXT 63
-#define NB_HTTP_CODES 14
+#define NB_HTTP_CODES 15

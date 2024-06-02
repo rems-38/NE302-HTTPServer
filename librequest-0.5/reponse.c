@@ -69,6 +69,7 @@ HTTPTable *loadTable() {
     addTable(codes, 403, "Forbidden");
     addTable(codes, 404, "Not Found");
     addTable(codes, 405, "Method Not Allowed");
+    addTable(codes, 411, "Length Required");
     addTable(codes, 414, "URI Too Long");
     addTable(codes, 500, "Internal Server Error");
     addTable(codes, 501, "Not Implemented");
