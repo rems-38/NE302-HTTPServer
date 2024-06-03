@@ -245,6 +245,15 @@ char* DotRemovalSegment(char* uri){
     return out;
 }
 
+void updateHeader(HTTPTable *codes, char *label, char *value) {
+    for (int i = 0; i < codes->headersCount; i++) {
+        if (strcmp(codes->headers[i].label, label) == 0) {
+            codes->headers[i].value = malloc(strlen(value) + 1);
+            strcpy(codes->headers[i].value, value);
+        }
+    }
+}
+
 int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     
     void *tree = getRootTree();
@@ -265,12 +274,7 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     }
     
     if(majeur == '1' && mineur == '1'){
-        for (int i = 0; i < codes->headersCount; i++){
-            if (strcmp(codes->headers[i].label, "Connection") == 0){
-                codes->headers[i].value = malloc(strlen("Keep-Alive")+1);
-                strcpy(codes->headers[i].value,"Keep-Alive");
-            }
-        }
+        updateHeader(codes, "Connection", "Keep-Alive");
     }
 
     if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){return 505;}
@@ -324,32 +328,22 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     type[n] = '\0';
     pclose(fp);
 
-    for (int i = 0; i < codes->headersCount; i++) {
-        if (strcmp(codes->headers[i].label, "Content-Type") == 0) {
-            codes->headers[i].value = malloc(strlen(type) + 1);
-            strcpy(codes->headers[i].value, type);
-        }
-    }
+    updateHeader(codes, "Content-Type", type);
     free(type);
 
-    /*
-    *fout = fopen(path, "r"); // pas sur que ça marche, fout est peut etre pas gardé
+    
+    FILE *file = fopen(path, "r");
     free(path);
     if (fout == NULL) { return 404; }
     else {
-        for (int i = 0; i < codes->headersCount; i++) {
-            if (strcmp(codes->headers[i].label, "Content-Type")) {
-                ; // récupérer le type du fichier
-                // si accepter (comment?)
-            }
-            else if (strcmp(codes->headers[i].label, "Content-Length")) {
-            char *fileSizeS = (char *)fileSize; // trouver comment mettre le int en char*
-                codes->headers[i].value = malloc(strlen(fileSizeS));
-                strcpy(codes->headers[i].value, fileSizeS);
-            }
-        }
+        // aller à la fin du fichier pour récupérer la taille
+        fseek(file, 0, SEEK_END);
+        long fsize = ftell(file);
+        fseek(file, 0, SEEK_SET);
+
+        updateHeader(codes, "Content-Length", fsize);
     }
-    */
+    fclose(file);
 
 
     // Host
@@ -539,12 +533,7 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
             //renvoyer close
         }
         else if (majeur == '1' && mineur == '0' && (strcmp(connection,"keep-alive") == 0 || strcmp(connection,"Keep-Alive") == 0)){
-            for (int i = 0; i < codes->headersCount; i++){
-                if (strcmp(codes->headers[i].label, "Connection") == 0){
-                    codes->headers[i].value = malloc(strlen("Keep-Alive")+1);
-                    strcpy(codes->headers[i].value,"Keep-Alive");
-                }
-            }
+            updateHeader(codes, "Connection", "Keep-Alive");
         }
         else {
             //fermeture de la connection
