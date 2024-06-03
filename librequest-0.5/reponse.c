@@ -267,8 +267,8 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     if(majeur == '1' && mineur == '1'){
         for (int i = 0; i < codes->headersCount; i++){
             if (strcmp(codes->headers[i].label, "Connection") == 0){
-                codes->headers[i].value = malloc(strlen("Keep-Value")+1);
-                strcpy(codes->headers[i].value,"Keep-Value");
+                codes->headers[i].value = malloc(strlen("Keep-Alive")+1);
+                strcpy(codes->headers[i].value,"Keep-Alive");
             }
         }
     }
@@ -527,8 +527,13 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
         if(strcmp(connection,"close") == 0){
             //renvoyer close
         }
-        else if (majeur == 1 && mineur == 0 && (strcmp(connection,"keep-alive") == 0 || strcmp(connection,"Keep-Alive") == 0)){
-            //garder la connection ouverte
+        else if (majeur == '1' && mineur == '0' && (strcmp(connection,"keep-alive") == 0 || strcmp(connection,"Keep-Alive") == 0)){
+            for (int i = 0; i < codes->headersCount; i++){
+                if (strcmp(codes->headers[i].label, "Connection") == 0){
+                    codes->headers[i].value = malloc(strlen("Keep-Alive")+1);
+                    strcpy(codes->headers[i].value,"Keep-Alive");
+                }
+            }
         }
         else {
             //fermeture de la connection
