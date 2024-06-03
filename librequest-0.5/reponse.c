@@ -529,15 +529,21 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
         strncpy(connection, ConnectionL, len);
         connection[len] = '\0';
 
-        if(strcmp(connection,"close") == 0){
+        if(strcmp(connection,"close") == 0 || strcmp(connection,"Close") == 0){
             //renvoyer close
+            updateHeader(codes,"Connection","close");
+            //et fermer la connection    
+            requestShutdownSocket(req.clientId);
         }
         else if (majeur == '1' && mineur == '0' && (strcmp(connection,"keep-alive") == 0 || strcmp(connection,"Keep-Alive") == 0)){
             updateHeader(codes, "Connection", "Keep-Alive");
         }
-        else {
-            //fermeture de la connection
-        }
+    }
+    else if (majeur == '1' && mineur == '0'){ // si 1.0 et pas de Connection header : fermer la connection
+        //renvoyer close
+        updateHeader(codes,"Connection","close");
+        //et fermer la connection    
+        requestShutdownSocket(req.clientId);
     }
 
     return 200;
