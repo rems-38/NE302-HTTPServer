@@ -301,16 +301,6 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     //percent-Encoding
     uri = percentEncoding(uri);
     uri = DotRemovalSegment(uri);
-
-    char *ext = strrchr(uri, '.');
-    ext++;
-    for (int i = 0; i < codes->headersCount; i++) {
-        if (strcmp(codes->headers[i].label, "Content-Type") == 0) {
-            codes->headers[i].value = malloc(strlen(ext) + 1);
-            strcpy(codes->headers[i].value, ext);
-        }
-    }
-    
     
     //Voir algo dans les rfc :
     for (int i = 0; i < len-1; i++) {
@@ -321,6 +311,27 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     strcpy(path, SERVER_ROOT);
     strcat(path, uri);
     free(uri);
+
+    // Gérer le Content-type (à l'aide de `file`)
+    char *command = malloc(512);
+    sprintf(command, "file --brief --mime-type %s", path);
+    FILE *fp = popen(command, "r");
+    free(command);
+    if (fp == NULL) { perror("popen"); return 500; }
+
+    char *type = malloc(128);
+    size_t n = fread(type, 1, 127, fp);
+    type[n] = '\0';
+    pclose(fp);
+
+    for (int i = 0; i < codes->headersCount; i++) {
+        if (strcmp(codes->headers[i].label, "Content-Type") == 0) {
+            codes->headers[i].value = malloc(strlen(type) + 1);
+            strcpy(codes->headers[i].value, type);
+        }
+    }
+    free(type);
+
     /*
     *fout = fopen(path, "r"); // pas sur que ça marche, fout est peut etre pas gardé
     free(path);
