@@ -25,6 +25,7 @@ void initTable(HTTPTable *codes) {
     int headersCount = sizeof(headers) / sizeof(headers[0]);
 
     codes->filename = malloc(512);
+    codes->is_head = false;
 
     codes->headers = malloc(headersCount * sizeof(Header));
     for (int i = 0; i < headersCount; i++) {
@@ -91,6 +92,7 @@ HttpReponse *getTable(HTTPTable *codes, int code) {
     rep->code = codes->table[hash(code, nbTry)];
     rep->httpminor = codes->httpminor;
     rep->filename = codes->filename;
+    rep->is_head = codes->is_head;
     rep->headers = codes->headers;
     rep->headersCount = codes->headersCount;
 
@@ -104,7 +106,7 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
     // Taille du fichier si existe
     FILE *fout = NULL;
     long fileSize = 0;
-    if (rep.filename != NULL) {
+    if (rep.filename != NULL && !rep.is_head) {
         fout = fopen(rep.filename, "r");
         if (fout != NULL) {
             fseek(fout, 0, SEEK_END);
@@ -119,8 +121,8 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
         if (!(strcmp(rep.headers[i].value, "") == 0)) {
             bufSize += strlen(rep.headers[i].label) + 2 + strlen(rep.headers[i].value) + strlen("\r\n"); // +2 pour le ": "
         }
-    }   
-    bufSize += fileSize;
+    }
+    if (!rep.is_head) { bufSize += fileSize; }
     bufSize += 2 * strlen("\r\n");
     msg->buf = malloc(bufSize + 10);
 
@@ -136,7 +138,7 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
     sprintf(msg->buf+len, "\r\n");
     len += strlen("\r\n");
 
-    if (fout != NULL) {
+    if (fout != NULL && !rep.is_head) {
         fread(msg->buf+len, fileSize, 1, fout);
         len += fileSize;
     }
@@ -344,6 +346,7 @@ int getRepCode(message req, HTTPTable *codes) {
     
     if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0 || strcmp(method, "HEAD") == 0)) { return 405; }
     else if (len > LEN_METHOD) { return 501; }
+    else if (strcmp(method, "HEAD") == 0) { codes->is_head = true; }
     
     if ((strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0) && (searchTree(tree,"message_body") != NULL)){ return 400; }
     free(method);

@@ -1,6 +1,8 @@
 #include "request.h"
 #include "config.h"
 
+#include <stdbool.h>
+
 
 typedef struct {
     char *label;
@@ -16,6 +18,7 @@ typedef struct {
     HttpCode *code;
     int httpminor;
     char *filename;
+    bool is_head;
     Header *headers;
     int headersCount;
 } HttpReponse;
@@ -24,6 +27,7 @@ typedef struct {
     HttpCode *table[NB_HTTP_CODES];
     int httpminor;
     char *filename;
+    bool is_head;
     Header *headers;
     int headersCount;
 } HTTPTable;
