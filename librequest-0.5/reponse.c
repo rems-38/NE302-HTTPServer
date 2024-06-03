@@ -264,13 +264,13 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
         codes->httpminor = '1';
     }
     
-    if(majeur == 1 && mineur == 1){
-            for (int i =0; i< (codes->headersCount); i++){
-                if (strcmp(codes->headers[i].label, "Connection") ==0){
-                    codes->headers[i].label = malloc(strlen("Keep-Value")+1);
-                    codes->headers[i].value ="Keep-Value";
-                }
+    if(majeur == '1' && mineur == '1'){
+        for (int i = 0; i < codes->headersCount; i++){
+            if (strcmp(codes->headers[i].label, "Connection") == 0){
+                codes->headers[i].value = malloc(strlen("Keep-Value")+1);
+                strcpy(codes->headers[i].value,"Keep-Value");
             }
+        }
     }
 
     if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){return 505;}
