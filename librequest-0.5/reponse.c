@@ -249,6 +249,23 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     void *tree = getRootTree();
     int len;
     
+    //HTTP Version
+    _Token *versionNode = searchTree(tree, "HTTP_version");
+    char *versionL = getElementValue(versionNode->node, &len);
+    char majeur = versionL[5];
+    char mineur = versionL[7];
+    printf("%c, %c\n", majeur, mineur);
+
+    if(mineur == '1' || mineur == '0'){
+        codes->httpminor = mineur - '0';
+    }
+    else{
+        codes->httpminor = '1';
+    }
+    
+    if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){return 505;}
+
+    //Methode
     _Token *methodNode = searchTree(tree, "method");
     char *methodL = getElementValue(methodNode->node, &len);
     char *method = malloc(len + 1);
@@ -303,15 +320,6 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     }
     */
 
-    _Token *versionNode = searchTree(tree, "HTTP_version");
-    char *versionL = getElementValue(versionNode->node, &len);
-    char majeur = versionL[5];
-    char mineur = versionL[7];
-    printf("%c, %c\n", majeur, mineur);
-
-    codes->httpminor = mineur - '0';
-    
-    if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){return 505;}
 
     // Host
 
@@ -481,7 +489,7 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
             while(strcmp(valeur[curseur_d + curseur_f],", ") != 0 || strcmp(valeur[curseur_d + curseur_f],"\r\n") != 0){
                 curseur_f++;
             }
-            if(strcmp(valeur[curseur_d:curseur_f],"gzip")!=0 && strcmp(valeur[curseur_d:curseur_f],"deflate")!=0 && strcmp(valeur[curseur_d:curseur_f],"br")!=0 && strcmp(valeur[curseur_d:curseur_f],"compress")!=0 && strcmp(valeur[curseur_d:curseur_f],"identity")!=0){return 400;}
+            if(strcmp(valeur[curseur_d+curseur_f],"gzip")!=0 && strcmp(valeur[curseur_d+curseur_f],"deflate")!=0 && strcmp(valeur[curseur_d+curseur_f],"br")!=0 && strcmp(valeur[curseur_d+curseur_f],"compress")!=0 && strcmp(valeur[curseur_d+curseur_f],"identity")!=0){return 400;}
             curseur_d = curseur_f + 2;
             curseur_f = 0;
         }
