@@ -36,6 +36,9 @@ void addTable(HTTPTable *codes, int code, char *info);
 HTTPTable *loadTable();
 HttpReponse *getTable(HTTPTable *codes, int code);
 
+void updateHeader(HTTPTable *codes, char *label, char *value);
+int configFileMsgBody(char *name, HTTPTable *codes);
+
 message *createMsgFromReponse(HttpReponse rep, unsigned int clientId);
 int getRepCode(message req, HTTPTable *codes) ;
 message *generateReponse(message req, int opt_code);

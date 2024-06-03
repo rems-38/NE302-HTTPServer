@@ -261,6 +261,46 @@ void updateHeader(HTTPTable *codes, char *label, char *value) {
     }
 }
 
+int configFileMsgBody(char *name, HTTPTable *codes) {
+    char *path = malloc(strlen(SERVER_ROOT) + strlen(name) + 1);
+    strcpy(path, SERVER_ROOT);
+    strcat(path, name);
+
+    // Gérer le Content-type (à l'aide de `file`)
+    char *command = malloc(512);
+    sprintf(command, "file --brief --mime-type %s", path);
+    FILE *fp = popen(command, "r");
+    free(command);
+    if (fp == NULL) { perror("popen"); return 500; }
+
+    char *type = malloc(128);
+    size_t n = fread(type, 1, 127, fp);
+    type[n-1] = '\0';
+    pclose(fp);
+
+    updateHeader(codes, "Content-Type", type);
+    free(type);
+
+    FILE *file = fopen(path, "r");
+    if (file == NULL) { return 404; }
+    else {
+        fseek(file, 0, SEEK_END);
+        long fsize = ftell(file);
+        fseek(file, 0, SEEK_SET);
+
+        char fsize_str[20];
+        sprintf(fsize_str, "%ld", fsize);
+
+        updateHeader(codes, "Content-Length", fsize_str);
+        
+        strcpy(codes->filename, path);
+        free(path);
+    }
+    fclose(file);
+    
+    return 1;
+}
+
 int getRepCode(message req, HTTPTable *codes) {
     
     void *tree = getRootTree();
@@ -284,7 +324,11 @@ int getRepCode(message req, HTTPTable *codes) {
         updateHeader(codes, "Connection", "Keep-Alive");
     }
 
-    if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){return 505;}
+    if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){
+        int code  = configFileMsgBody("/505.html", codes);
+        if (code != 1) { return code; }
+        return 505;
+    }
 
     //Methode
     _Token *methodNode = searchTree(tree, "method");
@@ -313,53 +357,13 @@ int getRepCode(message req, HTTPTable *codes) {
     //percent-Encoding
     uri = percentEncoding(uri);
     uri = DotRemovalSegment(uri);
+
+    int code = configFileMsgBody(uri, codes);
+    if (code != 1) { return code; }
     
-    //Voir algo dans les rfc :
-    for (int i = 0; i < len-1; i++) {
-        if (uri[i] == '.' && uri[i+1] == '.') { return 403; } // tentative de remonter à la racine du serveur
-    }
-    
-    char *path = malloc(strlen(SERVER_ROOT) + strlen(uri) + 1);
-    strcpy(path, SERVER_ROOT);
-    strcat(path, uri);
     free(uri);
 
-    // Gérer le Content-type (à l'aide de `file`)
-    char *command = malloc(512);
-    sprintf(command, "file --brief --mime-type %s", path);
-    FILE *fp = popen(command, "r");
-    free(command);
-    if (fp == NULL) { perror("popen"); return 500; }
-
-    char *type = malloc(128);
-    size_t n = fread(type, 1, 127, fp);
-    type[n-1] = '\0';
-    pclose(fp);
-
-    updateHeader(codes, "Content-Type", type);
-    free(type);
-
-    
-    FILE *file = fopen(path, "r");
-    if (file == NULL) { return 404; }
-    else {
-        fseek(file, 0, SEEK_END);
-        long fsize = ftell(file);
-        fseek(file, 0, SEEK_SET);
-
-        char fsize_str[20];
-        sprintf(fsize_str, "%ld", fsize);
-
-        updateHeader(codes, "Content-Length", fsize_str);
-        
-        strcpy(codes->filename, path);
-        free(path);
-    }
-    fclose(file);
-
-
     // Host
-
     _Token *HostNode = searchTree(tree, "Host");
     if (majeur == '1' && mineur == '1' && HostNode == NULL) { return 400; } // HTTP/1.1 sans Host
     if ((HostNode != NULL) && (HostNode->next != NULL)) { return 400; } // plusieurs Host
@@ -380,7 +384,7 @@ int getRepCode(message req, HTTPTable *codes) {
             i++;
         }
 
-        if(point<2 | point>3){return 400;}
+        //if(point<2 | point>3){return 400;}
 
         if(point == 2 && d_point == 0){// nom de domaine sans port
             char txt1[63],txt2[63],txt3[63];
