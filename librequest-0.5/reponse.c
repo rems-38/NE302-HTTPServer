@@ -115,7 +115,7 @@ message *createMsgFromReponse(HttpReponse rep, FILE *fout, unsigned int clientId
     }   
     bufSize += fileSize;
     bufSize += 2 * strlen("\r\n");
-    msg->buf = malloc(bufSize + 1);
+    msg->buf = malloc(bufSize + 10);
 
     // Transfert de la data
     sprintf(msg->buf, "HTTP/1.%d %d %s\n", rep.httpminor, rep.code->code, rep.code->info);
@@ -264,6 +264,15 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
         codes->httpminor = '1';
     }
     
+    if(majeur == 1 && mineur == 1){
+            for (int i =0; i< (codes->headersCount); i++){
+                if (strcmp(codes->headers[i].label, "Connection") ==0){
+                    codes->headers[i].label = malloc(strlen("Keep-Value")+1);
+                    codes->headers[i].value ="Keep-Value";
+                }
+            }
+    }
+
     if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){return 505;}
 
     //Methode
@@ -507,24 +516,25 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
 
     }
 
-/*
-    // A METTRE DANS LA BONNE FONCTION
+    // Connection
+    _Token *ConnectionNode = searchTree(tree, "connection_option");
+    if(ConnectionNode != NULL){
+        char *ConnectionL = getElementValue(ConnectionNode->node, &len);
+        char *connection = malloc(len +1);
+        strncpy(connection, ConnectionL, len);
+        connection[len] = '\0';
 
-    _Token *ConnectionNode = searchTree(tree, "Connection");
-    char *ConnectionL = getElementValue(ConnectionNode->node, &len);
-    if(strcmp(ConnectionL,"close") == 0){
-        //renvoyer close
+        if(strcmp(connection,"close") == 0){
+            //renvoyer close
+        }
+        else if (majeur == 1 && mineur == 0 && (strcmp(connection,"keep-alive") == 0 || strcmp(connection,"Keep-Alive") == 0)){
+            //garder la connection ouverte
+        }
+        else {
+            //fermeture de la connection
+        }
     }
-    else if(majeur == 1 && mineur == 1){
-        //garder connection ouverte
-    }
-    else if (majeur == 1 && mineur == 0 && (strcmp(ConnectionL,"keep-alive") == 0 || strcmp(ConnectionL,"Keep-Alive") == 0)){
-        //garder la connection ouverte
-    }
-    else {
-        //fermeture de la connection
-    }
-*/
+
     return 200;
 }
 
