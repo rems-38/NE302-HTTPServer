@@ -24,6 +24,8 @@ void initTable(HTTPTable *codes) {
     };
     int headersCount = sizeof(headers) / sizeof(headers[0]);
 
+    codes->filename = malloc(512);
+
     codes->headers = malloc(headersCount * sizeof(Header));
     for (int i = 0; i < headersCount; i++) {
         codes->headers[i].label = malloc(strlen(headers[i].label) + 1);
@@ -88,6 +90,7 @@ HttpReponse *getTable(HTTPTable *codes, int code) {
 
     rep->code = codes->table[hash(code, nbTry)];
     rep->httpminor = codes->httpminor;
+    rep->filename = codes->filename;
     rep->headers = codes->headers;
     rep->headersCount = codes->headersCount;
 
@@ -95,19 +98,23 @@ HttpReponse *getTable(HTTPTable *codes, int code) {
 }
 
 
-message *createMsgFromReponse(HttpReponse rep, FILE *fout, unsigned int clientId) {
+message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
     message *msg = malloc(sizeof(message));
 
     // Taille du fichier si existe
-    size_t fileSize = 0;
-    if (fout != NULL) {
-        fseek(fout, 0, SEEK_END);
-        fileSize = ftell(fout);
-        fseek(fout, 0, SEEK_SET);
+    FILE *fout = NULL;
+    long fileSize = 0;
+    if (rep.filename != NULL) {
+        fout = fopen(rep.filename, "r");
+        if (fout != NULL) {
+            fseek(fout, 0, SEEK_END);
+            fileSize = ftell(fout);
+            fseek(fout, 0, SEEK_SET);
+        }
     }
-    
+
     // Calcul de la taille nécessaire pour buf
-    int bufSize = strlen("HTTP/1.0 ") + 3 + strlen(" ") + strlen(rep.code->info) + strlen("\r\n"); // 3 : taille d'une code (200, 404, ...)
+    int bufSize = strlen("HTTP/1.x ") + 3 + strlen(" ") + strlen(rep.code->info) + strlen("\r\n"); // 3 : taille d'une code (200, 404, ...)
     for (int i = 0; i < rep.headersCount; i++) {
         if (!(strcmp(rep.headers[i].value, "") == 0)) {
             bufSize += strlen(rep.headers[i].label) + 2 + strlen(rep.headers[i].value) + strlen("\r\n"); // +2 pour le ": "
@@ -254,7 +261,7 @@ void updateHeader(HTTPTable *codes, char *label, char *value) {
     }
 }
 
-int getRepCode(message req, HTTPTable *codes, FILE **fout) {
+int getRepCode(message req, HTTPTable *codes) {
     
     void *tree = getRootTree();
     int len;
@@ -290,7 +297,8 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     else if (len > LEN_METHOD) { return 501; }
     
     if ((strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0) && (searchTree(tree,"message_body") != NULL)){ return 400; }
-    
+    free(method);
+
     _Token *uriNode = searchTree(tree, "request_target");
     char *uriL = getElementValue(uriNode->node, &len);
     char *uri = malloc(len + 1);
@@ -325,7 +333,7 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
 
     char *type = malloc(128);
     size_t n = fread(type, 1, 127, fp);
-    type[n] = '\0';
+    type[n-1] = '\0';
     pclose(fp);
 
     updateHeader(codes, "Content-Type", type);
@@ -333,15 +341,19 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
 
     
     FILE *file = fopen(path, "r");
-    free(path);
-    if (fout == NULL) { return 404; }
+    if (file == NULL) { return 404; }
     else {
-        // aller à la fin du fichier pour récupérer la taille
         fseek(file, 0, SEEK_END);
         long fsize = ftell(file);
         fseek(file, 0, SEEK_SET);
 
-        updateHeader(codes, "Content-Length", fsize);
+        char fsize_str[20];
+        sprintf(fsize_str, "%ld", fsize);
+
+        updateHeader(codes, "Content-Length", fsize_str);
+        
+        strcpy(codes->filename, path);
+        free(path);
     }
     fclose(file);
 
@@ -553,13 +565,12 @@ message *generateReponse(message req, int opt_code) {
     HTTPTable *codes = loadTable(); //initialisation de la table des codes possibles de retour
 
     int code;
-    FILE *fout = NULL;
-    if (opt_code == -1) { code = getRepCode(req, codes, &fout); } //recherche du code à renvoyé
+    if (opt_code == -1) { code = getRepCode(req, codes); } //recherche du code à renvoyer
     else { code = opt_code; }
 
     printf("code : %d\n", code);
     HttpReponse *rep = getTable(codes, code);
-    message *msg = createMsgFromReponse(*rep, fout, req.clientId);
+    message *msg = createMsgFromReponse(*rep, req.clientId);
 
     freeTable(codes);
 

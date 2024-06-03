@@ -15,6 +15,7 @@ typedef struct {
 typedef struct {
     HttpCode *code;
     int httpminor;
+    char *filename;
     Header *headers;
     int headersCount;
 } HttpReponse;
@@ -22,6 +23,7 @@ typedef struct {
 typedef struct {
     HttpCode *table[NB_HTTP_CODES];
     int httpminor;
+    char *filename;
     Header *headers;
     int headersCount;
 } HTTPTable;
@@ -34,6 +36,6 @@ void addTable(HTTPTable *codes, int code, char *info);
 HTTPTable *loadTable();
 HttpReponse *getTable(HTTPTable *codes, int code);
 
-message *createMsgFromReponse(HttpReponse rep, FILE *fout, unsigned int clientId);
-int getRepCode(message req, HTTPTable *codes, FILE **fout) ;
+message *createMsgFromReponse(HttpReponse rep, unsigned int clientId);
+int getRepCode(message req, HTTPTable *codes) ;
 message *generateReponse(message req, int opt_code);

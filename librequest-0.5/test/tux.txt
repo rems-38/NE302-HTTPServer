@@ -1,0 +1,3 @@
+GET /tux.png HTTP/1.0
+
+
