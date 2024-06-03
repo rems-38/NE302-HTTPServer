@@ -521,27 +521,70 @@ int getRepCode(message req, HTTPTable *codes) {
 
     // Accept-Encoding
 
-    _Token *Accept_Encoding = searchTree(tree,"Accept_Encoding_header");
+    
+    _Token *Accept_Encoding = searchTree(tree,"header_field");
+    
+    char *ae_t = getElementValue(Accept_Encoding->node, &len);
+    char *ae = malloc(16);
+    strncpy(ae, ae_t, 15);
+    ae[15] = '\0';
 
-    if (Accept_Encoding != NULL){
-        if(Accept_Encoding -> next != NULL){return 400;}
+    
+    while(Accept_Encoding->next != NULL && strcmp(ae,"Accept-Encoding") != 0){
+        Accept_Encoding = Accept_Encoding->next;
+        ae_t = getElementValue(Accept_Encoding->node, &len);
+        ae = malloc(16);
+        strncpy(ae, ae_t, 15);
+        ae[16] = '\0';
+    }
+    
+
+    if (strcmp(ae,"Accept-Encoding") == 0){
         char *AE_text = getElementValue(Accept_Encoding->node, &len);
         char accept_encoding[len];
         sscanf(AE_text, "%*s %s", accept_encoding);
-        printf("%s OU %s \n",AE_text,accept_encoding);
 
-        char **valeur;
-        int curseur_d = 0;
-        int curseur_f = 0;
-
-        while(valeur[curseur_d-2] != "\r\n"){
-            while(strcmp(valeur[curseur_d + curseur_f],", ") != 0 || strcmp(valeur[curseur_d + curseur_f],"\r\n") != 0){
-                curseur_f++;
-            }
-            if(strcmp(valeur[curseur_d+curseur_f],"gzip")!=0 && strcmp(valeur[curseur_d+curseur_f],"deflate")!=0 && strcmp(valeur[curseur_d+curseur_f],"br")!=0 && strcmp(valeur[curseur_d+curseur_f],"compress")!=0 && strcmp(valeur[curseur_d+curseur_f],"identity")!=0){return 400;}
-            curseur_d = curseur_f + 2;
-            curseur_f = 0;
+        char *ae_value = strtok(accept_encoding, ", ");
+        
+        while (ae_value != NULL) {
+            if(strcmp(ae_value,"gzip")!=0 && strcmp(ae_value,"deflate")!=0 && strcmp(ae_value,"br")!=0 && strcmp(ae_value,"compress")!=0 && strcmp(ae_value,"identity")!=0){return 400;}
+            ae_value = strtok(NULL, ", ");
         }
+
+
+    }
+
+    // Accept
+
+    _Token *Accept = searchTree(tree,"header_field");
+    
+    char *a_t = getElementValue(Accept->node, &len);
+    char *a = malloc(8);
+    strncpy(a, a_t,7);
+    a[7] = '\0';
+
+    
+    while(Accept->next != NULL && strcmp(a,"Accept:") != 0){
+        Accept_Encoding = Accept_Encoding->next;
+        a_t = getElementValue(Accept->node, &len);
+        a = malloc(8);
+        strncpy(a, a_t, 7);
+        a[7] = '\0';
+    }
+    
+
+    if (strcmp(ae,"Accept:") == 0){
+        char *A_text = getElementValue(Accept->node, &len);
+        char accept[len];
+        sscanf(A_text, "%*s %s", accept);
+
+        char *a_value = strtok(accept, ", ");
+        
+        while (a_value != NULL) {
+            if(strcmp(a_value,"text/html")!=0 && strcmp(a_value,"text/css")!=0 && strcmp(a_value,"text/javascript")!=0 && strcmp(a_value,"application/json")!=0 && strcmp(a_value,"image/jpeg")!=0 && strcmp(a_value,"image/png")!=0 && strcmp(a_value,"application/pdf")!=0 && strcmp(a_value,"image/gif")!=0 && strcmp(a_value,"image/svg+xml")!=0 && strcmp(a_value,"image/tiff")!=0 && strcmp(a_value,"video/mp4")!=0){return 400;}
+            a_value = strtok(NULL, ", ");
+        }
+
 
     }
 
