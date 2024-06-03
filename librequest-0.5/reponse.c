@@ -282,7 +282,12 @@ int configFileMsgBody(char *name, HTTPTable *codes) {
     free(type);
 
     FILE *file = fopen(path, "r");
-    if (file == NULL) { return 404; }
+    if (file == NULL) { 
+        int code = configFileMsgBody("/404.html", codes);
+        if (code != 1) { return code; }
+        
+        return 404;
+    }
     else {
         fseek(file, 0, SEEK_END);
         long fsize = ftell(file);
@@ -549,7 +554,7 @@ int getRepCode(message req, HTTPTable *codes) {
             //renvoyer close
             updateHeader(codes,"Connection","close");
             //et fermer la connection    
-            requestShutdownSocket(req.clientId);
+            //requestShutdownSocket(req.clientId);
         }
         else if (majeur == '1' && mineur == '0' && (strcmp(connection,"keep-alive") == 0 || strcmp(connection,"Keep-Alive") == 0)){
             updateHeader(codes, "Connection", "Keep-Alive");
@@ -559,7 +564,7 @@ int getRepCode(message req, HTTPTable *codes) {
         //renvoyer close
         updateHeader(codes,"Connection","close");
         //et fermer la connection    
-        requestShutdownSocket(req.clientId);
+        //requestShutdownSocket(req.clientId);
     }
 
     return 200;
