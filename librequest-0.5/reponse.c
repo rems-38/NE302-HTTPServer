@@ -19,7 +19,8 @@ void initTable(HTTPTable *codes) {
     Header headers[] = {
         {"Content-Type", ""},
         {"Content-Length", ""},
-        {"Connection", ""}
+        {"Connection", ""},
+        {"Host", ""}
     };
     int headersCount = sizeof(headers) / sizeof(headers[0]);
 
@@ -274,7 +275,7 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     
     if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0 || strcmp(method, "HEAD") == 0)) { return 405; }
     else if (len > LEN_METHOD) { return 501; }
-
+    
     if ((strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0) && (searchTree(tree,"message_body") != NULL)){ return 400; }
     
     _Token *uriNode = searchTree(tree, "request_target");
@@ -291,6 +292,16 @@ int getRepCode(message req, HTTPTable *codes, FILE **fout) {
     //percent-Encoding
     uri = percentEncoding(uri);
     uri = DotRemovalSegment(uri);
+
+    char *ext = strrchr(uri, '.');
+    ext++;
+    for (int i = 0; i < codes->headersCount; i++) {
+        if (strcmp(codes->headers[i].label, "Content-Type") == 0) {
+            codes->headers[i].value = malloc(strlen(ext) + 1);
+            strcpy(codes->headers[i].value, ext);
+        }
+    }
+    
     
     //Voir algo dans les rfc :
     for (int i = 0; i < len-1; i++) {
