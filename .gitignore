@@ -4,3 +4,4 @@ main
 **/*.gch
 **/sock
 **/simple
+.vscode/
