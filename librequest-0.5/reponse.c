@@ -531,76 +531,81 @@ int getRepCode(message req, HTTPTable *codes) {
 
     // Accept-Encoding
 
-    
     _Token *Accept_Encoding = searchTree(tree,"header_field");
+    if(Accept_Encoding != NULL){
     
-    char *ae_t = getElementValue(Accept_Encoding->node, &len);
-    char *ae = malloc(16);
-    strncpy(ae, ae_t, 15);
-    ae[15] = '\0';
-
-    
-    while(Accept_Encoding->next != NULL && strcmp(ae,"Accept-Encoding") != 0){
-        Accept_Encoding = Accept_Encoding->next;
-        ae_t = getElementValue(Accept_Encoding->node, &len);
-        ae = malloc(16);
+        char *ae_t = getElementValue(Accept_Encoding->node, &len);
+        char *ae = malloc(16);
         strncpy(ae, ae_t, 15);
         ae[15] = '\0';
-    }
-    
 
-    if (strcmp(ae,"Accept-Encoding") == 0){
-        char *AE_text = getElementValue(Accept_Encoding->node, &len);
-        char accept_encoding[len];
-        sscanf(AE_text, "%*s %s", accept_encoding);
-
-        char *ae_value = strtok(accept_encoding, ", ");
-        printf("OK1\n");
-        while (ae_value != NULL) {
-            if(strcmp(ae_value,"gzip")!=0 && strcmp(ae_value,"deflate")!=0 && strcmp(ae_value,"br")!=0 && strcmp(ae_value,"compress")!=0 && strcmp(ae_value,"identity")!=0){return 400;}
-            ae_value = strtok(NULL, ", ");
+        
+        while(Accept_Encoding->next != NULL && strcmp(ae,"Accept-Encoding") != 0){
+            Accept_Encoding = Accept_Encoding->next;
+            ae_t = getElementValue(Accept_Encoding->node, &len);
+            ae = malloc(16);
+            strncpy(ae, ae_t, 15);
+            ae[15] = '\0';
         }
-        printf("OK2\n");
+        
 
+        if (strcmp(ae,"Accept-Encoding") == 0){
+            char *AE_text = getElementValue(Accept_Encoding->node, &len);
+            char accept_encoding[len];
+            sscanf(AE_text, "%*s %s", accept_encoding);
+
+            char *ae_value = strtok(accept_encoding, ", ");
+            printf("OK1\n");
+            while (ae_value != NULL) {
+                if(strcmp(ae_value,"gzip")!=0 && strcmp(ae_value,"deflate")!=0 && strcmp(ae_value,"br")!=0 && strcmp(ae_value,"compress")!=0 && strcmp(ae_value,"identity")!=0){return 400;}
+                ae_value = strtok(NULL, ", ");
+            }
+            printf("OK2\n");
+
+        }
+        free(ae);
     }
-
     // Accept
 
     _Token *Accept = searchTree(tree,"header_field");
-    
-    char *a_t = getElementValue(Accept->node, &len);
-    char *a = malloc(8);
-    strncpy(a, a_t,7);
-    a[7] = '\0';
-
-    
-    while(Accept->next != NULL && strcmp(a,"Accept:") != 0){
-        Accept = Accept->next;
-        a_t = getElementValue(Accept->node, &len);
-        a = malloc(8);
-        strncpy(a, a_t, 7);
+    if(Accept != NULL){
+        char *a_t = getElementValue(Accept->node, &len);
+        char *a = malloc(8);
+        strncpy(a, a_t,7);
         a[7] = '\0';
+
+        
+        while(Accept->next != NULL && strcmp(a,"Accept:") != 0){
+            Accept = Accept->next;
+            a_t = getElementValue(Accept->node, &len);
+            a = malloc(8);
+            strncpy(a, a_t, 7);
+            a[7] = '\0';
+        }
+        
+
+        if (strcmp(a,"Accept:") == 0){
+            char *A_text = getElementValue(Accept->node, &len);
+            char accept[len];
+            sscanf(A_text, "%*s %s", accept);
+
+            char *a_value = strtok(accept, ", ");
+            
+            while (a_value != NULL) {
+                if(strcmp(a_value,"text/html")!=0 && strcmp(a_value,"text/css")!=0 && strcmp(a_value,"text/javascript")!=0 && strcmp(a_value,"application/json")!=0 && strcmp(a_value,"image/jpeg")!=0 && strcmp(a_value,"image/png")!=0 && strcmp(a_value,"application/pdf")!=0 && strcmp(a_value,"image/gif")!=0 && strcmp(a_value,"image/svg+xml")!=0 && strcmp(a_value,"image/tiff")!=0 && strcmp(a_value,"video/mp4")!=0){return 400;}
+                a_value = strtok(NULL, ", ");
+            }
+
+
+        }
+        free(a);
     }
     
-
-    if (strcmp(ae,"Accept:") == 0){
-        char *A_text = getElementValue(Accept->node, &len);
-        char accept[len];
-        sscanf(A_text, "%*s %s", accept);
-
-        char *a_value = strtok(accept, ", ");
-        
-        while (a_value != NULL) {
-            if(strcmp(a_value,"text/html")!=0 && strcmp(a_value,"text/css")!=0 && strcmp(a_value,"text/javascript")!=0 && strcmp(a_value,"application/json")!=0 && strcmp(a_value,"image/jpeg")!=0 && strcmp(a_value,"image/png")!=0 && strcmp(a_value,"application/pdf")!=0 && strcmp(a_value,"image/gif")!=0 && strcmp(a_value,"image/svg+xml")!=0 && strcmp(a_value,"image/tiff")!=0 && strcmp(a_value,"video/mp4")!=0){return 400;}
-            a_value = strtok(NULL, ", ");
-        }
-
-
-    }
-
     // Connection
+    printf("debut connection\n");
     _Token *ConnectionNode = searchTree(tree, "connection_option");
     if(ConnectionNode != NULL){
+        printf("connection header\n");
         char *ConnectionL = getElementValue(ConnectionNode->node, &len);
         char *connection = malloc(len +1);
         strncpy(connection, ConnectionL, len);
@@ -615,14 +620,18 @@ int getRepCode(message req, HTTPTable *codes) {
         else if (majeur == '1' && mineur == '0' && (strcmp(connection,"keep-alive") == 0 || strcmp(connection,"Keep-Alive") == 0)){
             updateHeader(codes, "Connection", "Keep-Alive");
         }
+        free(connection);
     }
     else if (majeur == '1' && mineur == '0'){ // si 1.0 et pas de Connection header : fermer la connection
+        printf("version 1.0\n");
         //renvoyer close
         updateHeader(codes,"Connection","close");
         //et fermer la connection    
         //requestShutdownSocket(req.clientId);
+        printf("fermeture de la connexion !!!\n");
     }
-
+    
+    printf("sortie de getRepCode\n");
     return 200;
 }
 
