@@ -653,7 +653,7 @@ message *generateReponse(message req, int opt_code) {
 
     int code;
     if (opt_code == -1) { code = getRepCode(req, codes); } //recherche du code à renvoyer
-    else { code = opt_code; }
+    else { code = opt_code; codes->httpminor = 0; }
 
     HttpReponse *rep;
     if (codes->is_php) {
