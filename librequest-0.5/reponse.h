@@ -28,6 +28,7 @@ typedef struct {
     int httpminor;
     char *filename;
     bool is_head;
+    bool is_php;
     Header *headers;
     int headersCount;
 } HTTPTable;

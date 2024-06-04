@@ -5,6 +5,7 @@
 #include "reponse.h"
 #include "../api/api.h"
 #include "config.h"
+#include "fastcgi.h"
 
 
 uint32_t h1(uint32_t code) { return code % NB_HTTP_CODES; }
@@ -26,6 +27,7 @@ void initTable(HTTPTable *codes) {
 
     codes->filename = malloc(512);
     codes->is_head = false;
+    codes->is_php = false;
 
     codes->headers = malloc(headersCount * sizeof(Header));
     for (int i = 0; i < headersCount; i++) {
@@ -279,6 +281,14 @@ int configFileMsgBody(char *name, HTTPTable *codes) {
     size_t n = fread(type, 1, 127, fp);
     type[n-1] = '\0';
     pclose(fp);
+
+    if (strcmp(type, "application/x-httpd-php")) {
+        printf("php");
+        codes->is_php = true;
+        return 1;
+        // on ne fait pas la suite car c'est pas le contenu du fichier qui nous intéresse
+        // mais la partie "interprété" par PHP donc ça sera plus gros
+    }
 
     updateHeader(codes, "Content-Type", type);
     free(type);
@@ -625,7 +635,11 @@ message *generateReponse(message req, int opt_code) {
     if (opt_code == -1) { code = getRepCode(req, codes); } //recherche du code à renvoyer
     else { code = opt_code; }
 
-    printf("code : %d\n", code);
+    if (codes->is_php) {
+        FCGI_Header header;
+
+    }
+
     HttpReponse *rep = getTable(codes, code);
     message *msg = createMsgFromReponse(*rep, req.clientId);
 
