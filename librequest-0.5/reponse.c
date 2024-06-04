@@ -149,6 +149,64 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
 
     return msg;
 }
+/*
+message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, FCGI_Header reponseFCGI){
+    
+    message *msg = malloc(sizeof(message));
+
+    // Taille du fichier si existe
+    FILE *fout = NULL;
+    long fileSize = 0;
+    if (rep.filename != NULL && !rep.is_head) {
+        fout = fopen(rep.filename, "r");
+        if (fout != NULL) {
+            fseek(fout, 0, SEEK_END);
+            fileSize = ftell(fout);
+            fseek(fout, 0, SEEK_SET);
+        }
+    }
+    
+    //récupération de la taille du message body
+    long fileSize = 0;
+    //parcours des différents FCGI_Header et ajout de leur taille
+
+        //fileSize += reponseFCGI[i].contentLength; // ?
+
+    // Calcul de la taille nécessaire pour buf
+    int bufSize = strlen("HTTP/1.x ") + 3 + strlen(" ") + strlen(rep.code->info) + strlen("\r\n"); // 3 : taille d'une code (200, 404, ...)
+    for (int i = 0; i < rep.headersCount; i++) {
+        if (!(strcmp(rep.headers[i].value, "") == 0)) {
+            bufSize += strlen(rep.headers[i].label) + 2 + strlen(rep.headers[i].value) + strlen("\r\n"); // +2 pour le ": "
+        }
+    }
+    if (!rep.is_head) { bufSize += fileSize; }
+    bufSize += 2 * strlen("\r\n");
+    msg->buf = malloc(bufSize + 10);
+
+    // Transfert de la data
+    sprintf(msg->buf, "HTTP/1.%d %d %s\n", rep.httpminor, rep.code->code, rep.code->info);
+    int len = strlen(msg->buf);
+    for (int i = 0; i < rep.headersCount; i++) {
+        if (!(strcmp(rep.headers[i].value, "") == 0)) {
+            sprintf(msg->buf+len, "%s: %s\r\n", rep.headers[i].label, rep.headers[i].value);
+            len += strlen(rep.headers[i].label) + 2 + strlen(rep.headers[i].value) + strlen("\r\n");
+        }
+    }
+    sprintf(msg->buf+len, "\r\n");
+    len += strlen("\r\n");
+
+    if (fout != NULL && !rep.is_head) {
+        fread(msg->buf+len, fileSize, 1, fout);
+        len += fileSize;
+    }
+    sprintf(msg->buf+len, "\r\n");
+    
+    msg->len = bufSize;
+    msg->clientId = clientId;
+
+    return msg;
+}
+*/
 
 int hexa(char c){
     if(c >= 48 && c <= 57){ //chiffre   
@@ -634,28 +692,23 @@ int getRepCode(message req, HTTPTable *codes) {
     printf("sortie de getRepCode\n");
     return 200;
 }
-
-HttpReponse *convertFCGI_HTTP(FCGI_Header *reponse, HTTPTable *codes) {
+/*
+HttpReponse *convertFCGI_HTTP(HTTPTable *codes, int code) {
     HttpReponse *rep = malloc(sizeof(HttpReponse));
-    // Faire en fonction de ce qu'il y a dans FGCI_Header reponse
-    // rep->code = 200;
-    // rep->httpminor = 1;
-    // rep->filename = NULL;
-    // rep->is_head = false;
-    // rep->headers = malloc(4 * sizeof(Header));
-    // rep->headersCount = 4;
-
-    // rep->headers[0].label = "Content-Type";
-    // rep->headers[0].value = "text/html";
-    // rep->headers[1].label = "Content-Length";
-    // rep->headers[1].value = "0";
-    // rep->headers[2].label = "Connection";
-    // rep->headers[2].value = "Keep-Alive";
-    // rep->headers[3].label = "Host";
-    // rep->headers[3].value = "localhost:8080";
+    
+    int nbTry = 0;
+    while (codes->table[hash(code, nbTry)]->code != code) { nbTry++; }
+    rep->code = codes->table[hash(code, nbTry)];
+    
+    rep->httpminor = codes->httpminor;
+    rep->filename = codes->filename;
+    rep->is_head = codes->is_head;
+    rep->headers = codes->headers;
+    rep->headersCount = codes->headersCount;
 
     return rep;
 }
+*/
 
 message *generateReponse(message req, int opt_code) {
     HTTPTable *codes = loadTable(); //initialisation de la table des codes possibles de retour
@@ -664,9 +717,9 @@ message *generateReponse(message req, int opt_code) {
     if (opt_code == -1) { code = getRepCode(req, codes); } //recherche du code à renvoyer
     else { code = opt_code; codes->httpminor = 0; }
 
-    HttpReponse *rep;
-    if (codes->is_php == 1) {
-        printf("I'm your php\n");
+    HttpReponse *rep = getTable(codes, code);
+    message *msg;
+    if (codes->is_php) {
         int sock = createConnexion();
         unsigned short requestId = 1;
 
@@ -687,15 +740,16 @@ message *generateReponse(message req, int opt_code) {
         send_empty_params(sock, requestId); // fin des paramètres
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 
-        FCGI_Header *reponse = receive_response(sock);
-        rep = convertFCGI_HTTP(reponse, codes);
+        FCGI_Header *reponseFCGI = receive_response(sock);
+
+        //msg = createMsgFromReponsePHP(*rep, req.clientId, reponseFCGI);
 
         close(sock);
     }
-    else { rep = getTable(codes, code); }
+    else {
+        msg = createMsgFromReponse(*rep, req.clientId);
+    }
     
-    message *msg = createMsgFromReponse(*rep, req.clientId);
-
     freeTable(codes);
     return msg;
 }

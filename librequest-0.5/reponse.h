@@ -46,6 +46,7 @@ void updateHeader(HTTPTable *codes, char *label, char *value);
 int configFileMsgBody(char *name, HTTPTable *codes);
 
 message *createMsgFromReponse(HttpReponse rep, unsigned int clientId);
+//message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, FCGI_Header reponseFCGI){
 int getRepCode(message req, HTTPTable *codes);
-HttpReponse *convertFCGI_HTTP(FCGI_Header *reponse, HTTPTable *codes);
+//HttpReponse *convertFCGI_HTTP(FCGI_Header *reponse, HTTPTable *codes, int code);
 message *generateReponse(message req, int opt_code);
