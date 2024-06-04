@@ -5,7 +5,6 @@
 #include "reponse.h"
 #include "../api/api.h"
 #include "config.h"
-#include "php.h"
 
 uint32_t h1(uint32_t code) { return code % NB_HTTP_CODES; }
 uint32_t h2(uint32_t code) { return 1 + (code % (NB_HTTP_CODES - 1)); }
@@ -627,6 +626,28 @@ int getRepCode(message req, HTTPTable *codes) {
     return 200;
 }
 
+HttpReponse *convertFCGI_HTTP(FCGI_Header reponse, HTTPTable *codes) {
+    HttpReponse *rep = malloc(sizeof(HttpReponse));
+    // Faire en fonction de ce qu'il y a dans FGCI_Header reponse
+    // rep->code = 200;
+    // rep->httpminor = 1;
+    // rep->filename = NULL;
+    // rep->is_head = false;
+    // rep->headers = malloc(4 * sizeof(Header));
+    // rep->headersCount = 4;
+
+    // rep->headers[0].label = "Content-Type";
+    // rep->headers[0].value = "text/html";
+    // rep->headers[1].label = "Content-Length";
+    // rep->headers[1].value = "0";
+    // rep->headers[2].label = "Connection";
+    // rep->headers[2].value = "Keep-Alive";
+    // rep->headers[3].label = "Host";
+    // rep->headers[3].value = "localhost:8080";
+
+    return rep;
+}
+
 message *generateReponse(message req, int opt_code) {
     HTTPTable *codes = loadTable(); //initialisation de la table des codes possibles de retour
 
@@ -634,6 +655,7 @@ message *generateReponse(message req, int opt_code) {
     if (opt_code == -1) { code = getRepCode(req, codes); } //recherche du code à renvoyer
     else { code = opt_code; }
 
+    HttpReponse *rep;
     if (codes->is_php) {
         int sock = createConnexion();
         int requestId = 1;
@@ -644,15 +666,15 @@ message *generateReponse(message req, int opt_code) {
         send_params(sock, requestId, "", ""); // fin des paramètres
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 
-        receive_response(sock);
+        FCGI_Header reponse = receive_response(sock);
+        rep = convertFCGI_HTTP(reponse, codes);
 
         close(sock);
     }
-
-    HttpReponse *rep = getTable(codes, code);
+    else { rep = getTable(codes, code); }
+    
     message *msg = createMsgFromReponse(*rep, req.clientId);
 
     freeTable(codes);
-
     return msg;
 }

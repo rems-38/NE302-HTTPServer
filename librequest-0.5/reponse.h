@@ -1,5 +1,6 @@
 #include "request.h"
 #include "config.h"
+#include "php.h"
 
 #include <stdbool.h>
 
@@ -45,5 +46,6 @@ void updateHeader(HTTPTable *codes, char *label, char *value);
 int configFileMsgBody(char *name, HTTPTable *codes);
 
 message *createMsgFromReponse(HttpReponse rep, unsigned int clientId);
-int getRepCode(message req, HTTPTable *codes) ;
+int getRepCode(message req, HTTPTable *codes);
+HttpReponse *convertFCGI_HTTP(FCGI_Header reponse, HTTPTable *codes);
 message *generateReponse(message req, int opt_code);

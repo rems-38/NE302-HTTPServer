@@ -77,7 +77,7 @@ void send_stdin(int sock, int requestId, const char *data) {
     write(sock, data, data_len);
 }
 
-void receive_response(int sock) {
+FCGI_Header receive_response(int sock) {
     FCGI_Header header;
     while (read(sock, &header, sizeof(header)) > 0) {
         header.requestId = ntohs(header.requestId);
@@ -104,4 +104,7 @@ void receive_response(int sock) {
             break;
         }
     }
+
+    return header;
 }
+
