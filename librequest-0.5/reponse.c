@@ -745,10 +745,10 @@ message *generateReponse(message req, int opt_code) {
         send_params(sock, requestId, "SERVER_ADDR", SERVER_ADDR);
         send_params(sock, requestId, "SERVER_PORT", srv_port_str);
         send_params(sock, requestId, "DOCUMENT_ROOT", SERVER_ROOT);
-        // SCRIPT_FILENAME = proxy:fcgi://127.0.0.1:9000//var/www/html/info.php
-        send_params(sock, requestId, "SCRIPT_FILENAME", generateFileName(SERVER_ADDR, srv_port_str, codes->filename));
-        //send_params(sock, requestId, "SCRIPT_FILENAME", codes->filename);
         send_params(sock, requestId, "SCRIPT_NAME", "/test.php"); // à modifier car par défaut pour les tests
+        // SCRIPT_FILENAME = proxy:fcgi://127.0.0.1:9000//var/www/html/info.php
+        send_params(sock, requestId, "SCRIPT_FILENAME", generateFileName("/test.php"));
+        //send_params(sock, requestId, "SCRIPT_FILENAME", codes->filename);
         send_params(sock, requestId, "REQUEST_METHOD", "GET");
 
         send_empty_params(sock, requestId); // fin des paramètres

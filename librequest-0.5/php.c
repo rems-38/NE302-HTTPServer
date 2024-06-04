@@ -39,14 +39,23 @@ void send_begin_request(int sock, unsigned short requestId) {
     write(sock, &body, sizeof(body));
 }
 
-char *generateFileName(const char *addr, const char *port, const char *filename) {
+char *generateFileName(const char *filename) {
     
-    // pour le test
-    // en vrai faut le modifier selon le filename etc
-    char *script_filename = malloc(strlen("proxy:fcgi://") + strlen(addr) + strlen(":") + strlen(port) + strlen("/~/NE302-HTTPServer/html/www/test.php") + 1);
-    sprintf(script_filename, "proxy:fcgi://%s:%s/test.php", addr, port);
-    
-    return script_filename;
+    char *addr = "127.0.0.1";
+    char *port = "9000";
+    // char *final = malloc(64);
+    // char *res = realpath(filename, final);
+    char *final = "/home/userir/NE302-HTTPServer/html/www/test.php";
+    char *res = "pas null";
+
+    if (res != NULL) {
+        char *script_filename = malloc(strlen("proxy:fcgi://") + strlen(addr) + strlen(port) + strlen(final) + 3);
+        sprintf(script_filename, "proxy:fcgi://%s:%s/%s", addr, port, final);
+        printf("script_filename: %s\n", script_filename);
+        //free(final);
+        
+        return script_filename;
+    } else { free(final); return " "; }
 }
 
 void encode_name_value_pair(const char *name, const char *value, unsigned char *buffer, int *len) {
