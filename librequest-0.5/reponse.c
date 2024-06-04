@@ -5,8 +5,7 @@
 #include "reponse.h"
 #include "../api/api.h"
 #include "config.h"
-#include "fastcgi.h"
-
+#include "php.h"
 
 uint32_t h1(uint32_t code) { return code % NB_HTTP_CODES; }
 uint32_t h2(uint32_t code) { return 1 + (code % (NB_HTTP_CODES - 1)); }
@@ -636,8 +635,18 @@ message *generateReponse(message req, int opt_code) {
     else { code = opt_code; }
 
     if (codes->is_php) {
-        FCGI_Header header;
+        int sock = createConnexion();
+        int requestId = 1;
 
+        send_begin_request(sock, requestId);
+        send_params(sock, requestId, "SCRIPT_FILENAME", codes->filename);
+        send_params(sock, requestId, "REQUEST_METHOD", "GET");
+        send_params(sock, requestId, "", ""); // fin des paramètres
+        send_stdin(sock, requestId, ""); // fin des données d'entrées
+
+        receive_response(sock);
+
+        close(sock);
     }
 
     HttpReponse *rep = getTable(codes, code);

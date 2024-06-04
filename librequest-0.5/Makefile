@@ -1,8 +1,8 @@
 
 all : librequest.so sock 
 
-sock : librequest.so main.o reponse.o
-	gcc -g -fsanitize=address -o sock main.o reponse.o -L. -lrequest -lparser
+sock : librequest.so main.o reponse.o php.o
+	gcc -g -fsanitize=address -o sock main.o reponse.o php.o -L. -lrequest -lparser
 
 %.o: %.c 
 	gcc -fPIC -fsanitize=address -g -I../../abnf -I./api -I libparser -c $<
