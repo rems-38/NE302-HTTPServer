@@ -505,13 +505,15 @@ int getRepCode(message req, HTTPTable *codes) {
 
     if (majeur == '1' && mineur == '1' && T_EncodingNode != NULL){ // Ne pas traiter si HTTP 1.0
         char *TE_text = getElementValue(T_EncodingNode->node, &len); // nous renvoie "Transfer-Encoding : xxxxx" et pas "xxxxxx"
+        
         char transfer_encoding[len];
-
         sscanf(TE_text, "%*s %s", transfer_encoding);
+        printf("te : -%s-\n",transfer_encoding);
 
         if(!(strcmp(transfer_encoding,"chunked")==0 | strcmp(transfer_encoding,"gzip")==0 | strcmp(transfer_encoding,"deflate")==0 | strcmp(transfer_encoding,"compress")==0 |strcmp(transfer_encoding,"identity")==0 )) {return 400;} // vérifier que la valeur du champ est bien prise en charge
-        if(!(TE_text[len]=='\r' && TE_text[len+1]=='\n' && TE_text[len+2]=='\r' && TE_text[len+3]=='\n')){return 400;} // vérifier \r\n\r\n après la valeur du champ
-        printf("OK\n");
+        printf("ici1 : -%s-\n",TE_text);
+        if(!(TE_text[len]=='\r' && TE_text[len+1]=='\n')){return 400;} //&& TE_text[len+2]=='\r' && TE_text[len+3]=='\n' : vérifier \r\n(\r\n) après la valeur du champ
+        printf("ici2\n");    
     }
 
     // Message Body
@@ -535,7 +537,7 @@ int getRepCode(message req, HTTPTable *codes) {
         ae_t = getElementValue(Accept_Encoding->node, &len);
         ae = malloc(16);
         strncpy(ae, ae_t, 15);
-        ae[16] = '\0';
+        ae[15] = '\0';
     }
     
 
@@ -545,12 +547,12 @@ int getRepCode(message req, HTTPTable *codes) {
         sscanf(AE_text, "%*s %s", accept_encoding);
 
         char *ae_value = strtok(accept_encoding, ", ");
-        
+        printf("OK1\n");
         while (ae_value != NULL) {
             if(strcmp(ae_value,"gzip")!=0 && strcmp(ae_value,"deflate")!=0 && strcmp(ae_value,"br")!=0 && strcmp(ae_value,"compress")!=0 && strcmp(ae_value,"identity")!=0){return 400;}
             ae_value = strtok(NULL, ", ");
         }
-
+        printf("OK2\n");
 
     }
 
@@ -565,7 +567,7 @@ int getRepCode(message req, HTTPTable *codes) {
 
     
     while(Accept->next != NULL && strcmp(a,"Accept:") != 0){
-        Accept_Encoding = Accept_Encoding->next;
+        Accept = Accept->next;
         a_t = getElementValue(Accept->node, &len);
         a = malloc(8);
         strncpy(a, a_t, 7);
