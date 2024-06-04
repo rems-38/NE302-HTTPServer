@@ -280,7 +280,7 @@ int configFileMsgBody(char *name, HTTPTable *codes) {
     type[n-1] = '\0';
     pclose(fp);
 
-    if (strcmp(type, "application/x-httpd-php") == 0) {
+    if (strcmp(type, "application/x-httpd-php") == 0 || strcmp(type, "text/x-php") == 0) {
         codes->is_php = true;
         return 1;
         // on ne fait pas la suite car c'est pas le contenu du fichier qui nous intéresse
