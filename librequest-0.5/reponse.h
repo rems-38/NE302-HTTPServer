@@ -47,5 +47,5 @@ int configFileMsgBody(char *name, HTTPTable *codes);
 
 message *createMsgFromReponse(HttpReponse rep, unsigned int clientId);
 int getRepCode(message req, HTTPTable *codes);
-HttpReponse *convertFCGI_HTTP(FCGI_Header reponse, HTTPTable *codes);
+HttpReponse *convertFCGI_HTTP(FCGI_Header *reponse, HTTPTable *codes);
 message *generateReponse(message req, int opt_code);

@@ -77,32 +77,35 @@ void send_stdin(int sock, int requestId, const char *data) {
     write(sock, data, data_len);
 }
 
-FCGI_Header receive_response(int sock) {
-    FCGI_Header header;
-    while (read(sock, &header, sizeof(header)) > 0) {
-        header.requestId = ntohs(header.requestId);
-        header.contentLength = ntohs(header.contentLength);
+FCGI_Header *receive_response(int sock) {
+    FCGI_Header *header = malloc(sizeof(FCGI_Header) * 32);
+    int i = 0;
+    while (read(sock, &header[i], sizeof(header[i])) > 0) {
+        header[i].requestId = ntohs(header[i].requestId);
+        header[i].contentLength = ntohs(header[i].contentLength);
 
-        char *content = malloc(header.contentLength + 1);
-        read(sock, content, header.contentLength);
-        content[header.contentLength] = '\0';
+        char *content = malloc(header[i].contentLength + 1);
+        read(sock, content, header[i].contentLength);
+        content[header[i].contentLength] = '\0';
 
-        if (header.type == FCGI_STDOUT) {
+        if (header[i].type == FCGI_STDOUT) {
             printf("Output: %s\n", content);
-        } else if (header.type == FCGI_STDERR) {
+        } else if (header[i].type == FCGI_STDERR) {
             fprintf(stderr, "Error: %s\n", content);
         }
 
         free(content);
 
-        if (header.paddingLength > 0) {
-            char padding[header.paddingLength];
-            read(sock, padding, header.paddingLength);
+        if (header[i].paddingLength > 0) {
+            char padding[header[i].paddingLength];
+            read(sock, padding, header[i].paddingLength);
         }
 
-        if (header.type == FCGI_END_REQUEST) {
+        if (header[i].type == FCGI_END_REQUEST) {
             break;
         }
+
+        i++; if (i >= 32) { break; }
     }
 
     return header;

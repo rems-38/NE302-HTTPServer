@@ -23,7 +23,7 @@ void initTable(HTTPTable *codes) {
     };
     int headersCount = sizeof(headers) / sizeof(headers[0]);
 
-    codes->filename = malloc(512);
+    codes->filename = NULL;
     codes->is_head = false;
     codes->is_php = false;
 
@@ -308,6 +308,7 @@ int configFileMsgBody(char *name, HTTPTable *codes) {
 
         updateHeader(codes, "Content-Length", fsize_str);
         
+        codes->filename = malloc(strlen(path) + 1);
         strcpy(codes->filename, path);
         free(path);
     }
@@ -626,7 +627,7 @@ int getRepCode(message req, HTTPTable *codes) {
     return 200;
 }
 
-HttpReponse *convertFCGI_HTTP(FCGI_Header reponse, HTTPTable *codes) {
+HttpReponse *convertFCGI_HTTP(FCGI_Header *reponse, HTTPTable *codes) {
     HttpReponse *rep = malloc(sizeof(HttpReponse));
     // Faire en fonction de ce qu'il y a dans FGCI_Header reponse
     // rep->code = 200;
@@ -660,13 +661,21 @@ message *generateReponse(message req, int opt_code) {
         int sock = createConnexion();
         int requestId = 1;
 
+        char srv_port_str[6];
+        sprintf(srv_port_str, "%d", SERVER_PORT);
+
         send_begin_request(sock, requestId);
-        send_params(sock, requestId, "SCRIPT_FILENAME", codes->filename);
+        send_params(sock, requestId, "SERVER_ADDR", SERVER_ADDR);
+        send_params(sock, requestId, "SERVER_PORT", srv_port_str);
+        send_params(sock, requestId, "DOCUMENT_ROOT", SERVER_ROOT);
+        // SCRIPT_FILENAME = proxy:fcgi://127.0.0.1:9000//var/www/html/info.php
+        send_params(sock, requestId, "SCRIPT_NAME", codes->filename);
         send_params(sock, requestId, "REQUEST_METHOD", "GET");
+
         send_params(sock, requestId, "", ""); // fin des paramètres
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 
-        FCGI_Header reponse = receive_response(sock);
+        FCGI_Header *reponse = receive_response(sock);
         rep = convertFCGI_HTTP(reponse, codes);
 
         close(sock);

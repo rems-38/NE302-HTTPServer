@@ -10,4 +10,4 @@ int createConnexion();
 void send_begin_request(int sock, int requestId);
 void send_params(int sock, int requestId, const char *name, const char *value);
 void send_stdin(int sock, int requestId, const char *data) ;
-FCGI_Header receive_response(int sock);
+FCGI_Header *receive_response(int sock);
