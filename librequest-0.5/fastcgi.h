@@ -16,8 +16,17 @@ typedef struct __attribute__((__packed__)) {
     unsigned short contentLength;
     unsigned char paddingLength;
     unsigned char reserved;
-    char contentData[FASTCGILENGTH]; 
 } FCGI_Header;
+
+typedef struct __attribute__((__packed__)) {
+    unsigned char version;
+    unsigned char type;
+    unsigned short requestId;
+    unsigned short contentLength;
+    unsigned char paddingLength;
+    unsigned char reserved;
+    char contentData[FASTCGILENGTH]; 
+} FCGI_Reponse;
 
 #define FCGI_HEADER_SIZE           8
 
@@ -51,7 +60,7 @@ typedef struct __attribute__((__packed__)) {
 
 
 typedef struct __attribute__((__packed__)) {
-    unsigned short role; //FCGI_RESPONDEUR | FCGI_AUTHOORIZER |FCGI_FILTER
+    unsigned short role; //FCGI_RESPONDEUR | FCGI_AUTHORIZER |FCGI_FILTER
     unsigned char flags; // FCGI_KEEP_CONN : laisse ouvert après demande sinon ferme
     unsigned char unused[5];
 }  FCGI_BeginRequestBody;

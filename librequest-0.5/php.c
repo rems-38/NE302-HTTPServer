@@ -18,14 +18,14 @@ int createConnexion() {
     return sock;
 }
 
-void send_begin_request(int sock, int requestId) {
+void send_begin_request(int sock, unsigned short requestId) {
     FCGI_Header header;
     FCGI_BeginRequestBody body;
 
     header.version = FCGI_VERSION_1;
     header.type = FCGI_BEGIN_REQUEST;
     header.requestId = htons(requestId);
-    header.contentLength = htons(sizeof(body));
+    header.contentLength = htons(sizeof(FCGI_BeginRequestBody));
     header.paddingLength = 0;
     header.reserved = 0;
 
@@ -33,15 +33,59 @@ void send_begin_request(int sock, int requestId) {
     body.flags = 0;
     memset(body.unused, 0, sizeof(body.unused));
 
+    printf("-> Sending begin request\n");
+
     write(sock, &header, sizeof(header));
     write(sock, &body, sizeof(body));
 }
 
-void send_params(int sock, int requestId, const char *name, const char *value) {
-    FCGI_Header header;
+char *generateFileName(const char *addr, const char *port, const char *filename) {
+    
+    // pour le test
+    // en vrai faut le modifier selon le filename etc
+    char *script_filename = malloc(strlen("proxy:fcgi://") + strlen(addr) + strlen(":") + strlen(port) + strlen("/~/NE302-HTTPServer/html/www/test.php") + 1);
+    sprintf(script_filename, "proxy:fcgi://%s:%s/test.php", addr, port);
+    
+    return script_filename;
+}
+
+void encode_name_value_pair(const char *name, const char *value, unsigned char *buffer, int *len) {
     int name_len = strlen(name);
     int value_len = strlen(value);
-    int content_len = name_len + value_len + 2;
+    unsigned char *start = buffer;
+
+    if (name_len < 128) {
+        *buffer++ = (unsigned char)name_len;
+    } else {
+        *buffer++ = (unsigned char)((name_len >> 24) | 0x80);
+        *buffer++ = (unsigned char)(name_len >> 16);
+        *buffer++ = (unsigned char)(name_len >> 8);
+        *buffer++ = (unsigned char)name_len;
+    }
+
+    if (value_len < 128) {
+        *buffer++ = (unsigned char)value_len;
+    } else {
+        *buffer++ = (unsigned char)((value_len >> 24) | 0x80);
+        *buffer++ = (unsigned char)(value_len >> 16);
+        *buffer++ = (unsigned char)(value_len >> 8);
+        *buffer++ = (unsigned char)value_len;
+    }
+
+    memcpy(buffer, name, name_len);
+    buffer += name_len;
+    memcpy(buffer, value, value_len);
+    buffer += value_len;
+
+    *len = buffer - start;
+}
+
+void send_params(int sock, unsigned short requestId, const char *name, const char *value) {
+    FCGI_Header header;
+    unsigned char buffer[FASTCGILENGTH];
+    int content_len;
+
+    encode_name_value_pair(name, value, buffer, &content_len);
 
     header.version = FCGI_VERSION_1;
     header.type = FCGI_PARAMS;
@@ -50,28 +94,37 @@ void send_params(int sock, int requestId, const char *name, const char *value) {
     header.paddingLength = 0;
     header.reserved = 0;
 
-    unsigned char *content = malloc(content_len);
-    content[0] = name_len;
-    content[1] = value_len;
-    memcpy(content + 2, name, name_len);
-    memcpy(content + 2 + name_len, value, value_len);
-
     write(sock, &header, sizeof(header));
-    write(sock, content, content_len);
-
-    free(content);
+    write(sock, buffer, content_len);
 }
 
-void send_stdin(int sock, int requestId, const char *data) {
+void send_empty_params(int sock, unsigned short requestId) {
+    FCGI_Header header;
+
+    header.version = FCGI_VERSION_1;
+    header.type = FCGI_PARAMS;
+    header.requestId = htons(requestId);
+    header.contentLength = 0;
+    header.paddingLength = 0;
+    header.reserved = 0;
+
+    printf("-> Sending empty params\n");
+
+    write(sock, &header, sizeof(header));
+}
+
+void send_stdin(int sock, unsigned short requestId, const char *data) {
     FCGI_Header header;
     int data_len = strlen(data);
 
     header.version = FCGI_VERSION_1;
     header.type = FCGI_STDIN;
     header.requestId = htons(requestId);
-    header.contentLength = htons(data_len);
+    header.contentLength = data_len;
     header.paddingLength = 0;
     header.reserved = 0;
+
+    printf("-> Sending stdin\n");
 
     write(sock, &header, sizeof(header));
     write(sock, data, data_len);

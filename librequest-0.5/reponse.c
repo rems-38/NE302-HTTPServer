@@ -280,15 +280,7 @@ int configFileMsgBody(char *name, HTTPTable *codes) {
     type[n-1] = '\0';
     pclose(fp);
 
-    if (strcmp(type, "application/x-httpd-php") == 0 || strcmp(type, "text/x-php") == 0) {
-        codes->is_php = true;
-        return 1;
-        // on ne fait pas la suite car c'est pas le contenu du fichier qui nous intéresse
-        // mais la partie "interprété" par PHP donc ça sera plus gros
-    }
-
     updateHeader(codes, "Content-Type", type);
-    free(type);
 
     FILE *file = fopen(path, "r");
     if (file == NULL) { 
@@ -310,7 +302,15 @@ int configFileMsgBody(char *name, HTTPTable *codes) {
         codes->filename = malloc(strlen(path) + 1);
         strcpy(codes->filename, path);
         free(path);
+
+        if (strcmp(type, "application/x-httpd-php") == 0 || strcmp(type, "text/x-php") == 0) {
+            codes->is_php = true;
+            return 1;
+            // on ne fait pas la suite car c'est pas le contenu du fichier qui nous intéresse
+            // mais la partie "interprété" par PHP donc ça sera plus gros
+        }
     }
+    free(type);
     fclose(file);
     
     return 1;
@@ -665,22 +665,26 @@ message *generateReponse(message req, int opt_code) {
     else { code = opt_code; codes->httpminor = 0; }
 
     HttpReponse *rep;
-    if (codes->is_php) {
+    if (codes->is_php == 1) {
+        printf("I'm your php\n");
         int sock = createConnexion();
-        int requestId = 1;
+        unsigned short requestId = 1;
 
         char srv_port_str[6];
         sprintf(srv_port_str, "%d", SERVER_PORT);
 
         send_begin_request(sock, requestId);
+        printf("-> Sending params\n");
         send_params(sock, requestId, "SERVER_ADDR", SERVER_ADDR);
         send_params(sock, requestId, "SERVER_PORT", srv_port_str);
         send_params(sock, requestId, "DOCUMENT_ROOT", SERVER_ROOT);
         // SCRIPT_FILENAME = proxy:fcgi://127.0.0.1:9000//var/www/html/info.php
-        send_params(sock, requestId, "SCRIPT_NAME", codes->filename);
+        send_params(sock, requestId, "SCRIPT_FILENAME", generateFileName(SERVER_ADDR, srv_port_str, codes->filename));
+        //send_params(sock, requestId, "SCRIPT_FILENAME", codes->filename);
+        send_params(sock, requestId, "SCRIPT_NAME", "/test.php"); // à modifier car par défaut pour les tests
         send_params(sock, requestId, "REQUEST_METHOD", "GET");
 
-        send_params(sock, requestId, "", ""); // fin des paramètres
+        send_empty_params(sock, requestId); // fin des paramètres
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 
         FCGI_Header *reponse = receive_response(sock);

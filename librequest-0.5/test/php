@@ -1,2 +1,3 @@
-GET /test.php HTTP/1.0 
+GET /test.php HTTP/1.0
+
 
