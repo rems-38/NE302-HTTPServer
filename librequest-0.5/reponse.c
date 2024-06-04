@@ -99,6 +99,20 @@ HttpReponse *getTable(HTTPTable *codes, int code) {
     return rep;
 }
 
+char *HexaToChar(char *content){
+    int content_length = strlen(content);
+    char *result = malloc(content_length/2);
+    char *hexa = malloc(3);
+
+    for(int i=0; i<content_length/2 ; i++){
+        hexa[0] = content[2*i];
+        hexa[1] = content[2*i+1];
+        hexa[2] = '\0';
+        char valeur = strtol(hexa,NULL,16);
+        result[i] = valeur;
+    }
+    return result;
+}
 
 message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
     message *msg = malloc(sizeof(message));
@@ -149,7 +163,7 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
 
     return msg;
 }
-/*
+
 message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, FCGI_Header reponseFCGI){
     
     message *msg = malloc(sizeof(message));
@@ -206,7 +220,7 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, FCGI_He
 
     return msg;
 }
-*/
+
 
 int hexa(char c){
     if(c >= 48 && c <= 57){ //chiffre   
