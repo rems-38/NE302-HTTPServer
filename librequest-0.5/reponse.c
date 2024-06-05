@@ -166,7 +166,8 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* t
         rep.code->info = rep_code_out->code->info;
     }
 
-    //Fonction arthur : recup header et les ajouter
+    //recup header et les ajouter
+    headers_from_STDOUT(txtData,rep);
    
     char *message_body = message_body_from_STD_OUT(txtData);
 
@@ -236,7 +237,7 @@ char *message_body_from_STD_OUT(char* STD_OUT_txt){
     return message_body;
 }
 
-void headers_from_STDOUT(char* STD_OUT_txt){
+void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
 
     int j=0; // parcourir STD_OUT_txt
     int k=0; // taille label et value
@@ -258,9 +259,8 @@ void headers_from_STDOUT(char* STD_OUT_txt){
             k++;
         }
         label[k] = '\0';
-        // UpdateHeader à ajouter
 
-        printf("label : %s\n",label);
+        //printf("label : %s\n",label);
         j=j+2;
         k=0;
 
@@ -270,8 +270,10 @@ void headers_from_STDOUT(char* STD_OUT_txt){
             j++;
         }
         value[k] = '\0';
-        // UpdateHeader à ajouter
-        printf("value : %s\n",value);
+        // UpdateHeader 
+        updateHeaderHttpReponse(rep, label, value);
+
+        //printf("value : %s\n",value);
 
         char *CRLF = malloc(3);
         CRLF[0] = STD_OUT_txt[j];
@@ -416,6 +418,15 @@ char* DotRemovalSegment(char* uri){
     }
     out[j] = '\0';
     return out;
+}
+
+void updateHeaderHttpReponse(HttpReponse rep, char *label, char *value) {
+    for (int i = 0; i < rep.headersCount; i++) {
+        if (strcmp(rep.headers[i].label, label) == 0) {
+            rep.headers[i].value = malloc(strlen(value) + 1);
+            strcpy(rep.headers[i].value, value);
+        }
+    }
 }
 
 void updateHeader(HTTPTable *codes, char *label, char *value) {

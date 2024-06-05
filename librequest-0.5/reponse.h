@@ -42,6 +42,7 @@ void addTable(HTTPTable *codes, int code, char *info);
 HTTPTable *loadTable();
 HttpReponse *getTable(HTTPTable *codes, int code);
 
+void updateHeaderHttpReponse(HttpReponse rep, char *label, char *value);
 void updateHeader(HTTPTable *codes, char *label, char *value);
 int configFileMsgBody(char *name, HTTPTable *codes);
 char *message_body_from_STD_OUT(char* STD_OUT_txt);
@@ -50,6 +51,7 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId);
 message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* txtData);
 int hexa(char c);
 char *message_body_from_STD_OUT(char* STD_OUT_txt);
+void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep);
 int ErrorInSTD_OUT(char* STD_OUT_txt);
 char *HexaToChar(char *content);
 char* percentEncoding(char* uri);
