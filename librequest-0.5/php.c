@@ -55,7 +55,7 @@ char *generateFileName(const char *filename) {
         //free(final);
         
         return script_filename;
-    } else { free(final); return " "; }
+    } else { return " "; }
 }
 
 void encode_name_value_pair(const char *name, const char *value, unsigned char *buffer, int *len) {

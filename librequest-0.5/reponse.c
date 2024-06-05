@@ -152,29 +152,17 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
     return msg;
 }
 
-message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, FCGI_Header reponseFCGI){
+message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* txtData){
     
     message *msg = malloc(sizeof(message));
 
-    // Taille du fichier si existe
-    FILE *fout = NULL;
-    long fileSize = 0;
-    if (rep.filename != NULL && !rep.is_head) {
-        fout = fopen(rep.filename, "r");
-        if (fout != NULL) {
-            fseek(fout, 0, SEEK_END);
-            fileSize = ftell(fout);
-            fseek(fout, 0, SEEK_SET);
-        }
-    }
-    
-    //récupération de la taille du message body
+    //Fonction arthur : recup code erreur (ou pas)
+    //ajout du code dans rep si pas déja fait
 
-    //char *message_body = message_body_from_STD_OUT(/*besoin du content_data de STD_OUT*/);
-    
-    //parcours des différents FCGI_Header et ajout de leur taille
+    //Fonction arthur : recup header et les ajouter
+   
+    char *message_body = message_body_from_STD_OUT(txtData);
 
-    //fileSize += reponseFCGI[i].contentLength; // ?
 
     // Calcul de la taille nécessaire pour buf
     int bufSize = strlen("HTTP/1.x ") + 3 + strlen(" ") + strlen(rep.code->info) + strlen("\r\n"); // 3 : taille d'une code (200, 404, ...)
@@ -183,8 +171,9 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, FCGI_He
             bufSize += strlen(rep.headers[i].label) + 2 + strlen(rep.headers[i].value) + strlen("\r\n"); // +2 pour le ": "
         }
     }
-    if (!rep.is_head) { bufSize += fileSize; }
+    if (!rep.is_head) { bufSize += strlen(message_body); } //ajout taille msg body
     bufSize += 2 * strlen("\r\n");
+    //pas besoin ajout taille header normalement
     msg->buf = malloc(bufSize + 10);
 
     // Transfert de la data
@@ -199,9 +188,9 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, FCGI_He
     sprintf(msg->buf+len, "\r\n");
     len += strlen("\r\n");
 
-    if (fout != NULL && !rep.is_head) {
-        fread(msg->buf+len, fileSize, 1, fout);
-        len += fileSize;
+    if (!rep.is_head) {//ajout msg body
+        sprintf(msg->buf+len, "%s", message_body);
+        len += strlen(message_body);
     }
     sprintf(msg->buf+len, "\r\n");
     
@@ -799,7 +788,8 @@ message *generateReponse(message req, int opt_code) {
         char HexData[100000];
         FCGI_Header *reponseFCGI = receive_response(sock, HexData);
 
-        //msg = createMsgFromReponsePHP(*rep, req.clientId, reponseFCGI);
+        char* txtData = HexaToChar(HexData);
+        msg = createMsgFromReponsePHP(*rep, req.clientId, txtData);
 
         free(script_name);
         free(script_filename);
