@@ -8,7 +8,6 @@
 #include "../api/api.h"
 #include "config.h"
 
-
 int main(int argc, char *argv[])
 {
 	message *requete;
@@ -29,11 +28,11 @@ int main(int argc, char *argv[])
 		printf("Client [%d] [%s:%d]\n",requete->clientId,inet_ntoa(requete->clientAddress->sin_addr),htons(requete->clientAddress->sin_port));
 		printf("%.*s\n\n",msg->len,msg->buf);
 		sendReponse(msg); 
+		controlConnection(msg);
+		//requestShutdownSocket(requete->clientId); 
 
-		requestShutdownSocket(requete->clientId); 
-
-	// on ne se sert plus de requete a partir de maintenant, on peut donc liberer... 
-	freeRequest(requete); 
+		// on ne se sert plus de requete a partir de maintenant, on peut donc liberer... 
+		freeRequest(requete); 
 	}
 	return (1);
 }

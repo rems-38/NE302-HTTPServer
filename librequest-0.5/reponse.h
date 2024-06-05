@@ -48,6 +48,7 @@ int configFileMsgBody(char *name, HTTPTable *codes);
 char *HexaToChar(char *content);
 message *createMsgFromReponse(HttpReponse rep, unsigned int clientId);
 //message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, FCGI_Header reponseFCGI){
+void controlConnection(message *msg);
 int getRepCode(message req, HTTPTable *codes);
 //HttpReponse *convertFCGI_HTTP(FCGI_Header *reponse, HTTPTable *codes, int code);
 message *generateReponse(message req, int opt_code);
