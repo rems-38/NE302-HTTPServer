@@ -156,18 +156,24 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* t
     
     message *msg = malloc(sizeof(message));
 
+    rep.headers[0].label = "Content-Type";
+    rep.headers[0].value = "text/html";
+    rep.headers[1].label = "Content-Length";
+    rep.headers[1].value = "70000";
+    rep.headersCount = 2;
+
     //recup code erreur (ou pas)
     //ajout du code dans rep 
-    int code_out = ErrorInSTD_OUT(txtData);
-    if(code_out != 200){
-        HTTPTable *codes = loadTable(); //initialisation de la table des codes possibles de retour
-        HttpReponse *rep_code_out = getTable(codes, code_out);
-        rep.code->code = code_out;
-        rep.code->info = rep_code_out->code->info;
-    }
+    // int code_out = ErrorInSTD_OUT(txtData);
+    // if(code_out != 200){
+    //     HTTPTable *codes = loadTable(); //initialisation de la table des codes possibles de retour
+    //     HttpReponse *rep_code_out = getTable(codes, code_out);
+    //     rep.code->code = code_out;
+    //     rep.code->info = rep_code_out->code->info;
+    // }
 
     //recup header et les ajouter
-    headers_from_STDOUT(txtData,rep);
+    //headers_from_STDOUT(txtData,rep);
    
     char *message_body = message_body_from_STD_OUT(txtData);
 
@@ -831,7 +837,6 @@ void controlConnection(message *msg){
     if(connecte == 1 || mineur == 0){
         requestShutdownSocket(msg->clientId);
     }
-    printf("mineur : %c\n", mineur);
 }
 
 message *generateReponse(message req, int opt_code) {
@@ -878,19 +883,22 @@ message *generateReponse(message req, int opt_code) {
         send_empty_params(sock, requestId); // fin des paramètres
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 
-        char HexData[100000];
-        FCGI_Header *reponseFCGI = receive_response(sock, HexData);
+        //char *HexData = malloc(1);
+        //HexData[0] = '\0';
+        //FCGI_Header *reponseFCGI = receive_response(sock, HexData);
+        char *HexData = receive_response(sock);
+
+        //printf("FINAL : %s\n", HexData);
 
         msg = createMsgFromReponsePHP(*rep, req.clientId, HexData);
 
+        free(HexData);
         free(params);
         close(sock);
     }
     else {
         msg = createMsgFromReponse(*rep, req.clientId);
     }
-    
-    printf("msg : %s\n",msg->buf);
 
     freeTable(codes);
     return msg;

@@ -144,10 +144,16 @@ void send_stdin(int sock, unsigned short requestId, const char *data) {
     write(sock, data, data_len);
 }
 
-FCGI_Header *receive_response(int sock, char* HexData) {
+char *receive_response(int sock) {
     FCGI_Header *header = malloc(sizeof(FCGI_Header) * 32);
+    char *HexData = malloc(1);
+    HexData[0] = '\0';
     int i = 0;
     while (read(sock, &header[i], sizeof(header[i])) > 0) {
+        if (header[i].type == FCGI_END_REQUEST) {
+            break;
+        }
+
         header[i].requestId = ntohs(header[i].requestId);
         header[i].contentLength = ntohs(header[i].contentLength);
 
@@ -155,13 +161,15 @@ FCGI_Header *receive_response(int sock, char* HexData) {
         read(sock, content, header[i].contentLength);
         content[header[i].contentLength] = '\0';
 
-        if (header[i].type == FCGI_STDOUT) {
-            printf("Output: %s\n", content);
-        } else if (header[i].type == FCGI_STDERR) {
-            fprintf(stderr, "Error: %s\n", content);
-        }
+        // if (header[i].type == FCGI_STDOUT) {
+        //     printf("Output: %s\n", content);
+        // } else if (header[i].type == FCGI_STDERR) {
+        //     fprintf(stderr, "Error: %s\n", content);
+        // }
 
-        strcat(HexData,content);
+        HexData = realloc(HexData, strlen(HexData) + header[i].contentLength + 1);
+        strcat(HexData, content);
+
         free(content);
 
         if (header[i].paddingLength > 0) {
@@ -169,13 +177,13 @@ FCGI_Header *receive_response(int sock, char* HexData) {
             read(sock, padding, header[i].paddingLength);
         }
 
-        if (header[i].type == FCGI_END_REQUEST) {
-            break;
-        }
+        
 
         i++; if (i >= 32) { break; }
     }
 
-    return header;
+    //printf("SORTIE : %s\n", HexData);
+
+    return HexData;
 }
 

@@ -23,4 +23,4 @@ char *getScriptFilename(const char *filename);
 void send_params(int sock, unsigned short requestId, FCGI_NameValuePair11 *params);
 void send_empty_params(int sock, unsigned short requestId);
 void send_stdin(int sock, unsigned short requestId, const char *data) ;
-FCGI_Header *receive_response(int sock, char* HexData);
+char *receive_response(int sock);
