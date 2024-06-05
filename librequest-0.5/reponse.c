@@ -299,14 +299,6 @@ char* DotRemovalSegment(char* uri){
     char* out = malloc(n+1);
     int i = 0, j = 0;
     while(i < n){
-        /*printf("\nout :");
-        for(int k = 0; k < j; k++){
-            printf("%c",out[k]);
-        }
-        printf("\turi :");
-        for(int k = i; k < n; k++){
-            printf("%c",uri[k]);
-        }*/
         if(uri[i] == '.' && uri[i+1] == '.' && uri[i+2] == '/'){
             i += 3; //enlever prefixe
         }
