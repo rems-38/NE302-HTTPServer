@@ -221,9 +221,8 @@ int hexa(char c){
     }
 }
 
-char *message_body_from_STD_OUT(char* STD_OUT_hexa){
+char *message_body_from_STD_OUT(char* STD_OUT_txt){
 
-    char *STD_OUT_txt = HexaToChar(STD_OUT_hexa);
 
     int j = 0;// correspond au nombre de ligne à sauter d'affilée
     int i = 0;// correspond au nombre de caractères avant d'atteindre le message body
@@ -239,6 +238,21 @@ char *message_body_from_STD_OUT(char* STD_OUT_hexa){
     for(int j=0; j<taille_msg_body; j++){message_body[j]=STD_OUT_txt[i+j];}
 
     return message_body;
+}
+
+int ErrorInSTD_OUT(char* STD_OUT_txt){ // retourne 200 si pas d'erreur, sinon retourne le numéro de l'erreur
+    char *first_header = malloc(sizeof(char *));
+
+    int i=0;
+    while(STD_OUT_txt[i] != ':'){first_header[i] = STD_OUT_txt[i]; i++;}
+    first_header[i] = '\0';
+
+    if(strcmp(first_header,"Status") == 0){
+        while(!((STD_OUT_txt[i]>='0' && STD_OUT_txt[i] <= '9') && (STD_OUT_txt[i+1]>='0' && STD_OUT_txt[i+1] <= '9') && (STD_OUT_txt[i+2]>='0' && STD_OUT_txt[i+2] <= '9'))){i++;}
+        int error = (STD_OUT_txt[i]-'0')*100 + (STD_OUT_txt[i+1]-'0')*10 + STD_OUT_txt[i+2]-'0';
+        return error;
+    }
+    return 200;
 }
 
 
