@@ -785,7 +785,8 @@ message *generateReponse(message req, int opt_code) {
         send_empty_params(sock, requestId); // fin des paramètres
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 
-        FCGI_Header *reponseFCGI = receive_response(sock);
+        char HexData[100000];
+        FCGI_Header *reponseFCGI = receive_response(sock, HexData);
 
         //msg = createMsgFromReponsePHP(*rep, req.clientId, reponseFCGI);
 

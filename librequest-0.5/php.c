@@ -160,7 +160,7 @@ void send_stdin(int sock, unsigned short requestId, const char *data) {
     write(sock, data, data_len);
 }
 
-FCGI_Header *receive_response(int sock) {
+FCGI_Header *receive_response(int sock, char* HexData) {
     FCGI_Header *header = malloc(sizeof(FCGI_Header) * 32);
     int i = 0;
     while (read(sock, &header[i], sizeof(header[i])) > 0) {
@@ -177,6 +177,7 @@ FCGI_Header *receive_response(int sock) {
             fprintf(stderr, "Error: %s\n", content);
         }
 
+        strcat(HexData,content);
         free(content);
 
         if (header[i].paddingLength > 0) {

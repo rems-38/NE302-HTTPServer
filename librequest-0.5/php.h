@@ -14,4 +14,4 @@ void encode_name_value_pair(const char *name, const char *value, unsigned char *
 void send_params(int sock, unsigned short requestId);
 void send_empty_params(int sock, unsigned short requestId);
 void send_stdin(int sock, unsigned short requestId, const char *data) ;
-FCGI_Header *receive_response(int sock);
+FCGI_Header *receive_response(int sock, char* HexData);
