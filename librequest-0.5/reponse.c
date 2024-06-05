@@ -231,8 +231,9 @@ char *message_body_from_STD_OUT(char* STD_OUT_txt){
     }
 
     int taille_msg_body = strlen(STD_OUT_txt) - i;
-    char *message_body = malloc(taille_msg_body);
+    char *message_body = malloc(taille_msg_body + 1);
     for(int j=0; j<taille_msg_body; j++){message_body[j]=STD_OUT_txt[i+j];}
+    message_body[taille_msg_body] = '\0';
 
     return message_body;
 }
@@ -242,16 +243,16 @@ void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
     int j=0; // parcourir STD_OUT_txt
     int k=0; // taille label et value
 
-    char *label = malloc(sizeof(char*));
-    char *value = malloc(sizeof(char*));
+    char *label = malloc(20);
+    char *value = malloc(50);
 
     int n=0; //vérifier si on a qu'un seul CRLF, sinon fin de la boucle
     bool fin_headers = false;
 
     while (!fin_headers){
         k=0;
-        label = malloc(sizeof(char*));
-        value = malloc(sizeof(char*));
+        label = malloc(20);
+        value = malloc(50);
 
         while(STD_OUT_txt[j] != ':'){ //label
             label[k] = STD_OUT_txt[j];
@@ -291,15 +292,21 @@ void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
         if(n>1){fin_headers = true;}
         n=0;
     }
+
+    free(label);
+    free(value);
 }
 
 
 
 int ErrorInSTD_OUT(char* STD_OUT_txt){ // retourne 200 si pas d'erreur, sinon retourne le numéro de l'erreur
-    char *first_header = malloc(sizeof(char *));
+    char *first_header = malloc(20);
 
     int i=0;
-    while(STD_OUT_txt[i] != ':'){first_header[i] = STD_OUT_txt[i]; i++;}
+    while(STD_OUT_txt[i] != ':'){
+        first_header[i] = STD_OUT_txt[i];
+        i++;
+    }
     first_header[i] = '\0';
 
     if(strcmp(first_header,"Status") == 0){
@@ -874,8 +881,7 @@ message *generateReponse(message req, int opt_code) {
         char HexData[100000];
         FCGI_Header *reponseFCGI = receive_response(sock, HexData);
 
-        char* txtData = HexaToChar(HexData);
-        msg = createMsgFromReponsePHP(*rep, req.clientId, txtData);
+        msg = createMsgFromReponsePHP(*rep, req.clientId, HexData);
 
         free(params);
         close(sock);
@@ -884,6 +890,8 @@ message *generateReponse(message req, int opt_code) {
         msg = createMsgFromReponse(*rep, req.clientId);
     }
     
+    printf("msg : %s\n",msg->buf);
+
     freeTable(codes);
     return msg;
 }
