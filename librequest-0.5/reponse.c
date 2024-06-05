@@ -763,20 +763,8 @@ message *generateReponse(message req, int opt_code) {
         int sock = createConnexion();
         unsigned short requestId = 1;
 
-        char srv_port_str[6];
-        sprintf(srv_port_str, "%d", SERVER_PORT);
-
         send_begin_request(sock, requestId);
-        printf("-> Sending params\n");
-        send_params(sock, requestId, "SERVER_ADDR", SERVER_ADDR);
-        send_params(sock, requestId, "SERVER_PORT", srv_port_str);
-        send_params(sock, requestId, "DOCUMENT_ROOT", SERVER_ROOT);
-        send_params(sock, requestId, "SCRIPT_NAME", "/test.php"); // à modifier car par défaut pour les tests
-        // SCRIPT_FILENAME = proxy:fcgi://127.0.0.1:9000//var/www/html/info.php
-        send_params(sock, requestId, "SCRIPT_FILENAME", generateFileName("/test.php"));
-        //send_params(sock, requestId, "SCRIPT_FILENAME", codes->filename);
-        send_params(sock, requestId, "REQUEST_METHOD", "GET");
-
+        send_params(sock, requestId);
         send_empty_params(sock, requestId); // fin des paramètres
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 

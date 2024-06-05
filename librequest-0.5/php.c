@@ -89,20 +89,41 @@ void encode_name_value_pair(const char *name, const char *value, unsigned char *
     *len = buffer - start;
 }
 
-void send_params(int sock, unsigned short requestId, const char *name, const char *value) {
+void send_params(int sock, unsigned short requestId) {
     FCGI_Header header;
     unsigned char buffer[FASTCGILENGTH];
-    int content_len;
+    int content_len = 0;
 
-    encode_name_value_pair(name, value, buffer, &content_len);
+    char srv_port_str[6];
+    sprintf(srv_port_str, "%d", SERVER_PORT);
 
+    char *params[6][2] = {
+        "SERVER_ADDR", SERVER_ADDR,
+        "SERVER_PORT", srv_port_str,
+        "DOCUMENT_ROOT", SERVER_ROOT,
+        "SCRIPT_NAME", "/test.php", // à modifier car par défaut pour les tests
+        // SCRIPT_FILENAME = proxy:fcgi://127.0.0.1:9000//var/www/html/info.php
+        "SCRIPT_FILENAME", generateFileName("/test.php"),
+        // "SCRIPT_FILENAME", codes->filename,
+        "REQUEST_METHOD", "GET"
+    };
+
+    for (int i = 0; i < sizeof(params) / sizeof(params[0]); i++) {
+        const char *name = params[i][0];
+        const char *value = params[i][1];
+        encode_name_value_pair(name, value, buffer+content_len, &content_len);
+    }
+
+    printf("%s\n", buffer);
+    
     header.version = FCGI_VERSION_1;
     header.type = FCGI_PARAMS;
     header.requestId = htons(requestId);
     header.contentLength = htons(content_len);
     header.paddingLength = 0;
     header.reserved = 0;
-
+    
+    printf("-> Sending params\n");
     write(sock, &header, sizeof(header));
     write(sock, buffer, content_len);
 }
