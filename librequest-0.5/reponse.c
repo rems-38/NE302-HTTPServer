@@ -842,13 +842,32 @@ message *generateReponse(message req, int opt_code) {
 
         char srv_port_str[6];
         sprintf(srv_port_str, "%d", SERVER_PORT);
-        char *script_name = getScriptName(codes->filename);
-        char *script_filename = getScriptFilename(codes->filename);
 
+        FCGI_NameValuePair11 *params = malloc(3 * sizeof(FCGI_NameValuePair11));
+
+        params[0].nameLengthB0 = strlen("REQUEST_METHOD");
+        params[0].valueLengthB0 = strlen("GET");
+        params[0].nameData = malloc(strlen("REQUEST_METHOD") + 1);
+        params[0].valueData = malloc(strlen("GET") + 1);
+        strcpy(params[0].nameData, "REQUEST_METHOD");
+        strcpy(params[0].valueData, "GET");
+
+        params[1].nameLengthB0 = strlen("SCRIPT_NAME");
+        params[1].valueLengthB0 = strlen(getScriptName(codes->filename));
+        params[1].nameData = malloc(strlen("SCRIPT_NAME") + 1);
+        params[1].valueData = malloc(strlen(getScriptName(codes->filename)) + 1);
+        strcpy(params[1].nameData, "SCRIPT_NAME");
+        strcpy(params[1].valueData, getScriptName(codes->filename));
+        
+        params[2].nameLengthB0 = strlen("SCRIPT_FILENAME");
+        params[2].valueLengthB0 = strlen(getScriptFilename(codes->filename));
+        params[2].nameData = malloc(strlen("SCRIPT_FILENAME") + 1);
+        params[2].valueData = malloc(strlen(getScriptFilename(codes->filename)) + 1);
+        strcpy(params[2].nameData, "SCRIPT_FILENAME");
+        strcpy(params[2].valueData, getScriptFilename(codes->filename));        
+        
         send_begin_request(sock, requestId);
-        send_params(sock, requestId, "REQUEST_METHOD", "GET");
-        send_params(sock, requestId, "SCRIPT_NAME", script_name);
-        send_params(sock, requestId, "SCRIPT_FILENAME", script_filename);
+        send_params(sock, requestId, params);
         send_empty_params(sock, requestId); // fin des paramètres
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 
@@ -858,8 +877,7 @@ message *generateReponse(message req, int opt_code) {
         char* txtData = HexaToChar(HexData);
         msg = createMsgFromReponsePHP(*rep, req.clientId, txtData);
 
-        free(script_name);
-        free(script_filename);
+        free(params);
         close(sock);
     }
     else {
