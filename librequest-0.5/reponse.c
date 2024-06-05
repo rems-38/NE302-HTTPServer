@@ -152,7 +152,7 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
     return msg;
 }
 
-/*message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, FCGI_Header reponseFCGI){
+message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, FCGI_Header reponseFCGI){
     
     message *msg = malloc(sizeof(message));
 
@@ -174,7 +174,7 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
     
     //parcours des différents FCGI_Header et ajout de leur taille
 
-        //fileSize += reponseFCGI[i].contentLength; // ?
+    //fileSize += reponseFCGI[i].contentLength; // ?
 
     // Calcul de la taille nécessaire pour buf
     int bufSize = strlen("HTTP/1.x ") + 3 + strlen(" ") + strlen(rep.code->info) + strlen("\r\n"); // 3 : taille d'une code (200, 404, ...)
@@ -209,7 +209,7 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
     msg->clientId = clientId;
 
     return msg;
-}*/
+}
 
 
 int hexa(char c){
@@ -225,9 +225,14 @@ char *message_body_from_STD_OUT(char* STD_OUT_hexa){
 
     char *STD_OUT_txt = HexaToChar(STD_OUT_hexa);
 
-    int i = 0;
-    while(STD_OUT_txt[i]!='\r'){i++;}
-    while(STD_OUT_txt[i] == '\r' || STD_OUT_txt[i] == '\n'){i++;}
+    int j = 0;// correspond au nombre de ligne à sauter d'affilée
+    int i = 0;// correspond au nombre de caractères avant d'atteindre le message body
+
+    while (j<2){ 
+        j=0;
+        while(STD_OUT_txt[i]!='\r'){i++;}
+        while(STD_OUT_txt[i] == '\r' & STD_OUT_txt[i+1] == '\n'){i=i+2;j++;}
+    }
 
     int taille_msg_body = strlen(STD_OUT_txt) - i;
     char *message_body = malloc(taille_msg_body);
