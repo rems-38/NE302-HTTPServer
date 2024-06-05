@@ -156,8 +156,15 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* t
     
     message *msg = malloc(sizeof(message));
 
-    //Fonction arthur : recup code erreur (ou pas)
-    //ajout du code dans rep si pas déja fait
+    //recup code erreur (ou pas)
+    //ajout du code dans rep 
+    int code_out = ErrorInSTD_OUT(txtData);
+    if(code_out != 200){
+        HTTPTable *codes = loadTable(); //initialisation de la table des codes possibles de retour
+        HttpReponse *rep_code_out = getTable(codes, code_out);
+        rep.code->code = code_out;
+        rep.code->info = rep_code_out->code->info;
+    }
 
     //Fonction arthur : recup header et les ajouter
    
