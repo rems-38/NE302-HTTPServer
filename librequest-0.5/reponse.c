@@ -6,6 +6,8 @@
 #include "../api/api.h"
 #include "config.h"
 
+int connecte = 0;
+
 uint32_t h1(uint32_t code) { return code % NB_HTTP_CODES; }
 uint32_t h2(uint32_t code) { return 1 + (code % (NB_HTTP_CODES - 1)); }
 uint32_t hash(uint32_t code, uint32_t nbTry) {
@@ -150,7 +152,7 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
     return msg;
 }
 
-message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, FCGI_Header reponseFCGI){
+/*message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, FCGI_Header reponseFCGI){
     
     message *msg = malloc(sizeof(message));
 
@@ -207,7 +209,7 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, FCGI_He
     msg->clientId = clientId;
 
     return msg;
-}
+}*/
 
 
 int hexa(char c){
@@ -713,6 +715,7 @@ int getRepCode(message req, HTTPTable *codes) {
             //renvoyer close
             updateHeader(codes,"Connection","close");
             //et fermer la connection    
+            connecte = 1;
             //requestShutdownSocket(req.clientId);
         }
         else if (majeur == '1' && mineur == '0' && (strcmp(connection,"keep-alive") == 0 || strcmp(connection,"Keep-Alive") == 0)){
@@ -724,6 +727,7 @@ int getRepCode(message req, HTTPTable *codes) {
         printf("version 1.0\n");
         //renvoyer close
         updateHeader(codes,"Connection","close");
+        connecte =1;
         //et fermer la connection    
         //requestShutdownSocket(req.clientId);
         printf("fermeture de la connexion !!!\n");
@@ -749,6 +753,14 @@ HttpReponse *convertFCGI_HTTP(HTTPTable *codes, int code) {
     return rep;
 }
 */
+
+void controlConnection(message *msg){
+    char mineur = msg->buf[7];
+    if(connecte == 1 || mineur == 0){
+        requestShutdownSocket(msg->clientId);
+    }
+    printf("mineur : %c\n", mineur);
+}
 
 message *generateReponse(message req, int opt_code) {
     HTTPTable *codes = loadTable(); //initialisation de la table des codes possibles de retour
