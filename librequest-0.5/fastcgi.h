@@ -16,17 +16,8 @@ typedef struct __attribute__((__packed__)) {
     unsigned short contentLength;
     unsigned char paddingLength;
     unsigned char reserved;
+    // char contentData[FASTCGILENGTH]; 
 } FCGI_Header;
-
-typedef struct __attribute__((__packed__)) {
-    unsigned char version;
-    unsigned char type;
-    unsigned short requestId;
-    unsigned short contentLength;
-    unsigned char paddingLength;
-    unsigned char reserved;
-    char contentData[FASTCGILENGTH]; 
-} FCGI_Reponse;
 
 #define FCGI_HEADER_SIZE           8
 
