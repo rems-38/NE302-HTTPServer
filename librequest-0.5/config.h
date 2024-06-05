@@ -1,4 +1,4 @@
-#define SERVER_ROOT "../html/www"
+#define SERVER_ROOT "html/www"
 #define LEN_METHOD 4
 #define LEN_URI 256
 #define LEN_HOST 253

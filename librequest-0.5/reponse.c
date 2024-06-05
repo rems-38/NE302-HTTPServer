@@ -445,7 +445,6 @@ int getRepCode(message req, HTTPTable *codes) {
     char *versionL = getElementValue(versionNode->node, &len);
     char majeur = versionL[5];
     char mineur = versionL[7];
-    printf("%c, %c\n", majeur, mineur);
 
     if(mineur == '1' || mineur == '0'){
         codes->httpminor = mineur - '0';
@@ -602,7 +601,6 @@ int getRepCode(message req, HTTPTable *codes) {
     _Token *Message_Body = searchTree(tree,"message_body");
 
     // Content-Length
-
     if(T_EncodingNode != NULL && C_LengthNode != NULL){return 400;} // Ne pas mettre s’il y a déjà Transfer-Encoding : 400
 
     if(C_LengthNode != NULL && C_LengthNode->next != NULL){return 400;} // plusieurs content-length
@@ -629,7 +627,6 @@ int getRepCode(message req, HTTPTable *codes) {
     }
 
     // Transfer-Encoding
-
     if (majeur == '1' && mineur == '1' && T_EncodingNode != NULL){ // Ne pas traiter si HTTP 1.0
         char *TE_text = getElementValue(T_EncodingNode->node, &len); // nous renvoie "Transfer-Encoding : xxxxx" et pas "xxxxxx"
         
@@ -644,12 +641,10 @@ int getRepCode(message req, HTTPTable *codes) {
     }
 
     // Message Body
-
     if (Message_Body != NULL && C_LengthNode == NULL){return 411;} // Si Message Body mais pas Content-Length : 411 Length Required
 
 
     // Accept-Encoding
-
     _Token *Accept_Encoding = searchTree(tree,"header_field");
     if(Accept_Encoding != NULL){
     
@@ -674,18 +669,15 @@ int getRepCode(message req, HTTPTable *codes) {
             sscanf(AE_text, "%*s %s", accept_encoding);
 
             char *ae_value = strtok(accept_encoding, ", ");
-            printf("OK1\n");
             while (ae_value != NULL) {
                 if(strcmp(ae_value,"gzip")!=0 && strcmp(ae_value,"deflate")!=0 && strcmp(ae_value,"br")!=0 && strcmp(ae_value,"compress")!=0 && strcmp(ae_value,"identity")!=0){return 400;}
                 ae_value = strtok(NULL, ", ");
             }
-            printf("OK2\n");
 
         }
         free(ae);
     }
     // Accept
-
     _Token *Accept = searchTree(tree,"header_field");
     if(Accept != NULL){
         char *a_t = getElementValue(Accept->node, &len);
@@ -721,7 +713,6 @@ int getRepCode(message req, HTTPTable *codes) {
     }
     
     // Connection
-    printf("debut connection\n");
     _Token *ConnectionNode = searchTree(tree, "connection_option");
     if(ConnectionNode != NULL){
         printf("connection header\n");
@@ -752,7 +743,6 @@ int getRepCode(message req, HTTPTable *codes) {
         printf("fermeture de la connexion !!!\n");
     }
     
-    printf("sortie de getRepCode\n");
     return 200;
 }
 /*
@@ -794,8 +784,15 @@ message *generateReponse(message req, int opt_code) {
         int sock = createConnexion();
         unsigned short requestId = 1;
 
+        char srv_port_str[6];
+        sprintf(srv_port_str, "%d", SERVER_PORT);
+        char *script_name = getScriptName(codes->filename);
+        char *script_filename = getScriptFilename(codes->filename);
+
         send_begin_request(sock, requestId);
-        send_params(sock, requestId);
+        send_params(sock, requestId, "REQUEST_METHOD", "GET");
+        send_params(sock, requestId, "SCRIPT_NAME", script_name);
+        send_params(sock, requestId, "SCRIPT_FILENAME", script_filename);
         send_empty_params(sock, requestId); // fin des paramètres
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 
@@ -804,6 +801,8 @@ message *generateReponse(message req, int opt_code) {
 
         //msg = createMsgFromReponsePHP(*rep, req.clientId, reponseFCGI);
 
+        free(script_name);
+        free(script_filename);
         close(sock);
     }
     else {

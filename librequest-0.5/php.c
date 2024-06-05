@@ -89,32 +89,55 @@ void encode_name_value_pair(const char *name, const char *value, unsigned char *
     *len = buffer - start;
 }
 
-void send_params(int sock, unsigned short requestId) {
+char *getScriptName(const char *filename) {
+    char *res = malloc(strlen(filename) - strlen(SERVER_ROOT) + 1);;
+    strcpy(res, filename + strlen(SERVER_ROOT));
+    return res;
+}
+
+char *getScriptFilename(const char *filename) {
+    char srv_port_str[6];
+    sprintf(srv_port_str, "%d", SERVER_PORT_PHP);
+
+    char *real = realpath(filename, NULL);
+
+    char *res = malloc(strlen("proxy:fcgi://") + strlen(SERVER_ADDR) + strlen(":") + strlen(srv_port_str) + strlen("/") + strlen(real) + 1);
+    sprintf(res, "proxy:fcgi://%s:%s/%s", SERVER_ADDR, srv_port_str, real);
+    
+    return res;
+}
+
+void send_params(int sock, unsigned short requestId, const char *name, const char *value) {
     FCGI_Header header;
     unsigned char buffer[FASTCGILENGTH];
     int content_len = 0;
 
-    char srv_port_str[6];
-    sprintf(srv_port_str, "%d", SERVER_PORT);
+    printf("name: %s\n", name);
+    printf("value: %s\n", value);
 
-    char *params[6][2] = {
-        "SERVER_ADDR", SERVER_ADDR,
-        "SERVER_PORT", srv_port_str,
-        "DOCUMENT_ROOT", SERVER_ROOT,
-        "SCRIPT_NAME", "/test.php", // à modifier car par défaut pour les tests
-        // SCRIPT_FILENAME = proxy:fcgi://127.0.0.1:9000//var/www/html/info.php
-        "SCRIPT_FILENAME", generateFileName("/test.php"),
-        // "SCRIPT_FILENAME", codes->filename,
-        "REQUEST_METHOD", "GET"
-    };
+    // char srv_port_str[6];
+    // sprintf(srv_port_str, "%d", SERVER_PORT);
 
-    for (int i = 0; i < sizeof(params) / sizeof(params[0]); i++) {
-        const char *name = params[i][0];
-        const char *value = params[i][1];
-        encode_name_value_pair(name, value, buffer+content_len, &content_len);
-    }
+    // char *params[6][2] = {
+    //     "SERVER_ADDR", SERVER_ADDR,
+    //     "SERVER_PORT", srv_port_str,
+    //     "DOCUMENT_ROOT", SERVER_ROOT,
+    //     "SCRIPT_NAME", "/test.php", // à modifier car par défaut pour les tests
+    //     // SCRIPT_FILENAME = proxy:fcgi://127.0.0.1:9000//var/www/html/info.php
+    //     "SCRIPT_FILENAME", generateFileName("/test.php"),
+    //     // "SCRIPT_FILENAME", codes->filename,
+    //     "REQUEST_METHOD", "GET"
+    // };
 
-    printf("%s\n", buffer);
+    // for (int i = 0; i < sizeof(params) / sizeof(params[0]); i++) {
+    //     const char *name = params[i][0];
+    //     const char *value = params[i][1];
+    //     encode_name_value_pair(name, value, buffer+content_len, &content_len);
+    // }
+
+    encode_name_value_pair(name, value, buffer, &content_len);
+
+    // printf("%s\n", buffer);
     
     header.version = FCGI_VERSION_1;
     header.type = FCGI_PARAMS;
