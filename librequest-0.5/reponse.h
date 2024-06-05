@@ -44,7 +44,7 @@ HttpReponse *getTable(HTTPTable *codes, int code);
 
 void updateHeader(HTTPTable *codes, char *label, char *value);
 int configFileMsgBody(char *name, HTTPTable *codes);
-
+char *message_body_from_STD_OUT(char* STD_OUT_txt);
 char *HexaToChar(char *content);
 message *createMsgFromReponse(HttpReponse rep, unsigned int clientId);
 message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* txtData);
