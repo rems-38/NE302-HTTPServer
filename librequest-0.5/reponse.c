@@ -236,6 +236,63 @@ char *message_body_from_STD_OUT(char* STD_OUT_txt){
     return message_body;
 }
 
+void headers_from_STDOUT(char* STD_OUT_txt){
+
+    int j=0; // parcourir STD_OUT_txt
+    int k=0; // taille label et value
+
+    char *label = malloc(sizeof(char*));
+    char *value = malloc(sizeof(char*));
+
+    int n=0; //vérifier si on a qu'un seul CRLF, sinon fin de la boucle
+    bool fin_headers = false;
+
+    while (!fin_headers){
+        k=0;
+        label = malloc(sizeof(char*));
+        value = malloc(sizeof(char*));
+
+        while(STD_OUT_txt[j] != ':'){ //label
+            label[k] = STD_OUT_txt[j];
+            j++;
+            k++;
+        }
+        label[k] = '\0';
+        // UpdateHeader à ajouter
+
+        printf("label : %s\n",label);
+        j=j+2;
+        k=0;
+
+        while(STD_OUT_txt[j] != '\r'){ //value
+            value[k] = STD_OUT_txt[j];
+            k++;
+            j++;
+        }
+        value[k] = '\0';
+        // UpdateHeader à ajouter
+        printf("value : %s\n",value);
+
+        char *CRLF = malloc(3);
+        CRLF[0] = STD_OUT_txt[j];
+        CRLF[1] = STD_OUT_txt[j+1];
+        CRLF[2] = '\0';
+
+        while(strcmp(CRLF,"\r\n")==0){
+            j = j+2;
+            n++;
+            CRLF[0] = STD_OUT_txt[j];
+            CRLF[1] = STD_OUT_txt[j+1];
+            CRLF[2] = '\0';
+        }
+
+        if(n>1){fin_headers = true;}
+        n=0;
+    }
+}
+
+
+
 int ErrorInSTD_OUT(char* STD_OUT_txt){ // retourne 200 si pas d'erreur, sinon retourne le numéro de l'erreur
     char *first_header = malloc(sizeof(char *));
 
