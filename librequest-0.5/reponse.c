@@ -524,6 +524,7 @@ int getRepCode(message req, HTTPTable *codes) {
     
     if(majeur == '1' && mineur == '1'){
         updateHeader(codes, "Connection", "Keep-Alive");
+        connecte = 0;
     }
 
     if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){
@@ -799,6 +800,7 @@ int getRepCode(message req, HTTPTable *codes) {
         }
         else if (majeur == '1' && mineur == '0' && (strcmp(connection,"keep-alive") == 0 || strcmp(connection,"Keep-Alive") == 0)){
             updateHeader(codes, "Connection", "Keep-Alive");
+            connecte = 0;
         }
         free(connection);
     }
@@ -806,7 +808,7 @@ int getRepCode(message req, HTTPTable *codes) {
         printf("version 1.0\n");
         //renvoyer close
         updateHeader(codes,"Connection","close");
-        connecte =1;
+        connecte = 1;
         //et fermer la connection    
         //requestShutdownSocket(req.clientId);
         printf("fermeture de la connexion !!!\n");
@@ -833,8 +835,7 @@ HttpReponse *convertFCGI_HTTP(HTTPTable *codes, int code) {
 */
 
 void controlConnection(message *msg){
-    char mineur = msg->buf[7];
-    if(connecte == 1 || mineur == 0){
+    if(connecte == 1){
         requestShutdownSocket(msg->clientId);
     }
 }
