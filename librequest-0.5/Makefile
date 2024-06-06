@@ -2,24 +2,12 @@ CC = gcc
 FLAGS = -Wall -Wextra -fPIC -fsanitize=address
 LINK =
 
-CLANG ?= no
 DEBUG ?= yes
-OPTIMIZE ?= yes
 VALGRIND ?= no
 
 ifeq ($(VALGRIND), yes)
 	FLAGS = -Wall -Wextra
 	LINK += -lasan -lubsan
-endif
-
-ifeq ($(CLANG), yes)
-	FLAGS = 
-	LINK =
-	CC = clang
-endif
-
-ifeq ($(OPTIMIZE), yes)
-	FLAGS += -O2 -march=native
 endif
 
 ifeq ($(DEBUG), yes)
