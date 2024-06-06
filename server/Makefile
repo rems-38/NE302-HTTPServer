@@ -15,13 +15,13 @@ ifeq ($(DEBUG), yes)
 endif
 
 
-all : librequest.so sock
+all : ../lib/librequest.so sock
 
-sock : librequest.so main.o reponse.o php.o
-	$(CC) $(FLAGS) -o ../sock main.o reponse.o php.o -L. -lrequest -lparser
+sock : ../lib/librequest.so main.o reponse.o php.o
+	$(CC) $(FLAGS) -o ../sock main.o reponse.o php.o -L../lib/ -lrequest -lparser
 
 %.o: %.c 
-	$(CC) $(LINK) -I../../abnf -I./api -I libparser -c $<
+	$(CC) $(LINK) -I./api -I libparser -c $<
 
 #librequest.so : socket.o 
 #	ld -shared -Bsymbolic -Bsymbolic-function -soname librequest.so -o librequest.so ./parser/librequest.o ./socket.o 
@@ -30,7 +30,7 @@ sock : librequest.so main.o reponse.o php.o
 clean : 
 	rm -rf rfc*.c 
 	rm -rf rfc*.h 
-	rm -rf httpparser
+#	rm -rf httpparser
 	rm -rf *.o 
 #	rm -rf *.so 
 

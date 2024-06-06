@@ -3,6 +3,20 @@
 Ce projet consiste à réaliser un server HTTP _complet_.
 
 
+## Librairies Issues
+
+Quand vous voulez exécuter le programme et que vous avez une erreur de ce genre :
+```
+./sock: error while loading shared libraries: librequest.so.0: cannot open shared object file: No such file or directory
+```
+
+Il s'agit d'une erreur de librairie. Pour résoudre ce problème, il suffit de faire comme suit :
+```
+$ export LD_LIBRARY_PATH=./lib/
+```
+
+Ensuite, vous pouvez exécuter votre programme sans problème.
+
 ## FCGI Issues
 
 Lors de la requête pour un fichier php, si vous recevez :

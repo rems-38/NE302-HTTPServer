@@ -16,4 +16,4 @@ arbre.o : arbre.c arbre.h
 
 
 clean : 
-	rm -rf *.o *.gch main
+	rm -rf *.o *.gch api

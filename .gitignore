@@ -2,6 +2,5 @@ main
 **/sg
 **/*.o
 **/*.gch
-**/sock
 **/simple
 .vscode/
