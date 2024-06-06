@@ -276,7 +276,7 @@ void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
         }
         label[k] = '\0';
 
-        printf("label : %s\n",label);
+        //printf("label : -%s-\n",label);
         j=j+2;
         k=0;
 
@@ -286,7 +286,7 @@ void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
             j++;
         }
         value[k] = '\0';
-        printf("value : %s\n",value);
+        //printf("value : -%s-\n",value);
         
         // UpdateHeader ne semple pas bien mettre a jour
         updateHeaderHttpReponse(rep, label, value);
@@ -790,7 +790,8 @@ int getRepCode(HTTPTable *codes) {
             char *a_value = strtok(accept, ", ");
             
             while (a_value != NULL) {
-                if(strcmp(a_value,"text/html")!=0 && strcmp(a_value,"text/css")!=0 && strcmp(a_value,"text/javascript")!=0 && strcmp(a_value,"application/json")!=0 && strcmp(a_value,"image/jpeg")!=0 && strcmp(a_value,"image/png")!=0 && strcmp(a_value,"application/pdf")!=0 && strcmp(a_value,"image/gif")!=0 && strcmp(a_value,"image/svg+xml")!=0 && strcmp(a_value,"image/tiff")!=0 && strcmp(a_value,"video/mp4")!=0){return 400;}
+                printf("a_value : %s\n",a_value);
+                //if(strcmp(a_value,"text/html")!=0 && strcmp(a_value,"text/css")!=0 && strcmp(a_value,"text/javascript")!=0 && strcmp(a_value,"application/json")!=0 && strcmp(a_value,"image/jpeg")!=0 && strcmp(a_value,"image/png")!=0 && strcmp(a_value,"application/pdf")!=0 && strcmp(a_value,"image/gif")!=0 && strcmp(a_value,"image/svg+xml")!=0 && strcmp(a_value,"image/tiff")!=0 && strcmp(a_value,"video/mp4")!=0){return 400;}
                 a_value = strtok(NULL, ", ");
             }
 
@@ -864,6 +865,8 @@ message *generateReponse(message req, int opt_code) {
     if (opt_code == -1) { code = getRepCode(codes); } //recherche du code à renvoyer
     else { code = opt_code; codes->httpminor = 0; }
 
+    //printf("code de sortie : %d\n",code);
+
     HttpReponse *rep = getTable(codes, code);
     message *msg;
     if (codes->is_php) {
@@ -903,7 +906,7 @@ message *generateReponse(message req, int opt_code) {
 
         char *HexData = receive_response(sock);
 
-        printf("FINAL : %s\n", HexData);
+        //printf("FINAL : %s\n", HexData);
 
         msg = createMsgFromReponsePHP(*rep, req.clientId, HexData);
 

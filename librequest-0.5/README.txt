@@ -20,7 +20,7 @@ gcc -Wall -g -o sock main.c -L. -lrequest
 
 **** launch it with: 
 
-export LD_LIBRARY_PATH=. 
+export LD_LIBRARY_PATH=./librequest-0.5/ 
 ./sock 
 
 **** And enjoy getting a 200 OK when u send it HTTP request with a remote client ==> 
