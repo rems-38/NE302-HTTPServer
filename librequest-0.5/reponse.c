@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <time.h>
 #include "reponse.h"
 #include "../api/api.h"
 #include "config.h"
@@ -12,11 +13,20 @@ int method_post = 0;
 void initTable(HTTPTable *codes) {
     for (int i = 0; i < HTTP_CODE_MAX+1; i++) { codes->table[i] = NULL; }
     
+    time_t now;
+    time(&now);
+    char* t = ctime(&now);
+    int n = strlen(t);
+    char* date = malloc(n);
+    strncpy(date,t,n-1);
+    date[n-1] = '\0';
+
     Header headers[] = {
-        {"Content-Type", ""},
-        {"Content-Length", ""},
+        {"Date", date},
+        {"Host", ""},
         {"Connection", ""},
-        {"Host", ""}
+        {"Content-Type", ""},
+        {"Content-Length", ""}
     };
     int headersCount = sizeof(headers) / sizeof(headers[0]);
 
@@ -769,7 +779,6 @@ int getRepCode(HTTPTable *codes) {
             char *a_value = strtok(accept, ", ");
             
             while (a_value != NULL) {
-                printf("a_value : %s\n",a_value);
                 //if(strcmp(a_value,"text/html")!=0 && strcmp(a_value,"text/css")!=0 && strcmp(a_value,"text/javascript")!=0 && strcmp(a_value,"application/json")!=0 && strcmp(a_value,"image/jpeg")!=0 && strcmp(a_value,"image/png")!=0 && strcmp(a_value,"application/pdf")!=0 && strcmp(a_value,"image/gif")!=0 && strcmp(a_value,"image/svg+xml")!=0 && strcmp(a_value,"image/tiff")!=0 && strcmp(a_value,"video/mp4")!=0){return 400;}
                 a_value = strtok(NULL, ", ");
             }
