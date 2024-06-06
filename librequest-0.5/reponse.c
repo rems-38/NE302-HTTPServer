@@ -8,14 +8,8 @@
 
 int connecte = 0;
 
-uint32_t h1(uint32_t code) { return code % NB_HTTP_CODES; }
-uint32_t h2(uint32_t code) { return 1 + (code % (NB_HTTP_CODES - 1)); }
-uint32_t hash(uint32_t code, uint32_t nbTry) {
-    return (h1(code) + nbTry * h2(code)) % NB_HTTP_CODES;
-}
-
 void initTable(HTTPTable *codes) {
-    for (int i = 0; i < NB_HTTP_CODES; i++) { codes->table[i] = NULL; }
+    for (int i = 0; i < HTTP_CODE_MAX+1; i++) { codes->table[i] = NULL; }
     
     Header headers[] = {
         {"Content-Type", ""},
@@ -40,7 +34,7 @@ void initTable(HTTPTable *codes) {
 }
 
 void freeTable(HTTPTable *codes) {
-    for (int i = 0; i < NB_HTTP_CODES; i++) {
+    for (int i = 0; i < HTTP_CODE_MAX+1; i++) {
         if (codes->table[i] != NULL) {
             free(codes->table[i]->info);
             free(codes->table[i]);
@@ -60,13 +54,10 @@ void addTable(HTTPTable *codes, int code, char *info) {
     HttpCode *el = malloc(sizeof(HttpCode));
     
     el->code = code;
-    
     el->info = malloc(strlen(info) + 1);
     strcpy(el->info, info);
 
-    int nbTry = 0;
-    while (codes->table[hash(code, nbTry)] != NULL) { nbTry++; }
-    codes->table[hash(code, nbTry)] = el;
+    codes->table[code] = el;
 }
 
 HTTPTable *loadTable() {
@@ -95,10 +86,7 @@ HTTPTable *loadTable() {
 HttpReponse *getTable(HTTPTable *codes, int code) {
     HttpReponse *rep = malloc(sizeof(HttpReponse));
 
-    int nbTry = 0;
-    while (codes->table[hash(code, nbTry)]->code != code) { nbTry++; }
-
-    rep->code = codes->table[hash(code, nbTry)];
+    rep->code = codes->table[code];
     rep->httpminor = codes->httpminor;
     rep->filename = codes->filename;
     rep->is_head = codes->is_head;

@@ -3,7 +3,7 @@
 #define LEN_URI 256
 #define LEN_HOST 253
 #define LEN_HOST_TXT 63
-#define NB_HTTP_CODES 15
+#define HTTP_CODE_MAX 505
 
 #define SERVER_ADDR "127.0.0.1"
 #define SERVER_PORT 8080

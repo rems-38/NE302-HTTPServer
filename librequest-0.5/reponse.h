@@ -25,7 +25,7 @@ typedef struct {
 } HttpReponse;
 
 typedef struct {
-    HttpCode *table[NB_HTTP_CODES];
+    HttpCode *table[HTTP_CODE_MAX+1];
     int httpminor;
     char *filename;
     bool is_head;
@@ -35,7 +35,6 @@ typedef struct {
 } HTTPTable;
 
 
-uint32_t hash(uint32_t code, uint32_t nbTry);
 void initTable(HTTPTable *codes);
 void freeTable(HTTPTable *codes);
 void addTable(HTTPTable *codes, int code, char *info);
