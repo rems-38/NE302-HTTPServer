@@ -164,13 +164,13 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* t
 
     //recup code erreur (ou pas)
     //ajout du code dans rep 
-    // int code_out = ErrorInSTD_OUT(txtData);
-    // if(code_out != 200){
-    //     HTTPTable *codes = loadTable(); //initialisation de la table des codes possibles de retour
-    //     HttpReponse *rep_code_out = getTable(codes, code_out);
-    //     rep.code->code = code_out;
-    //     rep.code->info = rep_code_out->code->info;
-    // }
+    int code_out = ErrorInSTD_OUT(txtData);
+    if(code_out != 200){
+        HTTPTable *codes = loadTable(); //initialisation de la table des codes possibles de retour
+        HttpReponse *rep_code_out = getTable(codes, code_out);
+        rep.code->code = code_out;
+        rep.code->info = rep_code_out->code->info;
+    }
 
     //recup header et les ajouter
     //headers_from_STDOUT(txtData,rep);
@@ -307,18 +307,25 @@ void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
 
 int ErrorInSTD_OUT(char* STD_OUT_txt){ // retourne 200 si pas d'erreur, sinon retourne le numéro de l'erreur
     char *first_header = malloc(20);
-
+    
     int i=0;
-    while(STD_OUT_txt[i] != ':'){
-        first_header[i] = STD_OUT_txt[i];
-        i++;
-    }
-    first_header[i] = '\0';
 
-    if(strcmp(first_header,"Status") == 0){
-        while(!((STD_OUT_txt[i]>='0' && STD_OUT_txt[i] <= '9') && (STD_OUT_txt[i+1]>='0' && STD_OUT_txt[i+1] <= '9') && (STD_OUT_txt[i+2]>='0' && STD_OUT_txt[i+2] <= '9'))){i++;}
-        int error = (STD_OUT_txt[i]-'0')*100 + (STD_OUT_txt[i+1]-'0')*10 + STD_OUT_txt[i+2]-'0';
-        return error;
+    while(STD_OUT_txt[i] != ':'){i++;}
+
+    if(i>=6){
+        
+        int j=0;
+        while(j < 6){
+            first_header[j] = STD_OUT_txt[i-6+j];
+            j++;
+        }
+        first_header[j] = '\0';
+        
+        if(strcmp(first_header,"Status") == 0){
+            while(!((STD_OUT_txt[i]>='0' && STD_OUT_txt[i] <= '9') && (STD_OUT_txt[i+1]>='0' && STD_OUT_txt[i+1] <= '9') && (STD_OUT_txt[i+2]>='0' && STD_OUT_txt[i+2] <= '9'))){i++;}
+            int error = (STD_OUT_txt[i]-'0')*100 + (STD_OUT_txt[i+1]-'0')*10 + STD_OUT_txt[i+2]-'0';
+            return error;
+        }
     }
     return 200;
 }
