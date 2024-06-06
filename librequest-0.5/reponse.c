@@ -486,11 +486,12 @@ int configFileMsgBody(char *name, HTTPTable *codes, char* host) {
     }
     char* path = malloc(strlen(SERVER_ROOT) + strlen(name) + 1);
     if(strcmp(domaine, "www") == 0 || strcmp(domaine, "127") == 0 || strcmp(domaine, "") == 0 ){
-        printf("www");
+        //printf("www");
         path = realloc(path, strlen(SERVER_ROOT)+ sizeof("/www") + strlen(name) + 1);
         strcpy(path, SERVER_ROOT);
         strcat(path, "/www");
         strcat(path, name);
+        printf("Path : %s\n", path);
     }
     else{
         path = realloc(path, strlen(SERVER_ROOT)+ 1 + strlen(domaine) + strlen(name) + 1);
@@ -535,6 +536,7 @@ int configFileMsgBody(char *name, HTTPTable *codes, char* host) {
         
         codes->filename = malloc(strlen(path) + 1);
         strcpy(codes->filename, path);
+        printf("filename : %s\n", codes->filename);
         free(path);
 
         if (strcmp(type, "application/x-httpd-php") == 0 || strcmp(type, "text/x-php") == 0) {
@@ -587,13 +589,27 @@ int getRepCode(HTTPTable *codes) {
     strncpy(method, methodL, len);
     method[len] = '\0';
     
-    if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0 || strcmp(method, "HEAD") == 0)) { return 405; }
-    else if (len > LEN_METHOD) { return 501; }
+    if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0 || strcmp(method, "HEAD") == 0)) { 
+        int code  = configFileMsgBody("/405.html", codes, "");
+        if (code != 1) { return code; }
+        return 405; 
+    }
+    else if (len > LEN_METHOD) { 
+        int code  = configFileMsgBody("/501.html", codes, "");
+        if (code != 1) { return code; }
+        return 501; 
+    }
     else if (strcmp(method, "HEAD") == 0) { codes->method = 2; }
     else if (strcmp(method, "POST") == 0) { codes->method = 3; }
     
-    if ((strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0) && (searchTree(tree,"message_body") != NULL)){ return 400; }
-    if((strcmp(method, "POST") == 0) && (searchTree(tree,"Content_Length_header") == NULL)){return 400;} //Post peut ne pas avoir de message body mais doit quand même avoir un content-length = 0
+    if ((strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0) && (searchTree(tree,"message_body") != NULL)){ 
+        int code  = configFileMsgBody("/400.html", codes, "");
+        if (code != 1) { return code; }
+        return 400; }
+    if((strcmp(method, "POST") == 0) && (searchTree(tree,"Content_Length_header") == NULL)){
+        int code  = configFileMsgBody("/400.html", codes, "");
+        if (code != 1) { return code; }
+        return 400;} //Post peut ne pas avoir de message body mais doit quand même avoir un content-length = 0
     free(method);
     free(methodNode);
 
@@ -604,7 +620,11 @@ int getRepCode(HTTPTable *codes) {
     char *uri = malloc(len + 1);
     strncpy(uri, uriL, len);
     uri[len] = '\0';
-    if (len > LEN_URI) { return 414; }
+    if (len > LEN_URI) { 
+        int code  = configFileMsgBody("/414.html", codes, "");
+        if (code != 1) { return code; }
+        //printf("414");
+        return 414; }
     if (strcmp(uri, "/") == 0) {
         uri = realloc(uri, strlen("/index.html") + 1);
         strcpy(uri, "/index.html");
@@ -619,14 +639,25 @@ int getRepCode(HTTPTable *codes) {
 
     // Host
     _Token *HostNode = searchTree(tree, "Host");
-    if (majeur == '1' && mineur == '1' && HostNode == NULL) { return 400; } // HTTP/1.1 sans Host
-    if ((HostNode != NULL) && (HostNode->next != NULL)) { return 400; } // plusieurs Host
+    if (majeur == '1' && mineur == '1' && HostNode == NULL) { 
+        //printf("Host");
+        int code  = configFileMsgBody("/400.html", codes, "");
+        if (code != 1) { return code; }
+        //printf("400");
+        return 400; } // HTTP/1.1 sans Host
+    if ((HostNode != NULL) && (HostNode->next != NULL)) { 
+        int code  = configFileMsgBody("/400.html", codes, "");
+        if (code != 1) { return code; }
+        return 400; } // plusieurs Host
     if (HostNode != NULL) {
         char *hostL = getElementValue(HostNode->node, &len);
         char *host = malloc(len + 1);
         strncpy(host, hostL, len);
         host[len] = '\0';
-        if(len > LEN_HOST){return 400;}
+        if(len > LEN_HOST){
+            int code  = configFileMsgBody("/400.html", codes, "");
+            if (code != 1) { return code; }     
+            return 400;}
 
         char *host_accepted[] = {"127.0.0.1","127.0.0.1:8080","www","test"}; // rajouter les sites au fur et à mesure
         int taille_host_accepted = 4; // à fixer à la main
@@ -648,7 +679,9 @@ int getRepCode(HTTPTable *codes) {
             i++;
         }
         if(i >= taille_host_accepted){
-            printf("Site non référencé -> tableau dans champ Host ligne ~ 603\n");
+            //printf("Site non référencé -> tableau dans champ Host ligne ~ 603\n");
+            int code  = configFileMsgBody("/400.html", codes, "");
+            if (code != 1) { return code; }
             return 400;
         }
 
@@ -658,7 +691,7 @@ int getRepCode(HTTPTable *codes) {
         free(host);
     }
     else{
-        printf("Pas Host");
+        //printf("Pas Hostt");
         int code = configFileMsgBody(uri3, codes, "");
         free(uri3);
         if (code != 1) { return code; }
@@ -670,9 +703,15 @@ int getRepCode(HTTPTable *codes) {
     _Token *Message_Body = searchTree(tree,"message_body");
 
     // Content-Length
-    if(T_EncodingNode != NULL && C_LengthNode != NULL){return 400;} // Ne pas mettre s’il y a déjà Transfer-Encoding : 400
+    if(T_EncodingNode != NULL && C_LengthNode != NULL){
+        int code  = configFileMsgBody("/400.html", codes, "");
+        if (code != 1) { return code; }
+        return 400;} // Ne pas mettre s’il y a déjà Transfer-Encoding : 400
 
-    if(C_LengthNode != NULL && C_LengthNode->next != NULL){return 400;} // plusieurs content-length
+    if(C_LengthNode != NULL && C_LengthNode->next != NULL){
+        int code  = configFileMsgBody("/400.html", codes, "");
+        if (code != 1) { return code; }
+        return 400;} // plusieurs content-length
 
     if (C_LengthNode != NULL && C_LengthNode->next == NULL){ // si un seul Content-Length avec valeur invalide : 400
         if(Message_Body == NULL){return 400;}// il doit y avoir un message_body si il y a content length
@@ -682,11 +721,19 @@ int getRepCode(HTTPTable *codes) {
 
         sscanf(CL_text, "%*s %s", c_length);
 
-        if(c_length[0]== '0' && (c_length[1] >= '0' && c_length[1] <= '9')){return 400;} // on ne veut pas de 0XXXX
+        if(c_length[0]== '0' && (c_length[1] >= '0' && c_length[1] <= '9')){
+            int code  = configFileMsgBody("/400.html", codes, "");
+            if (code != 1) { return code; }
+            return 400;} // on ne veut pas de 0XXXX
         
         int i=0;
         while(c_length[i] != '\0'){
-            if(!(c_length[i] >= '0' && c_length[i] <= '9')){return 400;} // valeur invalide (négative ou avec des caractères autres que des chiffres)
+            //printf("c_length[%d] : %c\n",i,c_length[i]);
+            if(!(c_length[i] >= '0' && c_length[i] <= '9')){
+                int code  = configFileMsgBody("/400.html", codes, "");
+                if (code != 1) { return code; }
+                return 400;
+            } // valeur invalide (négative ou avec des caractères autres que des chiffres)
             i++;
         }
             int content_l_value = atoi(c_length);
@@ -703,15 +750,24 @@ int getRepCode(HTTPTable *codes) {
         sscanf(TE_text, "%*s %s", transfer_encoding);
         //printf("te : -%s-\n",transfer_encoding);
 
-        if(!((strcmp(transfer_encoding,"chunked")==0) | (strcmp(transfer_encoding,"gzip")==0) | (strcmp(transfer_encoding,"deflate")==0) | (strcmp(transfer_encoding,"compress")==0) |(strcmp(transfer_encoding,"identity")==0) )) {return 400;} // vérifier que la valeur du champ est bien prise en charge
+        if(!((strcmp(transfer_encoding,"chunked")==0) | (strcmp(transfer_encoding,"gzip")==0) | (strcmp(transfer_encoding,"deflate")==0) | (strcmp(transfer_encoding,"compress")==0) |(strcmp(transfer_encoding,"identity")==0) )) {
+            int code  = configFileMsgBody("/400.html", codes, "");
+            if (code != 1) { return code; }
+            return 400;} // vérifier que la valeur du champ est bien prise en charge
         //printf("ici1 : -%s-\n",TE_text);
-        if(!(TE_text[len]=='\r' && TE_text[len+1]=='\n')){return 400;} //&& TE_text[len+2]=='\r' && TE_text[len+3]=='\n' : vérifier \r\n(\r\n) après la valeur du champ
+        if(!(TE_text[len]=='\r' && TE_text[len+1]=='\n')){
+            int code  = configFileMsgBody("/400.html", codes, "");
+            if (code != 1) { return code; }
+            return 400;} //&& TE_text[len+2]=='\r' && TE_text[len+3]=='\n' : vérifier \r\n(\r\n) après la valeur du champ
         //printf("ici2\n");    
     }
     free(T_EncodingNode);
 
     // Message Body
-    if (Message_Body != NULL && C_LengthNode == NULL){return 411;} // Si Message Body mais pas Content-Length : 411 Length Required
+    if (Message_Body != NULL && C_LengthNode == NULL){
+        int code  = configFileMsgBody("/411.html", codes, "");
+        if (code != 1) { return code; }
+        return 411;} // Si Message Body mais pas Content-Length : 411 Length Required
     free(C_LengthNode);
     free(Message_Body);
 
@@ -742,7 +798,10 @@ int getRepCode(HTTPTable *codes) {
 
             char *ae_value = strtok(accept_encoding, ", ");
             while (ae_value != NULL) {
-                if(strcmp(ae_value,"gzip")!=0 && strcmp(ae_value,"deflate")!=0 && strcmp(ae_value,"br")!=0 && strcmp(ae_value,"compress")!=0 && strcmp(ae_value,"identity")!=0){return 400;}
+                if(strcmp(ae_value,"gzip")!=0 && strcmp(ae_value,"deflate")!=0 && strcmp(ae_value,"br")!=0 && strcmp(ae_value,"compress")!=0 && strcmp(ae_value,"identity")!=0){
+                    int code  = configFileMsgBody("/400.html", codes, "");
+                    if (code != 1) { return code; }
+                    return 400;}
                 ae_value = strtok(NULL, ", ");
             }
 

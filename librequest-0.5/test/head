@@ -1,2 +1,2 @@
-HEAD /index.html HTTP/1.0
+HEAD /index.html HTTP/1.1
 
