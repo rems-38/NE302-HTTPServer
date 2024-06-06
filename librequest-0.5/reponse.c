@@ -917,11 +917,11 @@ message *generateReponse(message req, int opt_code) {
         send_empty_params(sock, requestId); // fin des paramètres
         if(method_post == 1){
             int len;
-            _Token *Message_Body = searchTree(tree,"message_body");
+            _Token *Message_Body = searchTree(getRootTree(),"message_body");
             char *msg = getElementValue(Message_Body->node, &len);
             send_stdin(sock, requestId, msg);
-            free(Message_Body);
-            free(msg);
+            // free(Message_Body);
+            // free(msg);
         }
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 

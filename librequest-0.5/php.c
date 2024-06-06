@@ -134,7 +134,7 @@ void send_stdin(int sock, unsigned short requestId, const char *data) {
     header.version = FCGI_VERSION_1;
     header.type = FCGI_STDIN;
     header.requestId = htons(requestId);
-    header.contentLength = data_len;
+    header.contentLength = htons(data_len);
     header.paddingLength = 0;
     header.reserved = 0;
 
