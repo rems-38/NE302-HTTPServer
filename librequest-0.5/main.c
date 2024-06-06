@@ -33,6 +33,9 @@ int main(void)
 
 		// on ne se sert plus de requete a partir de maintenant, on peut donc liberer... 
 		freeRequest(requete); 
+
+		free(msg->buf);
+		free(msg);
 	}
 	return (1);
 }

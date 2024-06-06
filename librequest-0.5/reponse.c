@@ -46,10 +46,13 @@ void freeTable(HTTPTable *codes) {
             free(codes->table[i]);
         }
     }
-    // for (int i = 0; i < codes->headersCount; i++) {
-    //     free(codes->headers[i].label);
-    //     free(codes->headers[i].value)
-    // }
+    if (codes->filename != NULL) {
+        free(codes->filename);
+    }
+    for (int i = 0; i < codes->headersCount; i++) {
+        free(codes->headers[i].label);
+        free(codes->headers[i].value);
+    }
     free(codes->headers);
 }
 
@@ -174,6 +177,7 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* t
         HttpReponse *rep_code_out = getTable(codes, code_out);
         rep.code->code = code_out;
         rep.code->info = rep_code_out->code->info;
+        free(rep_code_out);
     }
 
     //recup header et les ajouter
@@ -213,6 +217,8 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* t
     if (!rep.is_head) {//ajout msg body
         sprintf(msg->buf+len, "%s", message_body);
         len += strlen(message_body);
+
+        free(message_body);
     }
     sprintf(msg->buf+len, "\r\n");
     
@@ -336,6 +342,8 @@ int ErrorInSTD_OUT(char* STD_OUT_txt){ // retourne 200 si pas d'erreur, sinon re
             return error;
         }
     }
+
+    free(first_header);
     return 200;
 }
 
@@ -488,6 +496,8 @@ int configFileMsgBody(char *name, HTTPTable *codes) {
 
     FILE *file = fopen(path, "r");
     if (file == NULL) { 
+        free(path);
+        free(type);
         int code = configFileMsgBody("/404.html", codes);
         if (code != 1) { return code; }
         
@@ -548,6 +558,7 @@ int getRepCode(HTTPTable *codes) {
         if (code != 1) { return code; }
         return 505;
     }
+    free(versionNode);
 
     //Methode
     _Token *methodNode = searchTree(tree, "method");
@@ -574,15 +585,18 @@ int getRepCode(HTTPTable *codes) {
         uri = realloc(uri, strlen("/index.html") + 1);
         strcpy(uri, "/index.html");
     }
+    free(methodNode);
     
     //percent-Encoding
-    uri = percentEncoding(uri);
-    uri = DotRemovalSegment(uri);
+    char *uri2 = percentEncoding(uri);
+    free(uri);
+    char *uri3 = DotRemovalSegment(uri2);
+    free(uri2);
 
-    int code = configFileMsgBody(uri, codes);
+    int code = configFileMsgBody(uri3, codes);
+    free(uri3);
     if (code != 1) { return code; }
     
-    free(uri);
 
     // Host
     _Token *HostNode = searchTree(tree, "Host");
@@ -682,6 +696,7 @@ int getRepCode(HTTPTable *codes) {
         
         free(host);
     }
+    free(HostNode);
 
     _Token *C_LengthNode = searchTree(tree, "Content_Length_header");
     _Token *T_EncodingNode = searchTree(tree, "Transfer_Encoding_header");
@@ -726,9 +741,12 @@ int getRepCode(HTTPTable *codes) {
         if(!(TE_text[len]=='\r' && TE_text[len+1]=='\n')){return 400;} //&& TE_text[len+2]=='\r' && TE_text[len+3]=='\n' : vérifier \r\n(\r\n) après la valeur du champ
         //printf("ici2\n");    
     }
+    free(T_EncodingNode);
 
     // Message Body
     if (Message_Body != NULL && C_LengthNode == NULL){return 411;} // Si Message Body mais pas Content-Length : 411 Length Required
+    free(C_LengthNode);
+    free(Message_Body);
 
 
     // Accept-Encoding
@@ -764,6 +782,8 @@ int getRepCode(HTTPTable *codes) {
         }
         free(ae);
     }
+    free(Accept_Encoding);
+
     // Accept
     _Token *Accept = searchTree(tree,"header_field");
     if(Accept != NULL){
@@ -799,6 +819,7 @@ int getRepCode(HTTPTable *codes) {
         }
         free(a);
     }
+    free(Accept);
     
     // Connection
     _Token *ConnectionNode = searchTree(tree, "connection_option");
@@ -831,6 +852,7 @@ int getRepCode(HTTPTable *codes) {
         //requestShutdownSocket(req.clientId);
         //printf("fermeture de la connexion !!!\n");
     }
+    free(ConnectionNode);
     
     return 200;
 }
@@ -906,11 +928,13 @@ message *generateReponse(message req, int opt_code) {
 
         char *HexData = receive_response(sock);
 
-        //printf("FINAL : %s\n", HexData);
-
         msg = createMsgFromReponsePHP(*rep, req.clientId, HexData);
 
         free(HexData);
+        for (int i = 0; i < 3; i ++) {
+            free(params[i].nameData);
+            free(params[i].valueData);
+        }
         free(params);
         close(sock);
     }
@@ -918,6 +942,7 @@ message *generateReponse(message req, int opt_code) {
         msg = createMsgFromReponse(*rep, req.clientId);
     }
 
+    free(rep);
     freeTable(codes);
     return msg;
 }
