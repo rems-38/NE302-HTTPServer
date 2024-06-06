@@ -43,7 +43,7 @@ HttpReponse *getTable(HTTPTable *codes, int code);
 
 void updateHeaderHttpReponse(HttpReponse rep, char *label, char *value);
 void updateHeader(HTTPTable *codes, char *label, char *value);
-int configFileMsgBody(char *name, HTTPTable *codes);
+int configFileMsgBody(char *name, HTTPTable *codes, char* host);
 char *message_body_from_STD_OUT(char* STD_OUT_txt);
 char *HexaToChar(char *content);
 message *createMsgFromReponse(HttpReponse rep, unsigned int clientId);

@@ -9,8 +9,8 @@ GET / HTTP/1.1
 Host: www.example.com
 Transfer-Encoding: chunked
 
-GET / HTTP/1.1
-Host: www.example.com
+GET /toto.html HTTP/1.1
+Host: test
 Transfer-Encoding: erreur
 
 GET / HTTP/1.1

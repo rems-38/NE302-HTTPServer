@@ -465,10 +465,30 @@ void updateHeader(HTTPTable *codes, char *label, char *value) {
     }
 }
 
-int configFileMsgBody(char *name, HTTPTable *codes) {
-    char *path = malloc(strlen(SERVER_ROOT) + strlen(name) + 1);
-    strcpy(path, SERVER_ROOT);
-    strcat(path, name);
+int configFileMsgBody(char *name, HTTPTable *codes, char* host) {
+
+    char* domaine = NULL;
+    if(strcmp(host, "") != 0){
+        domaine = strtok(host, ".");
+    }
+    else{
+        domaine = "";
+    }
+    char* path = malloc(strlen(SERVER_ROOT) + strlen(name) + 1);
+    if(strcmp(domaine, "www") == 0 || strcmp(domaine, "127") == 0 || strcmp(domaine, "") == 0 ){
+        printf("www");
+        path = realloc(path, strlen(SERVER_ROOT)+ sizeof("/www") + strlen(name) + 1);
+        strcpy(path, SERVER_ROOT);
+        strcat(path, "/www");
+        strcat(path, name);
+    }
+    else{
+        path = realloc(path, strlen(SERVER_ROOT)+ 1 + strlen(domaine) + strlen(name) + 1);
+        strcpy(path, SERVER_ROOT);
+        strcat(path, "/");
+        strcat(path, domaine);
+        strcat(path, name);
+    }
 
     // Gérer le Content-type (à l'aide de `file`)
     char *command = malloc(512);
@@ -488,7 +508,7 @@ int configFileMsgBody(char *name, HTTPTable *codes) {
     if (file == NULL) { 
         free(path);
         free(type);
-        int code = configFileMsgBody("/404.html", codes);
+        int code = configFileMsgBody("/404.html", codes, "");
         if (code != 1) { return code; }
         
         return 404;
@@ -544,7 +564,7 @@ int getRepCode(HTTPTable *codes) {
     }
 
     if(!(majeur == '1' && (mineur == '1' || mineur == '0'))){
-        int code  = configFileMsgBody("/505.html", codes);
+        int code  = configFileMsgBody("/505.html", codes, "");
         if (code != 1) { return code; }
         return 505;
     }
@@ -565,7 +585,10 @@ int getRepCode(HTTPTable *codes) {
     if ((strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0) && (searchTree(tree,"message_body") != NULL)){ return 400; }
     if((strcmp(method, "POST") == 0) && (searchTree(tree,"Content_Length_header") == NULL)){return 400;} //Post peut ne pas avoir de message body mais doit quand même avoir un content-length = 0
     free(method);
+    free(methodNode);
 
+    //URI
+    printf("URI");
     _Token *uriNode = searchTree(tree, "request_target");
     char *uriL = getElementValue(uriNode->node, &len);
     char *uri = malloc(len + 1);
@@ -576,7 +599,6 @@ int getRepCode(HTTPTable *codes) {
         uri = realloc(uri, strlen("/index.html") + 1);
         strcpy(uri, "/index.html");
     }
-    free(methodNode);
     
     //percent-Encoding
     char *uri2 = percentEncoding(uri);
@@ -584,10 +606,6 @@ int getRepCode(HTTPTable *codes) {
     char *uri3 = DotRemovalSegment(uri2);
     free(uri2);
 
-    int code = configFileMsgBody(uri3, codes);
-    free(uri3);
-    if (code != 1) { return code; }
-    
 
     // Host
     _Token *HostNode = searchTree(tree, "Host");
@@ -627,6 +645,12 @@ int getRepCode(HTTPTable *codes) {
         }
 
         free(host);
+    }
+    else{
+        printf("Pas Hostt");
+        int code = configFileMsgBody(uri3, codes, "");
+        free(uri3);
+        if (code != 1) { return code; }
     }
     free(HostNode);
 
