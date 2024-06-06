@@ -1,25 +1,39 @@
+CC = gcc
 FLAGS = -Wall -Wextra -fPIC -fsanitize=address
 LINK =
 
+CLANG ?= no
 DEBUG ?= yes
+OPTIMIZE ?= yes
 VALGRIND ?= no
-
-ifeq ($(DEBUG), yes)
-	FLAGS += -g
-endif
 
 ifeq ($(VALGRIND), yes)
 	FLAGS = -Wall -Wextra
 	LINK += -lasan -lubsan
 endif
 
+ifeq ($(CLANG), yes)
+	FLAGS = 
+	LINK =
+	CC = clang
+endif
+
+ifeq ($(OPTIMIZE), yes)
+	FLAGS += -O2 -march=native
+endif
+
+ifeq ($(DEBUG), yes)
+	FLAGS += -g
+endif
+
+
 all : librequest.so sock
 
 sock : librequest.so main.o reponse.o php.o
-	gcc $(FLAGS) -o ../sock main.o reponse.o php.o -L. -lrequest -lparser
+	$(CC) $(FLAGS) -o ../sock main.o reponse.o php.o -L. -lrequest -lparser
 
 %.o: %.c 
-	gcc $(FLAGS) $(LINK) -I../../abnf -I./api -I libparser -c $<
+	$(CC) $(LINK) -I../../abnf -I./api -I libparser -c $<
 
 #librequest.so : socket.o 
 #	ld -shared -Bsymbolic -Bsymbolic-function -soname librequest.so -o librequest.so ./parser/librequest.o ./socket.o 
