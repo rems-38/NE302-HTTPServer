@@ -260,7 +260,6 @@ char *message_body_from_STD_OUT(char* STD_OUT_txt){
 
 void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
 
-    printf("STDOUT: %s\n",STD_OUT_txt);
     int j=0; // parcourir STD_OUT_txt
     int k=0; // taille label et value
 
@@ -659,7 +658,7 @@ int getRepCode(HTTPTable *codes) {
         free(host);
     }
     else{
-        printf("Pas Hostt");
+        printf("Pas Host");
         int code = configFileMsgBody(uri3, codes, "");
         free(uri3);
         if (code != 1) { return code; }
@@ -676,6 +675,8 @@ int getRepCode(HTTPTable *codes) {
     if(C_LengthNode != NULL && C_LengthNode->next != NULL){return 400;} // plusieurs content-length
 
     if (C_LengthNode != NULL && C_LengthNode->next == NULL){ // si un seul Content-Length avec valeur invalide : 400
+        if(Message_Body == NULL){return 400;}// il doit y avoir un message_body si il y a content length
+
         char *CL_text = getElementValue(C_LengthNode->node, &len); // nous renvoie "Content-Length : xxxxx" et pas "xxxxxx"
         char c_length[len];
 
@@ -685,15 +686,13 @@ int getRepCode(HTTPTable *codes) {
         
         int i=0;
         while(c_length[i] != '\0'){
-            //printf("c_length[%d] : %c\n",i,c_length[i]);
             if(!(c_length[i] >= '0' && c_length[i] <= '9')){return 400;} // valeur invalide (négative ou avec des caractères autres que des chiffres)
             i++;
         }
-        /*
-        int content_l_value = atoi(c_length);
-        char *message_bodyL = getElementValue(Message_Body->node, &len);
-        if(content_l_value != len){return 400;}// vérifier que c'est la taille du message body
-        */
+            int content_l_value = atoi(c_length);
+            char *message_bodyL = getElementValue(Message_Body->node, &len);
+            int taille_message_b = len - 2; // pour ne pas compter CRLF à la fin du message body
+            if(content_l_value != taille_message_b){return 400;}// vérifier que c'est la taille du message body
     }
 
     // Transfer-Encoding
