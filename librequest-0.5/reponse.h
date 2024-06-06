@@ -19,7 +19,7 @@ typedef struct {
     HttpCode *code;
     int httpminor;
     char *filename;
-    bool is_head;
+    int method;
     Header *headers;
     int headersCount;
 } HttpReponse;
@@ -28,7 +28,7 @@ typedef struct {
     HttpCode *table[HTTP_CODE_MAX+1];
     int httpminor;
     char *filename;
-    bool is_head;
+    int method; // 1 = GET, 2 = HEAD , 3 = POST
     bool is_php;
     Header *headers;
     int headersCount;
@@ -57,5 +57,6 @@ char* percentEncoding(char* uri);
 char* DotRemovalSegment(char* uri);
 void controlConnection(message *msg);
 int getRepCode(HTTPTable *codes);
+void createSettingsParams(Header *settings, FCGI_NameValuePair11 *params, HTTPTable *codes);
 //HttpReponse *convertFCGI_HTTP(FCGI_Header *reponse, HTTPTable *codes, int code);
 message *generateReponse(message req, int opt_code);

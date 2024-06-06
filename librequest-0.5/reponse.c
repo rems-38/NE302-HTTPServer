@@ -21,7 +21,7 @@ void initTable(HTTPTable *codes) {
     int headersCount = sizeof(headers) / sizeof(headers[0]);
 
     codes->filename = NULL;
-    codes->is_head = false;
+    codes->method = 0;
     codes->is_php = false;
 
     codes->headers = malloc(headersCount * sizeof(Header));
@@ -90,7 +90,7 @@ HttpReponse *getTable(HTTPTable *codes, int code) {
     rep->code = codes->table[code];
     rep->httpminor = codes->httpminor;
     rep->filename = codes->filename;
-    rep->is_head = codes->is_head;
+    rep->method = codes->method;
     rep->headers = codes->headers;
     rep->headersCount = codes->headersCount;
 
@@ -104,7 +104,7 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
     // Taille du fichier si existe
     FILE *fout = NULL;
     long fileSize = 0;
-    if (rep.filename != NULL && !rep.is_head) {
+    if (rep.filename != NULL && rep.method != 2) {
         fout = fopen(rep.filename, "r");
         if (fout != NULL) {
             fseek(fout, 0, SEEK_END);
@@ -120,7 +120,7 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
             bufSize += strlen(rep.headers[i].label) + 2 + strlen(rep.headers[i].value) + strlen("\r\n"); // +2 pour le ": "
         }
     }
-    if (!rep.is_head) { bufSize += fileSize; }
+    if (rep.method != 2) { bufSize += fileSize; }
     bufSize += 2 * strlen("\r\n");
     msg->buf = malloc(bufSize + 10);
 
@@ -136,7 +136,7 @@ message *createMsgFromReponse(HttpReponse rep, unsigned int clientId) {
     sprintf(msg->buf+len, "\r\n");
     len += strlen("\r\n");
 
-    if (fout != NULL && !rep.is_head) {
+    if (fout != NULL && rep.method != 2) {
         fread(msg->buf+len, fileSize, 1, fout);
         len += fileSize;
     }
@@ -186,7 +186,7 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* t
             bufSize += strlen(rep.headers[i].label) + 2 + strlen(rep.headers[i].value) + strlen("\r\n"); // +2 pour le ": "
         }
     }
-    if (!rep.is_head) { bufSize += strlen(message_body); } //ajout taille msg body
+    if (rep.method != 2) { bufSize += strlen(message_body); } //ajout taille msg body
     bufSize += 2 * strlen("\r\n");
     //pas besoin ajout taille header normalement
     msg->buf = malloc(bufSize + 10);
@@ -203,7 +203,7 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* t
     sprintf(msg->buf+len, "\r\n");
     len += strlen("\r\n");
 
-    if (!rep.is_head) {//ajout msg body
+    if (rep.method != 2) {//ajout msg body
         sprintf(msg->buf+len, "%s", message_body);
         len += strlen(message_body);
 
@@ -559,8 +559,8 @@ int getRepCode(HTTPTable *codes) {
     
     if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0 || strcmp(method, "HEAD") == 0)) { return 405; }
     else if (len > LEN_METHOD) { return 501; }
-    else if (strcmp(method, "HEAD") == 0) { codes->is_head = true; }
-    else if (strcmp(method, "POST") == 0) { method_post = 1; }
+    else if (strcmp(method, "HEAD") == 0) { codes->method = 2; }
+    else if (strcmp(method, "POST") == 0) { codes->method = 3; }
     
     if ((strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0) && (searchTree(tree,"message_body") != NULL)){ return 400; }
     if((strcmp(method, "POST") == 0) && (searchTree(tree,"Content_Length_header") == NULL)){return 400;} //Post peut ne pas avoir de message body mais doit quand même avoir un content-length = 0
@@ -847,29 +847,56 @@ int getRepCode(HTTPTable *codes) {
     
     return 200;
 }
-/*
-HttpReponse *convertFCGI_HTTP(HTTPTable *codes, int code) {
-    HttpReponse *rep = malloc(sizeof(HttpReponse));
-    
-    int nbTry = 0;
-    while (codes->table[hash(code, nbTry)]->code != code) { nbTry++; }
-    rep->code = codes->table[hash(code, nbTry)];
-    
-    rep->httpminor = codes->httpminor;
-    rep->filename = codes->filename;
-    rep->is_head = codes->is_head;
-    rep->headers = codes->headers;
-    rep->headersCount = codes->headersCount;
-
-    return rep;
-}
-*/
 
 void controlConnection(message *msg){
     if(connecte == 1){
         requestShutdownSocket(msg->clientId);
     }
 }
+
+void createSettingsParams(Header *settings, FCGI_NameValuePair11 *params, HTTPTable *codes) {
+    Header sett[5] = {
+        {"SCRIPT_NAME", getScriptName(codes->filename)},
+        {"SCRIPT_FILENAME", getScriptFilename(codes->filename)},
+        {"REQUEST_METHOD", ""},
+        {"CONTENT_LENGTH", ""},
+        {"message_body", ""}
+    };
+
+    if (codes->method == 1) { sett[2].value = "GET"; }
+    else if (codes->method == 2) { sett[2].value = "HEAD"; }
+    else if (codes->method == 3) {
+        sett[2].value = "POST";
+
+        int len;
+        _Token *Message_Body = searchTree(getRootTree(),"message_body");
+        char *msg = getElementValue(Message_Body->node, &len);
+
+        char *len_str = malloc(7);
+        sprintf(len_str, "%d", len);
+        sett[3].value = len_str;
+        sett[4].value = msg;
+        free(Message_Body);
+    }
+
+    FCGI_NameValuePair11 *par = malloc(5 * sizeof(FCGI_NameValuePair11));
+    for (int i = 0; i < 5; i++) {
+        if (strcmp(settings[i].value, "") == 0) { break; }
+
+        par[i].nameLengthB0 = strlen(settings[i].label);
+        par[i].valueLengthB0 = strlen(settings[i].value);
+        par[i].nameData = malloc(strlen(settings[i].label) + 1);
+        par[i].valueData = malloc(strlen(settings[i].value) + 1);
+        memcpy(par[i].nameData, settings[i].label, par[i].nameLengthB0);
+        memcpy(par[i].valueData, settings[i].value, par[i].valueLengthB0);
+    }
+
+    settings = sett;
+    params = par;
+
+    free(par);
+}
+
 
 message *generateReponse(message req, int opt_code) {
     HTTPTable *codes = loadTable(); //initialisation de la table des codes possibles de retour
@@ -888,40 +915,16 @@ message *generateReponse(message req, int opt_code) {
 
         char srv_port_str[6];
         sprintf(srv_port_str, "%d", SERVER_PORT);
-
-        FCGI_NameValuePair11 *params = malloc(3 * sizeof(FCGI_NameValuePair11));
-
-        params[0].nameLengthB0 = strlen("REQUEST_METHOD");
-        params[0].valueLengthB0 = strlen("GET");
-        params[0].nameData = malloc(strlen("REQUEST_METHOD") + 1);
-        params[0].valueData = malloc(strlen("GET") + 1);
-        memcpy(params[0].nameData, "REQUEST_METHOD", params[0].nameLengthB0);
-        memcpy(params[0].valueData, "GET", params[0].valueLengthB0);
-
-        params[1].nameLengthB0 = strlen("SCRIPT_NAME");
-        params[1].valueLengthB0 = strlen(getScriptName(codes->filename));
-        params[1].nameData = malloc(strlen("SCRIPT_NAME") + 1);
-        params[1].valueData = malloc(strlen(getScriptName(codes->filename)) + 1);
-        memcpy(params[1].nameData, "SCRIPT_NAME", params[1].nameLengthB0);
-        memcpy(params[1].valueData, getScriptName(codes->filename), params[1].valueLengthB0);
         
-        params[2].nameLengthB0 = strlen("SCRIPT_FILENAME");
-        params[2].valueLengthB0 = strlen(getScriptFilename(codes->filename));
-        params[2].nameData = malloc(strlen("SCRIPT_FILENAME") + 1);
-        params[2].valueData = malloc(strlen(getScriptFilename(codes->filename)) + 1);
-        memcpy(params[2].nameData, "SCRIPT_FILENAME", params[2].nameLengthB0);
-        memcpy(params[2].valueData, getScriptFilename(codes->filename), params[2].valueLengthB0);        
-        
+        Header *settings;
+        FCGI_NameValuePair11 *params;        
+        createSettingsParams(settings, params, codes);
+
         send_begin_request(sock, requestId);
         send_params(sock, requestId, params);
         send_empty_params(sock, requestId); // fin des paramètres
-        if(method_post == 1){
-            int len;
-            _Token *Message_Body = searchTree(getRootTree(),"message_body");
-            char *msg = getElementValue(Message_Body->node, &len);
-            send_stdin(sock, requestId, msg);
-            // free(Message_Body);
-            // free(msg);
+        if(codes->method == 3){
+            send_stdin(sock, requestId, settings[4].value);
         }
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 
@@ -930,6 +933,7 @@ message *generateReponse(message req, int opt_code) {
         msg = createMsgFromReponsePHP(*rep, req.clientId, HexData);
 
         free(HexData);
+        free(settings);
         for (int i = 0; i < 3; i ++) {
             free(params[i].nameData);
             free(params[i].valueData);
