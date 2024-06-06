@@ -1,7 +1,0 @@
-Wr /02 HTTP/2.1
-Content-Type:  	 %jOPeA4/5sGikcYcHJAy		; L^3hHo9vjzh="•\2ÇS"  		; 	zS09Vc0="" 			; qx3DOo%Fu="RŽ \Å"	   ; 6q22="\t\­N" 							;yS=0u|  	; 	wMp="\E"	 	 ;	 e="v" ;   				y="“\Ê\‚\ oD¿Þ«" 		  		    		 ;	X.$&="ïÙC4	\ÓA\—"
-Cookie: 	*wvcQ=5		 	   		
-Content-Type:					mMD2wQjtMa*/EtKT;  	 			 	   		 	`Py1="\¯\™\0\µ"  		    ;		 ^Q8e=""	
-Host:202.66.80.222	
-Connection: 	  	 		 3Ubhs^,9 
-

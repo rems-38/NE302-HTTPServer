@@ -1,4 +1,0 @@
-_ /_F%B2=f HTTP/5.0
-Host:  59.7.148.250:78		 	 	 	   		
-Transfer-Encoding:compress		,		 D2	
-

@@ -1,10 +1,0 @@
-|w /y HTTP/7.2
-Cookie:	h=1		 	 	 
-Host:[96::C:5:3:F]  	 
-$ot+R:			 ˘ 		 	0û	Èö/   	 	!˙ ‚)   	&9   º 	  
-Connection:-7,   				      	 _h~drVUK&   ,X0lEK55,		,  		    		 
-Transfer-Encoding:,	  ,      		 ,fdNf 		;		i = 		"Á\3" ;0Vff 	 	 	="\+ı\∫\Õ –"	;	 t7FI  =			"\ãu\á\ê\û"   ;	3   		 	 ="\KÀØ\Ã•";y=  	"\Œ"		;BP	="\G\"Uz\Ÿ\é√†\Ò\ª„ß\(\qß\∑ª\ì\—"		   ;		 			 		    	78`3OEAwkelq	=  		"‘®\f"	;V			 =		  "É∫P›d\Ö"	  	;  	v%e 	   = "£\$‘"  	,mR|     	 		 	;wB="\À\âè" 			, 	  	 deflate	   ,hy 	  	 	 				;	 Ilp^gN		= 	""	 	 	 	 	 ;JnGul	 	 	 =	"\aZ"	    
-Host: [AB4:0CB4::D:4:D25C:4.87.95.43]
-Connection:, 				 			NdM ,		 tX+		, ,	_i    	   	  ,,Qo^~sMlQo	 ,  I	 ,
-
-r4ç

@@ -1,4 +1,0 @@
-m /$%7C HTTP/7.1
-Connection:   	   H0.~		, , '+YQ12,    
-Host:[::F:1A:85.246.133.144]		   				 
-

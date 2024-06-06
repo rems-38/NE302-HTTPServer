@@ -1,9 +1,0 @@
-kwZ /4 HTTP/2.3
-Host:		 [E:B3DF:D:7::7427:9C:B]	
-Host:[83:F6::5.42.40.253]:2   	 
-$:		tÎ   	 			 	    B‹_ä			çÂ		 ¿ 
-l2:	Þ­	
-P: 	  	  	  	™		   				ú¶ $  		
-Host:		    [2B::6:FC61:146.253.210.5]:04319	  
-Transfer-Encoding:,		 ,chunked,		,  , 	  	, ,    	, 	 	 ,
-

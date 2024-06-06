@@ -1,7 +1,0 @@
-9x~hDl /7%AE HTTP/2.9
-Host:[3::C9:1:0:A:204.188.254.10]:
-Expect: 100-continue	
-Host:				 245.219.3.252		 	  
-Transfer-Encoding:		 	,			 	gzip,c-8   	 			   		;b3K  		 = "" ;	Yf.	 =   	    	 "þV\½\Ú\:™\;\}t\¾"; bf = "" ;O= "\r\2\v¡L\±" 	,  
-Cookie:Dk2G=NfgD; uCk="{"; W="Rr"; 2c="3@"; INga%d=ZS; Y2gSyEy+=Z7y{5/UOZs; Z="T"; c=x; z69=""	 	 	  	 
-

@@ -1,6 +1,0 @@
-!uut /5s/3//4fdU// HTTP/7.4
-Content-Type:jR/*f
-Cookie: 	 oE~_1tOw2="c"; %C="^SJ"; !=""; .N=""; !!llv^u$l-U="yz"; f#Y="nDJa"; D="Rq>A"; zF~PwN=; Zw|i8pO=%R; JEe^%+Ta=; $r12sc_Z="q(/D"; 0kRq7%=F$CQ%8w=wl; |=""; 4jYV=   
-Host: [BD6:356:D09:DEB2:3B8:A:9.250.253.8]
-
-1

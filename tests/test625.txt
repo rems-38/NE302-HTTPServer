@@ -1,8 +1,0 @@
-WBB1 /?4j HTTP/2.5
-9O:    			
-Host: 			   224.6.9.107
-Cookie:	 	 ZjYcve5.=ObR		 			  
-Cookie: s.=S   	  		
-Content-Type:'z#C#Z/QYV		  ; 	S=V		 	 ;		 	  		s="“\¹ª\{\ú\‡\Ì\Þ\s\ ?¦\X\Ô\…"
-Transfer-Encoding:	 	, ,		 	  ,	, ,,compress	 	
-

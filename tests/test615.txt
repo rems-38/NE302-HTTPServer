@@ -1,7 +1,0 @@
-lmc /m/.//JQM!/%48c%8FRP8//WE/j3h/+Ks? HTTP/1.2
-Host:[F:808:4:9:81:9:9:FEC5]
-*uw: 		 
-Host:   	 	 	[3::3:142.215.1.3]:852
-Transfer-Encoding:	 		 i	  	 		
-^:	 °	 	½F	 =g	 		 	 		  	  
-

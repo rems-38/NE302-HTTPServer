@@ -1,5 +1,0 @@
-&cu // HTTP/1.1
-Cookie: !wVQ="5"; FZ.="h"; u3^="Wt"; M=m; U=; PM8="!"; N="s"; o="D|"; mG=1%uhXc`2; c="Pb]/!!Gs.Ol6$"					 	  	  
-Host: 	 6.255.0.48:    	
-
-ƒ}

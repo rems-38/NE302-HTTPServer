@@ -1,8 +1,0 @@
-XB*g$ /y@W/k%E9Od/? HTTP/6.6
-Host:
-Connection:			    ,		,  		5		, 	   ,	 ,~,			    
-Host:	      					[::A5:EC:1:11.81.218.66]		
-Host:D+:65157906	 		
-Transfer-Encoding: 		,	 	 	,compress,Xb 	  ; L		=  "F";		Dz&^rp= 	 		"";WZw=   	 ""	;3 =	V3 ;	gIx 	= 		   "\Kˇ›\õ\Å∆k\ç"	 	;		mlt  	 	= 	 					"\ "; 		E  		= 			 "" ,	 		,,,		 	 
-Content-Type:	u/6	;   	abX="\c\R¿\∂å"
-

@@ -1,6 +1,0 @@
-xy3hqLK'zmHm6o$5 /?3 HTTP/1.4
-Host:72.205.61.217:1		 			 	 	
-Cookie:JHCzW="H:/"; 0="}0<["; 8^5l=s; `i=j/%; j$4=oUv; 6|="/"; n$~Dv=; 1= 
-Cookie:    	   		_3E&3=:; |%j="W]KB?"
-Connection:   		   	 ,,nL*	,xE,		  		,		 c 		  	 	 	,	,
-

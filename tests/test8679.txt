@@ -1,6 +1,0 @@
-| /0C HTTP/2.3
-Transfer-Encoding:*							 	 ;	m=		 	 	  	  "›\Þ" ;T=		"\ì<\Ï¤\ÂTÂr\‚‹" 	,	 	  	 ,	13Ox 		 	 	  		 	;	 		 sR	   =     		 "»´\QŠ\‹{" ,,, 	H;	 	 o	    	   		 =	 0G		;jeEN.vdyLtC	 =	"\Y\@d\h\ø\2Ï\š" 	 ,	 ,	  	'GHqr ;  	`Y|Sw_	 	 		=		"'\¹‘";   	$jYh	 =					"\†\w"	,  , chunked   
-hY:	ÚÇ  
-Host: 	  	[v520.hpE8]:28			
-Content-Length: 	 7       
-

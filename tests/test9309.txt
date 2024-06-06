@@ -1,3 +1,0 @@
-W /Hi1/%A2SJX HTTP/8.9
-Transfer-Encoding:gzip	 ,	 			,
-

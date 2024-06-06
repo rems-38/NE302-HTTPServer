@@ -1,3 +1,0 @@
-Hi-xB0 /a HTTP/1.1
-
-O

@@ -1,5 +1,0 @@
-ah /v%1B HTTP/9.3
-$V:	ú1			 / 		  	   	 
-Cookie:	 	h^-Un=bK		 	   	
-Content-Length: 				 		  417	 
-

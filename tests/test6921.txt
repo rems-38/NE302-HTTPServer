@@ -1,7 +1,0 @@
-Y /~/%7F%C7P/%08v%23-%B8l9//*Y%63:/6S%C1/e HTTP/5.6
-Connection:	 ,,   ,	  	,,jO, 	 ,, ,	 hbA   , TWO-8rc8c0GyuR-uy,	 ,	,     	  	 e,	 		  c3t	 
-Cookie:	   V="{"; g="{8mJn" 
-Transfer-Encoding:	 				   ,		, ,	x;		H8=""		 	;%q*= "\ê"	    	; 		gq 	=prf*mK34S	; 	 2 =  	 	"\Œ\)Q"
-Host:	[ADD1::A:57:AA:74D:224.235.254.116]:761 		
-Host:158.214.104.134 
-

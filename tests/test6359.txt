@@ -1,3 +1,0 @@
-Lon /YW/%4B/d+h%4E6u HTTP/7.5
-Host:	[97:0FA:23:0::5:1:B5]   		 
-

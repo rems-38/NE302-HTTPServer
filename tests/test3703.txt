@@ -1,4 +1,0 @@
-i /@V HTTP/0.4
-Host: 		 %6ASkW+%00gGE		  
-Cookie:99kwD0s=; 1e=	
-

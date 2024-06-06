@@ -1,8 +1,0 @@
-S /U? HTTP/4.7
-Connection:	,, 		 ,	,  	  	0T    ,		 		 	 	 t  	 ,
-Host:	 				 	 213.228.199.35
-Host: [A:F:7:0:6:3C:4.67.27.231]:75880 	 	
-A~+$U:	" 	 	 	 a°   	 		 kv		ÃŒ 	 	¾[	     tÌ 	7&Ö	 
-Content-Type:	 ^BR/iq 		;		 2C="\½"
-Content-Length:2    	 
-

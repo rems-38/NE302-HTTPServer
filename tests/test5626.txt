@@ -1,8 +1,0 @@
-W /!67C%14 HTTP/9.5
-Host:	 [::AEF:2.232.14.254]  			 
-Transfer-Encoding:,  	,	 	.				 		;aF`HjO  	 =wK     		   	
-Transfer-Encoding: ,, 		 ,P9  			 		;  f7OOZ^JVE			 = 	"=\&ç(\}Z"	  	  	 			;D71x8 =   "\z\É\ıÚ≠"    ;	TKI = 	"õ\C\Ã" ,	,	 	_$	  ;		2n	=		"";$   ="i\&"	  				 	 ;*O =  	 	 	"\D\‡´" 	 	 ;   				  	 	S	="" 	 			   	    		 	; 	        |V7e& 	 	=""			 , 	 	,	1i^EO7; 					_n    		 = ""		;ZgnK	    	= 		"π5"			;	QdB 	  		 	  	 		 = 	g+_;		yL	=		"%"	;'jl!EL72a 	=g&L 	 ;   	 	1orb=	     		 ""		   ;K9` 		=	"?*"		 ;		   Ygi		= "\Ì\Â";		 GlO				    	    = 	""	 ,  	t.id.`4!04-	;Y	="\‡\o\Ê\ı"	  	 	 	;		%6lPAE	=		 		OJn#;%fT	  = 	 "\J¡\,ÂÑ\s"  	  		 		  	  ; 6Y91T~U+="\M\Up\o\_G\m#";19a   = "Ö\Û\ˇ\ä\Ô\•" ;		  		f			=""	; O = "\lF" 	 	 ;  	u =""	 		 ;h =  					 		 "¶£",  	 		chunked	,,Y 	 ;E	= 	"\Õ¯"				  ,  	Os;	 	 	D*PHfu     	="\Ö!\¸qâ|\ÃAÇ´"	 
-Host:	    [C::0:D:F:156.6.219.250]:8  	 	  		
-Host:	[::B95F:3:2:2E:3.224.0.219]:66  	 		 	
-Connection:VGB_XRkE    ,		 , 	   DRPaqj_5KZ1ZeYRDv3,	6-#U
-

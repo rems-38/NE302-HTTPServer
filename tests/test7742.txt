@@ -1,7 +1,0 @@
-&-NJ //F//S5tE-b HTTP/4.1
-Host:  	253.101.4.250	
-Host: 		   [E9B::98.4.93.5]:55	
-Content-Type:51Wrk0egBLAW/F	   ;	  5%w=""				 	; H1P17f=IMT 
-Cookie:	-="O"; r5.a="y"; Qn=!; BG=t^fgAs; 2="l%"; O=KS1-; Q=fP~VU; Q=!|jSG; j`kvww%'i9U="$"; r=bFY0; .h="olhs"; N=""; j8g="b+"; jhNf~26ZD="T)UoErt"; M$uIX=; pKgx%="|*"; FWrx="&xTVuhw@s5HO"; qjR9B9Y5u%n=; 1%=f8; *7U= 
-Host:	 [BC:7A4:A:0:7:9:236.251.19.248] 
-

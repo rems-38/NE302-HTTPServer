@@ -1,7 +1,0 @@
-. ///qYFd@nO HTTP/4.1
-Host:	 F		 	 
-Content-Length: 			76790097 
-Host:		242.236.251.206:7798834
-Host:					r:98	
-
-4

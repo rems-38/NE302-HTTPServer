@@ -1,6 +1,0 @@
--~d6 /Z3a%C8ke2L/%A564M%72Sq%84c HTTP/9.3
-Expect:	100-continue 	
-d^X|6Y:    • Õ
-Expect: 100-continue
-
-lµ

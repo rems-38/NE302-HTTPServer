@@ -1,6 +1,0 @@
-igs1$rLh / HTTP/8.3
-Expect:  	100-continue  				 	
-Host: 	    	    	[::A863:2:D:9:A:251.250.49.9]
-Host:		[::1.252.7.4]	   
-Content-Type: 			./vW;			   BaP4I89%!Z#="\è";#jxrK='JNpDIumzEJiJg`			 		 			
-

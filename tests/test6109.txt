@@ -1,7 +1,0 @@
-yn~dx` //%72/V%E4/.%C2/mlzmy%C5/q?FH?Ndj7?.K HTTP/3.8
-Host:				216.87.230.47:0 		   				
-Host: [::1:E:30:C:6:4.252.214.9]:8057749 
-Connection:	i   	 , 	,,	 	   
-Cookie: 	 		   iWU4="4M"
-Host:	253.243.208.250:9321 
-

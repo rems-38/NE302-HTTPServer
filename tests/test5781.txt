@@ -1,5 +1,0 @@
-% /P1%3A/%93@nsw?p HTTP/2.5
-Z6:	 			 	
-Transfer-Encoding:compress	 		 			
-
-×

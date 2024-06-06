@@ -1,6 +1,0 @@
-SH /kf%6Dir9%DCV//2C HTTP/9.5
-Host: 	   [::1:E:2:ABA:EB]	
-Content-Type:		   		  	    	F4t/Qe2
-Host:  [C7:B:926:14:5:58:91.7.156.53]:5  
-Host:	    252.6.255.44:95769978373074 		   	 	   
-

@@ -1,4 +1,0 @@
-Fho /u%CEGg HTTP/9.6
-Transfer-Encoding:,	,	 ,			,  	chunked	,	 			
-Host:[v38.TkpT]   
-

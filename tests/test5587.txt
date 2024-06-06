@@ -1,4 +1,0 @@
-CI //y7_C HTTP/3.4
-Transfer-Encoding:,		  deflate 	 
-Content-Type:   		sMw/A%0M	; 	j=""
-

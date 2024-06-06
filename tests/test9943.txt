@@ -1,3 +1,0 @@
-7 /Z HTTP/0.4
-Transfer-Encoding:  		,	 	       compress,,   		
-

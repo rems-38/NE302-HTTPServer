@@ -1,6 +1,0 @@
-$c^ /5%A2//U/Z%DD4/%CAvXfr%1B/rH3u4%5E9%14g%50%4ErT%95,Jp/Kf?7%AD HTTP/6.1
-Connection:,,		OU     	 		,					 		-5,LC		 
-Host:	  [::11D:255.10.70.4]
-Host:  226.7.206.0
-Cookie:			D="eTGJ"; fcs^M=""; PuID!EX=4xTg+; eAHJ`an5gmDS=""; 7=j; a=x4Pm-q.*; U=hpSt; t_="pU" 	 
-

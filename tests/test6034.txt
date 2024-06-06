@@ -1,9 +1,0 @@
-FnTg /+/D/ HTTP/7.0
--B|LlRx7k:Ÿ	F<‰/ l• 			 	
-Transfer-Encoding:, ,		 		 	 		-%SH7H8*2mRrzW8kf4V4WMZNp 			;  	  	   						x0  	 	=	""  			 
-Host:		   	[::4:8:8F1:82.7.200.255]:	 
-Host:[::5:E:AC:F56:07:233.90.229.11]	 	 	   
-Host: 250.170.250.240:654618			 
-Connection:	, ,5      ,	  	,V  , 
-
-Í×

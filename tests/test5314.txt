@@ -1,8 +1,0 @@
-O /%2Cq/ HTTP/2.6
-Cookie:    	 UmA8=""; po4g=MDUy+; .N.=		 	 			 
-S: 	  X  			)©   dÖ  		 	
-Host:		[F:F2::5:9E:7.7.225.122]:7364105419 	 		    			
-E:  	 	 	  †‰ 	kZ	§				 
-Transfer-Encoding: 		 	 	 	,56`;		 	 		  	gf	=	 		  "ì\È"			;  -UIc= 	 w%; Vj= "\˘"   	;_CCW% 	="î\O\>W#\T\ÛS.\3z“\u\ú\~\«" 		 ,  	    c.;Dx*Xh98%S#0iM 	=			"";  nNq  ="\Òã";	OmCB2Hd~	=	"J"				,DF		  ,	 	   	 		 	compress ,	deflate   	
-
-#G

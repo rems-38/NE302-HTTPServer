@@ -1,9 +1,0 @@
-c /,,7//? HTTP/7.8
-sLS71FDR:	#	   	êû¶Í			 	-Z  	«ÂÒ∞  é
-  Ω	  	 “Ó&		  Ï@ 	  	…ï		 		 	ìπ  	 
-Host:[1BC:65E2::122.39.4.7]:  		
-Oh_c':8	 	 55	!!	
-Expect:100-continue 	  
-Content-Type: 	 		 e8oBuuv/G1UJ9|~ ;	 			  		  		w4="";	  	 	Wx="«w"	 ; 	_f="á" 	 		 ;4Ms=D&h6NF3 	
-Transfer-Encoding:  		 	,	 ,		 	    ,` ;Tb0  	 		="" 
-

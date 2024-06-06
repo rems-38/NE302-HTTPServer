@@ -1,7 +1,0 @@
-c ///pa/6?cEG HTTP/7.4
-Host:	 	 [::679:6:F:8:E:245.251.2.6]:16688  	 	 
-Cookie:	  	  		K^^!QK_GmR="f"; %yMXL=H; 2=""; 3XJ.="Gc|d%11D%>=L5"; I=""; y+%S8wDc5^E="*!D3"; HV=&?l[GY; RL="4"	
-Content-Type:		3/jQT 	;5d^UY'7pW="\[\ήνµφ\ζ" 	 	 ; 	+-QoonO=R;Q=a			 ;				!hc=""		
-Host:[::2:1:AF:1:AC1:5.201.208.254]:916
-Host:[A::]			 		  
-

@@ -1,8 +1,0 @@
-MHjl /QJz3%F5/%6Ea/%33?v HTTP/7.0
-Transfer-Encoding:	 	 		  	  +		 	 	 ;*dp4uE~ZDmcv2  	  =		   "";`cF4.V$`wJFxfVXj	 	= 		"";		  R3.					  ="\Ω\“";6SL	 =	 	 			"\‰ßZ\9"    	; 	G3*+P	= 	  	d7#ML 		;	   X^r	="\˚\Ë\•x9–Åø\+\ÿ\ß\Ä¢µ"  		   ;  			 7#Wx16	="",   	H+*N,
-Expect:100-continue		 		
-Cookie:  	   Xl=""; Ybv_.-lOh6N449.="1"; +KqV&P9ky="sD"
-Transfer-Encoding:c4D-		 ;apxZNiTi-NTlJ		 			=	_+N2bFLrQ9XgN$NJ	;C	="" 	
-Transfer-Encoding: 	,		,,	, 	V~VY6U|VL6 			  	 		; 	  qzIp~r	   =	 	 	"\Â"			 	 	 		  ; OVXW~ =	 		 	""	;WdHXh =	 		"";2x'.nyTf	 	 	 = "\¨Y\*è\=\º"   ;wA7woT*i9O-S3kL`GY*npv5qN&= 		"t"		   	 ;			  	4	= "",			 chunked 	,		 		 	, 	  W 			  ;  	  	 rEA5#^Z		  	   =    	 	"£˝\Áu\ú";x#Si    	=	  "\µ"   	 
-Host:[::CD:0F:4CE:4:3:0.211.253.245]
-

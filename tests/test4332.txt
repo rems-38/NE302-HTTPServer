@@ -1,4 +1,0 @@
-f-o //%AEAYR%3076LB/q/%CD%FF/d:(/T/A/ HTTP/1.6
-Expect:			100-continue	  
-
-ªu

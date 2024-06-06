@@ -1,4 +1,0 @@
-v4 /Jw/?)&5w HTTP/0.3
-Host:  	 [4::9:F:D:30.185.254.129]:4
-Connection:	 , 	Rn			
-

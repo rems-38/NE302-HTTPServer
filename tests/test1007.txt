@@ -1,5 +1,0 @@
-f /X&/42?r7 HTTP/0.1
-Host:  	[::6:3:C:37F:145.236.9.227]:011      	
-Connection:,			 	FBdlC  ,,lgat	  						  		 	, ,S		
-
-=`

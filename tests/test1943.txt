@@ -1,9 +1,0 @@
-MSWTm_vCC /V4/%A2x/ISB?LD HTTP/3.1
-Host:		[::5.254.91.74] 	 	 	
-Cookie:JI^_-JEUnQ7Pv="$|/"			 		
-Host:	253.3.5.144: 
-Host:[v3ABE5E8D5ED.V]:3631087	   
-Cookie:      |HC9|bl!=""; S&="/d"; ~+="0|"; V3m="(}#"; K1=; 6p="P"
-Transfer-Encoding:	0e 		 	, `3vz		 , 			 	
-Transfer-Encoding:kwMJE&; 	 H = 	  	"\ºﬂ\ñ7" 	  ;		 	.  ="p\\\¢\æ\óå\¥"  	,		 ,z5 ;  g	  ="ù\{d"		
-

@@ -1,5 +1,0 @@
-4 /?I HTTP/7.9
-Transfer-Encoding:	  	 				 , 				 	 	 		 	  	,  ,,		 	,, , 	 			,  ,		chunked
-Connection: 	 	  	,		,	    ,,	 	,	,  	, o 
-
-Ó	»

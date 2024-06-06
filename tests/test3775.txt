@@ -1,4 +1,0 @@
-MSyhe /, HTTP/4.1
-Transfer-Encoding:	,		,		 ,deflate,	 
-Connection: 	 	,,	,	u+	 	   	 	 	    	  
-

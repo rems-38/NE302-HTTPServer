@@ -1,5 +1,0 @@
-B /k%5B/Hdo?%4BQ HTTP/3.2
-Cookie:	   Om=@C; z5=2?; Y-=
-Host: 226.7.3.132:
-Connection:  	,		k1 ,	    			     	`O+	, 
-

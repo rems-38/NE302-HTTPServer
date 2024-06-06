@@ -1,9 +1,0 @@
-6kQ-63 //Il/BQ8/%8D/ HTTP/1.1
-M~E: 	 	Zy     	 øß			 		   			 		}V"…	   		ÍZQÆ
-Host:	[::70:3B:A:0EE:79:36.85.4.48]:2
-+:			Ú# 	 	   		…yËY  ¤æ	  «E 02					¤ç~ƒ	 ¸}	=‰£	  				   	 	   		guK 	  	 	 
-7Azo: 			H	  	Y¡¬		  		BÔ	;
-+:	 	
-Transfer-Encoding:	`+H		  	;#p#&p	= "\'ø–ò"	 		 ;w5		 		=	  "";   H5`F$	 	=  	"‚"	 ;		` 			 	=   	  		 	 	"L"	,  uic^$5_
-Content-Length:	  51466840	 	 
-

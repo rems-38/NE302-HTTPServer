@@ -1,4 +1,0 @@
-t1g /a/m HTTP/1.6
-Connection:,		 		,,	 ,	,,			,	, 				,	 	 			  	 ,,			 	,				 ,	 	 ,   guyD_Xe,			,		 	 	 
-Transfer-Encoding:deflate	   ,7l2N~t  	;	 	 	Q6ak=	"Ô\3"  ,	 Dc8 ,,G3f+ ;ADnC			    = "L\3" 	 	;   pgd = 	  	"1";	 	aaFE#'+			  	=			"®"		 ,,			U.n		;	.m2V3xT2			=  	 		"0—«\Zt"		 	;	    ~	 		=			"u",  	 	 		 ,  	   ,			 		 	  2z	;	 			|= "ò\ž\ñ\ûZ\Ú\ö"   ;fNy 	=""	
-

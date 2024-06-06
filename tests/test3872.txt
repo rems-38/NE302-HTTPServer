@@ -1,3 +1,0 @@
-2l /d%C1%CAl.CBoJ%80/i HTTP/2.1
-Host: 	  8.252.209.3
-

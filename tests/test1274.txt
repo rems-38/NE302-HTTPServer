@@ -1,7 +1,0 @@
-w /? HTTP/1.6
-Host:  	 	 					 		 [::0:1:228.40.144.48]:8913	
-Host:		 	247.204.252.233		 
-B:		 k 	 	y[«				 	(4 			
-Content-Type:      T4h88'v/lwdJbz;				 		O%cYw^UB="Ê²\™M\d/\á\e\#"			  		;  yp`.f7jl_+4L~g="Ý×\âh\e\¼" 
-Host:	 [::07:B:E:8C:9:232.8.66.3]  
-

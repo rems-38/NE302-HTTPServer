@@ -1,3 +1,0 @@
-fn /X HTTP/2.4
-Transfer-Encoding:,				 	 		 #h~t#		 ; sW  =		"ù\Û" 
-

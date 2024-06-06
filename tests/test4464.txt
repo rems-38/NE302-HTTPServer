@@ -1,8 +1,0 @@
-|V1G /tcZ/p HTTP/1.8
-Host:		[5::B:860:2:CF:9.9.6.52]:9  
-Connection:,  ,  			 	,	,	 	 ,A-y1K	,,	   xO~,  				  
-Connection: 				    		,	 -ITk ,',	,  .pi,,_ivgL	  ,		 
-l|:	  	 L	 2¸«  Î­    ù 	      		 
-Host:[::F:2:FDE:F4CA:F:4.204.211.51]	
-Host:	[v1470F1.Y2M1en]:5942083
-

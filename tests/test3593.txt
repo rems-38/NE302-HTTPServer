@@ -1,3 +1,0 @@
-r5b //Kw HTTP/1.1
-Cookie:	 		Al#="'p"
-

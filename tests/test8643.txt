@@ -1,6 +1,0 @@
-oW /ghT%E3//Ga%FA4// HTTP/7.5
-Host:	 				 	 	3.52.213.158	
-TCRV|_%`$:	p÷	
-Expect:				  		 100-continue 		 
-l: 	 		 		
-

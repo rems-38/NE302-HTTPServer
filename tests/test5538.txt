@@ -1,6 +1,0 @@
-S#%b / HTTP/6.6
-Host: [8::68:27:F:71:5:7]:60321173  
-Connection: 	 ,  	 		,	  		3Vwh,#Jz	
-Host:  		[B6FB::14.97.16.93]
-Cookie:  6n.8="B"; C8z~aE=eo; oYooJg=I
-

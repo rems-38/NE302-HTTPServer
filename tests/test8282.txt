@@ -1,9 +1,0 @@
-6RF /?%F5r HTTP/3.6
-Ky:		
-Connection:,	  ,	 	 u 	
-E: 	 
-Host:
-Host: 	202.201.94.6	  	 
-Host:  [E::B:25:0:3]: 
-Host: 			[62:F9A2:792C:3:7A:93:239.5.206.15]:32 		
-

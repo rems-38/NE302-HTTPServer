@@ -1,6 +1,0 @@
-Z //-?Z%BF HTTP/4.4
-Cookie:  S=""; u=; ~=; t8C.m="]" 				 	
-Host:		  [4::F3B:3:7C2F:D7:5.5.230.174] 
-Cookie:   _|e!.XtgL=""; 9^="??"; Ezx2v'="LfCy!W1KtQ|Fc@pDFalf%a"
-Cookie:			 	 0UU=Z; g=l; 8=":4PmS<G"; k`h32=""
-

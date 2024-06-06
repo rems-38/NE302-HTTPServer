@@ -1,8 +1,0 @@
-8HIH //&Qc+%D0BW/%58%164%AD!%06%BAi%AC HTTP/1.0
-Host:  [4:D35D::06:F81:58.98.243.1] 	 	 
-Cookie:#tuYLBMh=`   
-Host:		235.124.2.109:	
-Connection:,,	 ,		   ,, ,    , , 		 ,	 By| , r,	 	 ,ksy&DJH,   	     	 		  	 
-Transfer-Encoding:,,   , 	 `Y5		  	 ;CS 	 	=		 ""; 4		 	 =					 	    -;  |%	  	 			 = 	 	""	 ;  G2_ =	"\!" ;HLMldJ=  HI	;w	 =  ""; 	Td'-lD_!	=		"\Ýù~\=g#<\N\â"				;    	 eQ= ""  ; 		e|'v3 	  = 			 	  1$A' 			; 	 VZDa8		= 		    "\¶" 	;*	=	 		 						    "Ç¬§\’\1",  		 		_hK;		 		LIo	   	=  	 		  "\S\Û\4\·\Ú\p"				 	  ;I	 =	"\¾\þ"  						;  	Z				="=Ž"	,  	 , 			 z	  		    ;	  	 F=  	  	"Ä"	 			; 				 	 		 vt4	 =     		BD&_szC!1 	 	  					;	  	 1hfkn 		 ="š\ë"	 ;  v%w 	     	 	=  "¢½\¿¾\Î"	;  	 	Zqw*bqE7#8KzX5	 	=	  Nnei;5  			 	="\9" 			   	 		  	 	;gu'&%9Y`a  	 =" "	,
-Transfer-Encoding:		 		 ,,,   ,	,	,	 ,	,		 	 		,	  ,	 ,	  	  , 	 			 ,			 		 	Bcaj   	 ;  R63MM =""	  		 ;	 y		 =	  	"" 	 	,	 		O^20wNs ;	 1P    = J;			  5		= 	 3J 	 	; 	 MbLuZ#pG	="Ûž"	   ,K ; 	2= ""  ; B9rl  				      =			 		"\J\t" ;qU-^|I 	 			 ="\Â\¼ê"  ;	9|$tq   	 	="\€Y\–Ì"	   	  	 	  ;			X0~O*7-R="\7\u\¾\nº=\_£ì" ;	 		 uY#  =	 		"\j÷"	 ; R9Zv="\,B|*"		;				+Y	= 	  "\`ˆ\¦\ð\ü\¡\b\ö"		;				.1L 			 		  = 		""   ;|_p	  		    	=*^;	 8pTw   	  	="";    		  	  b   	  =  	"\á\Ë"		 	 				;	  	*j	    			 		=	 	 		 	"" 		;oUJ.!VGU =	"\\aEî„" 	, 	  	,			
-

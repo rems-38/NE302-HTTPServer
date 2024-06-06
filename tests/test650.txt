@@ -1,5 +1,0 @@
-t /-?+!%74 HTTP/9.9
-Cookie:	a=""; $=i; G=""; R=rA6; 2=; D="a"; XsM15cjHsN=*; *4z="O6"; vUkf0oXb0~^="iJZ:"
-Content-Length: 	6		
-Cookie:#="Q>"; 8_="0!"
-

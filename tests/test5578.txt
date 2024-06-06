@@ -1,5 +1,0 @@
-Y`l`9 / HTTP/8.1
-Transfer-Encoding:,		 Q|aWPUV-h$3f	;  	o	 ="\3\ﬁ\ûm\,\W±\ù"	;	 ODpS8WPs	=			  		"\‘øÄ\ê\ó\Ã\Æ\àCnÔ"
-Transfer-Encoding:,	,	 ,		 	 	  ,			,,	bH#e  ;9mHckI23FWh= 		 "À"	  , 	 	,	  	deflate , 		 6A|jVcst-;E	 =	"ª" 	;			    8T=    	 		 	"";		    gE|es_U+y ="\í§"	 	 		
-Host:[8:E18:C7::5:07:10.8.1.105]:7749175 	 	 	  	
-

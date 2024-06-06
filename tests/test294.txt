@@ -1,6 +1,0 @@
-i /9/W%B2/HG HTTP/6.8
-Host: [::254.45.250.5]:5
-Cookie:	 		L=XsVyI; dp=54b*; U1=
-Host:1.6.6.254:9646185
-
-i

@@ -1,8 +1,0 @@
-~o /S HTTP/1.6
-Host: 		  	  [vF6.979=g]:     
-Cookie:		 	 aV="C=lyPdz"; u59WJ=qf.wAF; -1sH&BpvJMdM8YS="jjm:cv@R@W{OwZh==it"; B=cHjTq$q; 0ure6TE=DO(; &AeAh=[f63I3:; sNoMt=z)Xw5		  
-Transfer-Encoding:		 ,	 	,, 	  	, 	compress  	
-Connection:  			 	 		 	 	, 	,	 	 	 	  	  , 	   	  	,,  ,, ,		 	, 		 	 	,,,tvXX 	 	   ,7jpR,	 			  	 aj7   	, 		,  ,  C	,	  	kd2	
-Cookie:		 |51a#Z.f3="-"; 2w="u)l"	 			 	
-Cookie:0t="{oEq"; T=""; _xbF="U+["; .94wRL=""; C=!}; .r32jqrVWF=f:@JK@eh	  	
-

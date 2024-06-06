@@ -1,4 +1,0 @@
-s /%3E%69? HTTP/1.8
-Cookie:		`%!0=""		  	 			 
-Connection:		,,  	,,	 U ,		   		 
-

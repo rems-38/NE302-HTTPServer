@@ -1,3 +1,0 @@
-$rt$&' /?$ HTTP/1.6
-Transfer-Encoding: ,		   ,,	,	compress,	,		 	 Rb8nnB
-

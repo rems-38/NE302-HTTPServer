@@ -1,4 +1,0 @@
-&V /,?oFj HTTP/0.6
-Host: 					[05E:B:3:5B:C:B250:118.1.45.78]:2712   	
-Cookie: CaEJu="K"; rfwbmf=; 5+PlMX7u=w{; Ac-fKq=6&M; _=; B=; Zk0aL`="sL"; D`D="Kc"; ^=>M2#
-

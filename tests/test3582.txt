@@ -1,4 +1,0 @@
-D /1/%02*:uv HTTP/7.9
-Transfer-Encoding:	  	, 	, 	   ,	 	,		  	 ,		 			,   ,  	 		 	,	, ,   	 	  		 ,	,		,	 	v3,
-
-ý

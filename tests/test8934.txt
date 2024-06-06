@@ -1,4 +1,0 @@
-2 /d;R/LaW0?3%1BjbPPxJ?%73@:%B8cpI HTTP/1.6
-Host:  [2:8:9::158.20.42.4]: 
-Connection: ,			 		,	      		52%,      	
-

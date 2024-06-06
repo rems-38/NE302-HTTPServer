@@ -1,4 +1,0 @@
-! //v7VywCm HTTP/5.0
-Host:	11.19.47.15   
-Content-Type:	rLVN/X    		;#="\v"	
-

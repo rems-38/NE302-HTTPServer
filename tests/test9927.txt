@@ -1,8 +1,0 @@
-lv //St? HTTP/9.2
-I:	 ‰ 	  ŸA  			    	 SE	
-Connection:  ,  ,	 	 				  ,	M ,	  	V&CPrzLCca-  
-#: 	<î 	ß­	   	ž7   			 		 		»ªë					   #	
-Cookie:   					WH+=; .wD="HI2"; %.sK="="; 0plTx=RBr?; I6w=">e#:hP["; 0="o"      		
-Host: 	 	 		[48:D:52::45:252.127.247.112] 				 
-Transfer-Encoding:		     			 , eU ;		 X^xf7	 	=	"ì" ;  !wHT5wObItBp8I-VP	=  		 	  		 "{" ;Ps+WFd'	 = 	"\m2ˆg\þ½Ò†"	
-

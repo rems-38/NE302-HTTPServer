@@ -1,7 +1,0 @@
-$Q^w /%DFa%BB?h HTTP/7.6
-Host: [::5:FF1D:5.247.215.9]	
-Host:	 214.129.8.250
-Cookie:				.VCm=:VuaG|; .r=i; sjQY+|=S; 9=]lR}6; #a.="]-=ye"  		
-3:	 	    		 	  	  	 	
-Host:  	 		 9.0.222.167:3
-

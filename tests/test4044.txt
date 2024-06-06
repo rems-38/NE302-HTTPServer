@@ -1,6 +1,0 @@
-BP|t0G /N%C88u//b?UF HTTP/4.3
-Host: 				225.0.247.224:9 
-Host:	[4A::246.151.217.236]:62 
-Host:     96.157.250.0	  
-Connection:,8-kvN7	
-

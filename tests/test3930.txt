@@ -1,7 +1,0 @@
-C+ /*%2E/4/ HTTP/7.9
-Expect:100-continue
-Cookie: x~dg8't6="Un5M%"; GYl^+$2C="}"; +|t=1X0; 2aRxt=`>F
-Content-Type:  1/FN-		 
-Host: 215.40.253.255	  
-A:     
-

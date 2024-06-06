@@ -1,7 +1,0 @@
-B /dx/?&%6C%70 HTTP/5.3
-o&Cn:³ 		
-Host:	 73.103.254.71 	 
-Connection:	  , 	 	 	 	 	,			,	 		,b  		   	 ,		   		pX`X	 		 	 	 		    		 	 
-Content-Length: 2	     						 	 		 		  			
-Host:  243.78.73.231:61
-

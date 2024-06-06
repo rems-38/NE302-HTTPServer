@@ -1,7 +1,0 @@
-I^W+wp ///%C2,c%9E6%16E?%54o06a%42=%1C-=? HTTP/5.1
-Host:  	[9:EE:0:F33:56:29:6.5.8.50] 
-Cookie:BU*=|m; OXN#rcB#=""; 7l=Tr8; .seeO=]x; #sq+hKnnI="" 
-Host:	[2EC:0FC6:1CFB:3:2:1:167.6.208.250]		  
-Connection:P~,	 , 	 	 l_Wa#+u	
-Host:			 212.8.7.0:868  
-

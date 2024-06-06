@@ -1,7 +1,0 @@
-OPueg /8/Cn/M.;n1bM%92':S HTTP/4.5
-Host: 	   	[708:D94:EF::C0:F:28.3.41.67]:5  		
-Host:				 	[A:F::F:106.21.73.2]:3 
-Host:	[::F:B0:7E:41:1:90.218.6.159]
-Transfer-Encoding: 		 , 	,   	 , 		 A_mq	
-Host:205.94.50.32	
-

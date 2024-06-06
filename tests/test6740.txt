@@ -1,5 +1,0 @@
-z /4Cmo/ HTTP/8.9
-Connection:		, 0hU6 		  	  		,  	 	 
-Host:[::BF7:3D:1B2:3:8:204.255.14.255]
-
-Ë

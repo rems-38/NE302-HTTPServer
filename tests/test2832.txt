@@ -1,3 +1,0 @@
-2 /%4Ap1yO/M!%DB//_/? HTTP/9.5
-Expect:	 100-continue    				 	  		 
-

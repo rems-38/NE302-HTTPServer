@@ -1,7 +1,0 @@
-M //ME HTTP/7.0
-Ov:  	5  	  W
-Cookie:  					mOfui=""; 6P^=Mb6K'[cv@			 		 
-r:	†    	   		 	‹ 	
-Expect: 100-continue
-Host:  ot:62
-

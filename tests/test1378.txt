@@ -1,6 +1,0 @@
-_ / HTTP/1.5
-Connection:		 	 	 	mOz 	, 	!*H	  , 		 PZ  , ,,	^jk  	  		,	Fe 
-Connection:	m	 	 	    ,   ,			
-Cookie: 			3py'0N4="v`?g"; 8Ti=_m; &``=_>; Tjgg0o=K@3u; x="DVgq{dU/"; z="<e_AP"; DcA*l+3=(Uj; qDyeR9u56w|Unjrl3=ht_; bu="'+'=[Wm2dX"; !k=+.	
-Host: [5:7:7:8:9:D:255.65.0.20]:99719	
-

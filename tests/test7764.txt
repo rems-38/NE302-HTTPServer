@@ -1,6 +1,0 @@
-p8 /Ew/Ftp9m%AB%35/ HTTP/1.6
-Connection:  ,,		,,	 ,	  			  ,  ,a$		,	 , ,	req.,	 			qV#!			, asSy	  	  	,	,
-Content-Type:C~py/.   	 	 
-Cookie:	Mv297e=""; w3b9=""; A-4=; Gr.DC="T**TC/n)#=^g.1~pwR"; t=""	     
-Expect:		  100-continue	 
-

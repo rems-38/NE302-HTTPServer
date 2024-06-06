@@ -1,3 +1,0 @@
-+ /? HTTP/5.3
-Host:  	  [vF..QZH+SOqL_k]	
-

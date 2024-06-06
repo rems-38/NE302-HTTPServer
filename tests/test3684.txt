@@ -1,4 +1,0 @@
-YRV /sz/r) HTTP/9.8
-Cookie: 8jbwsiw%f.X="l"; X="u"; t=""		 		 
-Host: 	[4:DDC2:C8:4:B:1F:83:8]:300								  	
-

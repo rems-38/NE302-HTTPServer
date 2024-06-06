@@ -1,3 +1,0 @@
-W /t/%ADE/b?'Z HTTP/3.1
-
-T

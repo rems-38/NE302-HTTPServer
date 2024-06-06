@@ -1,3 +1,0 @@
-I /Hr/v HTTP/4.2
-Host:				[v44D4._]:	 			
-

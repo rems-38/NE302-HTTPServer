@@ -1,5 +1,0 @@
-BVK /C/dw HTTP/4.4
-Transfer-Encoding:	 ,   ,  chunked	  		 ,c	 	 , 	  ,,ofk		    ;					r= 	 	+` ,  deflate 	     	  	 
-Connection:  	,		  ,		,   				 ,,	 		   XAr ,	, YFp,
-C9:  	ì	 	+ 	
-

@@ -1,4 +1,0 @@
-CLk /TL(I/?wq HTTP/5.0
-Transfer-Encoding:, 	,, ,,  ,   ,,gzip
-Host:	213.60.4.251: 					 	 	
-

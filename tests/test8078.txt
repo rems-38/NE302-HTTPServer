@@ -1,7 +1,0 @@
-4zFTmow!4s52rYVv6j10n9 /0pv%3EXGuax*IKl/US/a%C9M~dK%7F~%6A/nukG6r_? HTTP/4.1
-Transfer-Encoding:  		,	,  	compress,   	  		D%DX;	 	 	z="ž\½\&";8=  m-|1z^qeB	 
-Connection:,  		 	~m		, 		 xbA-J  ,+B 		,,c	 			
-Content-Type:	  	 	DH/7WM	; uGQ="\¼"	  ;		  	!1b="o\Ýz" 			;  		K1="\‹"  	; 8*u="Î"
-Host: 	 [6::6:737:7C4:6BA4:75.255.5.76]:533    
-
-…“

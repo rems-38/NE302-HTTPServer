@@ -1,5 +1,0 @@
-!va#CA /LD8t%50-%4Bl%7DR HTTP/3.5
-Content-Length:	1609		
-Host:  		[::B:4C:0:05C:245.61.253.8]:596	
-
-4

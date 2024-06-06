@@ -1,5 +1,0 @@
-%VS /ju/Z/.4%FF, HTTP/8.6
-Host:250.30.251.1	    
-Host:	    	[vDC5930ACCBF.5w;&]
-Host:[::D:1:CC:9:5:161.4.201.7]  
-

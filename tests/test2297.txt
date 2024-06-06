@@ -1,6 +1,0 @@
-spOo /m/?B HTTP/1.3
-Host: [vDB3FC9EAFEF0.!]	 		
-Transfer-Encoding:,, gzip 
-Host: A 	
-
-N «“?q

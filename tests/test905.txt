@@ -1,7 +1,0 @@
-|l //7/%10Bv(ei;-xv/yszd HTTP/9.0
-7Z:		 				ä ®.	
-Host:[::3:5:FF:D:86:8.242.250.175]:5   
-Cookie:    	0=""; FDsipJ=""; *=""    	 
-Connection:	, 	S  	,	$f			 ,	 5CEC4    	 		 		   , 	   	,	  	 ^D
-Content-Type:3F/PvH#		 	
-

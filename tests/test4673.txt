@@ -1,5 +1,0 @@
-$gS /G/%66-2 HTTP/7.9
-Host:   		Wwv1ecSDM67
-Host:  	 		  	 	[::1:F:C]
-Host:3.25.47.104
-

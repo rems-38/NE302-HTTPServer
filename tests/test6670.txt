@@ -1,9 +1,0 @@
-^VZOT //sT5$$x%87%DAplW///%FB/&3$Y/H%6DFJ0g(%99'/%0B%52/fxT%7D;+iwSTqy/%8B14//Tgm%85F//;V%C4%CB-NoHPmk%B4LA1n2 HTTP/9.2
-Host: [::F:43D:B2:F70F:5:214.9.5.3]					     	 
-^: 	
-Host:			126.97.235.101:7
-Host:  	73.0.250.168 		 	
-Host: 244.255.1.2
-Host:  [B071:277:98A1:5:4B:D20:71.77.246.0] 	
-
-/

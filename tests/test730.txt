@@ -1,9 +1,0 @@
-E8yx3JA1i ///h/7z/38%C1)3K/,)u%3D//W&89E=/y9(;%0C/2+/g-%69%EB'Y//Wt$/ HTTP/4.2
-5: 	 		 
-Host:			 [C:A0:17:BC:A0:604:5.254.7.99]
-Host:   			   	 [v88.MjNI]:462
-Connection:	, 		,	 ,~  ,,		
-e:	  µ	,   
-Transfer-Encoding:, 		 	,	, ,m 	 	 		;		 	 	   	 	 		 W2	=  	  K    ;		    	 			u9U4	=		  	"\3\¢8S.]"	;					  	 	C+Erlr-I		=		"\H‹D";  		   uF0*   	 ="s"	;~lB	=x 	 		 	; ^3=""	;			  	 	 		 '5`-gjw&a  ="hE\+ç\ï\×å\‰fd\S'"			,  	   L;	ln=  		 	 	"",G   ;I8c 	 		  			 =	  	"\Å"; ^="" ;  	DL						=	"\5\‰\aœ\i"	 ;	 &		=	 "Ý\xAx\Ü"	 		,%xYw!;  			 ^lS*kI		=	 "\Y"			   ;  Zkb 	=	 "\U+¼"  		;	  lmo$ =		 	"\à)i\ÿ" ;t_sA =M	   ,,     		v~		 	 	;  	 		FE 		= 		"\š\K´\“\I"   	;	 	 	  Sx=	  ")"	 ;	 	 		|="å·Æ\½1·"	    		 	 		; 	 Xy6 	    =  							"ý" 	;	l7qHUlqrYL="\úè\0\ç=\Ýp" 	 	;Gq=""		;	 	^E=   "\*";4yW=u
-Transfer-Encoding:, 	   	,, 	,,, 			aEO%zWes+'H,K1    	 	; 	 	 ~D  			 = "úGY\A"	 	  ;w       =	   		"\$"  ;	 	 			7QQcRG|="\Þ"	 	; rIGfd&Q$m  =	 "\áâ¾" 	    	 	 		 	; 		f	="ò"	; 	 %^Yx_fR$#	   	=	"\¢"			 	 		;.		=	    "ÎÊÈ", 	 ,	 	 		  	 , 			 	  	   	, 6b4W	   	,   chunked ,	      chunked, 				,	  	 ,   c	 		 ;  		 	L 	 =		"\$w`>·V\l" ;  		J			="â»\z"		; +IkE2l1XA'=           "\$\Ù\È" 	; 	gY		=""    ;         r			=	  	0+t^e$ ; 		 7RUk	 	 	  	 	="´Zµ\k" 	 ;		    Lg|					  ="¯:\Â\p\"\Ô\Â\”¤\ß\ƒ";80747e		=	  "\u"	 	  		  				 	;  a#fWVk	=""   	 	 	
-

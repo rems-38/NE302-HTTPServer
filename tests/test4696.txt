@@ -1,6 +1,0 @@
-ljK / HTTP/7.1
-Transfer-Encoding:	2
-Host:			 [69:E:9F:ED7C:CFF:5:231.253.212.46]:369	 		
-Connection:		 ,,	!RMli.xBab$  	 , 	 		,	 		 				    6Y!7.w ,,		 			    ,t		 	  	 
-Host:	GZO=N':19	
-

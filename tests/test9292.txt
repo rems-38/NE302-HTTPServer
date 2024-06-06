@@ -1,4 +1,0 @@
-it8e //K HTTP/2.0
-Content-Type:	 		*/_ 	
-Host:[::E:A62:6:59.8.251.235]   
-

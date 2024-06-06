@@ -1,4 +1,0 @@
-L /%84 HTTP/4.6
-Host:					 [vC.Op,]:2006 
-Cookie:e6="vy58"		 	
-

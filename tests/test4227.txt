@@ -1,3 +1,0 @@
-b // HTTP/7.7
-Host:			[v5CEC.CX]: 
-

@@ -1,6 +1,0 @@
-Hy /_B HTTP/1.0
-Host:155.241.8.194	 				    
-Cookie:	 	  	-S$="Q"; t="b~<&$XXwu.%<f|&s7iJ"			 
-Host:[vC1.TNM6GY]			
-
-Z

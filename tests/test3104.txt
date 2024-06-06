@@ -1,7 +1,0 @@
-x|'MR /%A6%F0y?Tul: HTTP/7.2
-x_:	
-Host:  		 [::2:FF:9E:D:7:FB:E]	 	
-Host:[::C:251.0.193.215]: 
-Cookie:		  	  						+=">ACYmmsT]q"; qs`i=; V#=""; 7%%10=w; U7=k471RV)`hN~; W=; BGBjt="pFKN"; e^="p"
-Connection:,	 	   	     	 ,0GOquIMNn8ME, 	 	
-

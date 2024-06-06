@@ -1,9 +1,0 @@
-s /y6/P HTTP/1.0
-Host: [vA914A.kq2D:b_+pRVdP] 	
-Transfer-Encoding:,,    , %8oSq 
-I:	 ˜œjÇ ·	 	 
-Connection:%_xKG9C	 , ,-GfL,, 'fluT5Udc^G	 	, Pt
-Host:	  251.38.254.6 
-Host:	 	250.232.220.7:	 		 
-Cookie:	 	s|'a&H=JZ)zT(j9; &=; !="*V"				
-

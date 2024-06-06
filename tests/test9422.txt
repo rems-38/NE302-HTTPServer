@@ -1,4 +1,0 @@
-qR / HTTP/6.0
-Transfer-Encoding:	deflate,
-Connection:  		 ,,  	 	 		 		,, , , 	 	  yvzl	  
-

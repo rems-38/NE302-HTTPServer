@@ -1,3 +1,0 @@
-wbI /%6Az HTTP/3.1
-Host::	 	
-

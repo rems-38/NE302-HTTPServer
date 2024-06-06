@@ -1,4 +1,0 @@
-a_U$ / HTTP/1.2
-Host:				  
-Host:				 [::B:1:2] 		 	     
-

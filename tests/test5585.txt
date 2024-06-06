@@ -1,8 +1,0 @@
-A^rdja# /A HTTP/4.3
-Cookie:		0="C(kE"; CL_Dv-5pn.=":lf"; 0k=o9IL; r=""; 1=""; +X=.]t%TqKH&r%)^M`#e)>yR]
-|Gv:			 	 	' 	 	8¡ 	Ωfÿ 				 	
-Host: [4A::0.128.251.229]:204 	 	  						 	
-Host:			s6%27j(C;A6uAN2KA3
-Host:	[3:F5:D:3EB8:5:CC:214.67.23.169]:	
-Transfer-Encoding:  	 	,		0n; OV!8	=	    	 "lìÅÇ´"	  
-

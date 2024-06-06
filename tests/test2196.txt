@@ -1,7 +1,0 @@
-L /2Y HTTP/3.8
-Cookie:	rj="+Io"; t=zObk; SW=6A; CJYX="zL"	
-Connection:,	      #   		  	, ,, jJ  , +N$,		  5			 	, &*g   	,	 	 	 	 	  QZ61*_a ,	,	 		 	 		   ,   			, 	 , 	 &j	 	
-Host:  [132:421::7:8.177.2.61]:602100161   		 		
-B: 	 	 Ö	 	 ¢	  
-
-Çjç2¢I

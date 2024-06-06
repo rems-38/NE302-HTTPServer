@@ -1,4 +1,0 @@
-.YVp ///!k?( HTTP/1.7
-Content-Length:548
-Expect: 100-continue		 	
-

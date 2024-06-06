@@ -1,4 +1,0 @@
-q /?nie*s HTTP/3.3
-Connection:	 	 NXbUsIxM	
-Host: [::C:82.5.162.47] 				 				
-

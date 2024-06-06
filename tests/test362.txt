@@ -1,6 +1,0 @@
-m8NH%tURY //6)Gt HTTP/4.5
-Host: 	  	 	 			 	[::FFD4:6:78:5:197.255.178.13]:993  
-Cookie: 	  U="d%)_["; N14gGvs20="e=-"; lop3F5D="Sm@1"; f|=""; *GrV-lLhfqa6=; !="oK~KOj"; tz=u)9
-Transfer-Encoding:		,			    ,zIq9	,	fZm5  		 
-Host:	   [6:B::E0:4:FC:73.213.254.84]:		
-

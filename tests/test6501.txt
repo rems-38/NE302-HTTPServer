@@ -1,5 +1,0 @@
-oo / HTTP/8.5
-Connection:	 	, 	    	     , 		 	    	     	 	,	,   *Y|
-Host:
-
-p

@@ -1,8 +1,0 @@
-e // HTTP/5.3
-Host: 		  	[::858:5:DAC2:7:8:74.227.3.238]:017
-Content-Type:   c+7L8-/m1sFUBNsmk  	;%dv="\0"	;	  m16B="\ê"	   		 	; RPd*="Œ\6Î8\³\Â" 		 ;	 	 	 		 Yq=&2s##e-7	;C="Ç\şk\ğ\bqÈ"		  ;icH="\¢\è"  	   ;`a="W_²\R";xM="İ";  				  n+e*aO'9rKIbJ=62   
-Expect: 100-continue
-Host: 	18.4.251.251:9  
-~3f#`: 		 	 	 p	  	 û¼		x6	  		  		  	ø		
-Host: 	 	253.249.0.218  			 
-

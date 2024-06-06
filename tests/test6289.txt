@@ -1,5 +1,0 @@
-u$D /FsK?:%70'@+q HTTP/4.8
-Host: 			  [2F:3::BBA:5B:D:2.250.254.0]	 		 
-Host:   	 2.214.52.4:25878 	 
-Transfer-Encoding:			 	, ,, , ,	,					  	, 			,   		  	   _W ,	  		    , 	 	 			  	  rVS_PS~mqYsQgkN3*R
-

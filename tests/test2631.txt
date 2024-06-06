@@ -1,8 +1,0 @@
-5F //wQ:-$k%CF(%FEvb?8hQ2)xu8 HTTP/0.0
-Host: 236.2.218.95	
-ME:	  | ‡ö	©  		
-Host:	   [6:EBFD::1729:3:81:47.253.118.24]:86135	
-Cookie:	    zp="3$"; *+mtc$="L}1v"; 8W="<"; |=`Tz; rKIfP9D+l="sy"; 5ZipcPB="yPdZ_/Xpa(mh"; dq6yEdWj*f8pU=""; 48K="9"; O=}f; uA1x=$XJ<; p#= 	  	   				  
-Host:	  232.1.3.250	  
-Transfer-Encoding:  		  	 	, ,f			;	 K7S			 		=	"\o";N% =	 	  "\Û\X\Ç\O\¾‹\V\œ\["	  	,	  Js,			  ,  vim#H';XY="",  
-

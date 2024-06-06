@@ -1,8 +1,0 @@
-+l /r HTTP/8.7
-Expect:  100-continue 	
-Host::5
-|:¨À»­	 	
-Cookie: 	w=""; 8_&9HB^=@a/w_HO}N84Vs(DX   
-Host:   %0Fi:506	 
-
-Î

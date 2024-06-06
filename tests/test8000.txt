@@ -1,7 +1,0 @@
-Z /4Ww HTTP/7.8
-Connection:	6	, 		
-Host:		 [::286:C8:0.9.162.204]:7
-Content-Type:	nr/R.H!S4J		 		 	
-Host:[21:77::0:6:6:201.5.11.9]	  	
-Host: 	253.221.35.33
-

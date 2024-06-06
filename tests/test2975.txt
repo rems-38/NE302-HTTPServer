@@ -1,4 +1,0 @@
--+Y /M%4C%54B///?S HTTP/7.0
-Content-Type:'$A3v/$6F5qFr6E
-Host: [::0:52:C:8DB:6B6:3.4.204.46]
-

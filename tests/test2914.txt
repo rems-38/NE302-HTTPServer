@@ -1,8 +1,0 @@
-|C&qomDtAM /%EF HTTP/9.8
-Host:	  		[::0F:9A:1C1:2.255.58.89]:	
-$1pK$6:					 				   	  
-Transfer-Encoding:,  	,		  	,   							 ,  	 ,	  		 ,,	  	 ,  		  				 #		;     	  zm7!mGk   =	"ê³"
-Transfer-Encoding:compress 	 , , 	
-Cookie:	t3O*a="@6" 		 
-
-(}

@@ -1,3 +1,0 @@
-- //%B56G/ZuKq/S~Wvocy HTTP/2.0
-Host:[81F1::D:8]:59
-

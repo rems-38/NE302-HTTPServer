@@ -1,6 +1,0 @@
--*N+$mb //7YU//N%7F////6qGa;tc*KcZ? HTTP/2.8
-Host: 		[::E962:7:9A:49F:53:244.113.254.228]: 				 
-Transfer-Encoding:   			MT	;	  0O=			"‡Šu"; p="\kÝ",	compress		,	, 	   
-Host: 	[::4.43.252.79]	 	
-Host:	  [::D:86.255.7.231]:72  
-
