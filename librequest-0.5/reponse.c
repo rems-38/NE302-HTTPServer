@@ -46,6 +46,10 @@ void freeTable(HTTPTable *codes) {
             free(codes->table[i]);
         }
     }
+    // for (int i = 0; i < codes->headersCount; i++) {
+    //     free(codes->headers[i].label);
+    //     free(codes->headers[i].value)
+    // }
     free(codes->headers);
 }
 
@@ -233,7 +237,7 @@ char *message_body_from_STD_OUT(char* STD_OUT_txt){
     while (j<2){ 
         j=0;
         while(STD_OUT_txt[i]!='\r'){i++;}
-        while(STD_OUT_txt[i] == '\r' & STD_OUT_txt[i+1] == '\n'){i=i+2;j++;}
+        while((STD_OUT_txt[i] == '\r') & (STD_OUT_txt[i+1] == '\n')){i=i+2;j++;}
     }
 
     int taille_msg_body = strlen(STD_OUT_txt) - i;
@@ -512,7 +516,7 @@ int configFileMsgBody(char *name, HTTPTable *codes) {
     return 1;
 }
 
-int getRepCode(message req, HTTPTable *codes) {
+int getRepCode(HTTPTable *codes) {
     
     void *tree = getRootTree();
     int len;
@@ -606,21 +610,21 @@ int getRepCode(message req, HTTPTable *codes) {
 
             i=0;
             while (txt1[i] != '\0'){
-                if(!((txt1[i]>=65 && txt1[i]<=90) | (txt1[i]>=97 && txt1[i]<=122) | txt1[i] == '-')){return 400;}
+                if(!((txt1[i]>=65 && txt1[i]<=90) | (txt1[i]>=97 && txt1[i]<=122) | (txt1[i] == '-'))){return 400;}
                 i++;
             }
             if (i>LEN_HOST_TXT){return 400;}
 
             i=0;
             while (txt2[i] != '\0'){
-                if(!((txt2[i]>=65 && txt2[i]<=90) | (txt2[i]>=97 && txt2[i]<=122) | txt2[i] == '-')){return 400;}
+                if(!((txt2[i]>=65 && txt2[i]<=90) | (txt2[i]>=97 && txt2[i]<=122) | (txt2[i] == '-'))){return 400;}
                 i++;
             }
             if (i>LEN_HOST_TXT){return 400;}
 
             i=0;
             while (txt3[i] != '\0'){
-                if(!((txt3[i]>=65 && txt3[i]<=90) | (txt3[i]>=97 && txt3[i]<=122) | txt3[i] == '-')){return 400;}
+                if(!((txt3[i]>=65 && txt3[i]<=90) | (txt3[i]>=97 && txt3[i]<=122) | (txt3[i] == '-'))){return 400;}
                 i++;
             }
             if (i>LEN_HOST_TXT){return 400;}
@@ -635,21 +639,21 @@ int getRepCode(message req, HTTPTable *codes) {
 
             i=0;
             while (txt1[i] != '\0'){
-                if(!((txt1[i]>=65 && txt1[i]<=90) | (txt1[i]>=97 && txt1[i]<=122) | txt1[i] == '-')){return 400;}
+                if(!((txt1[i]>=65 && txt1[i]<=90) | (txt1[i]>=97 && txt1[i]<=122) | (txt1[i] == '-'))){return 400;}
                 i++;
             }
             if (i>LEN_HOST_TXT){return 400;}
 
             i=0;
             while (txt2[i] != '\0'){
-                if(!((txt2[i]>=65 && txt2[i]<=90) | (txt2[i]>=97 && txt2[i]<=122) | txt2[i] == '-')){return 400;}
+                if(!((txt2[i]>=65 && txt2[i]<=90) | (txt2[i]>=97 && txt2[i]<=122) | (txt2[i] == '-'))){return 400;}
                 i++;
             }
             if (i>LEN_HOST_TXT){return 400;}
 
             i=0;
             while (txt3[i] != '\0'){
-                if(!((txt3[i]>=65 && txt3[i]<=90) | (txt3[i]>=97 && txt3[i]<=122) | txt3[i] == '-')){return 400;}
+                if(!((txt3[i]>=65 && txt3[i]<=90) | (txt3[i]>=97 && txt3[i]<=122) | (txt3[i] == '-'))){return 400;}
                 i++;
             }
             if (i>LEN_HOST_TXT){return 400;}
@@ -661,13 +665,13 @@ int getRepCode(message req, HTTPTable *codes) {
         if (point == 3 && d_point == 0){// ip sans port
             int ip[4];
             sscanf(host, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]);
-            if((ip[0]>256|ip[0]<0) | (ip[1]>256|ip[1]<0) | (ip[2]>256|ip[2]<0) | (ip[3]>256|ip[3]<0)){return 400;}
+            if(((ip[0]>256)|(ip[0]<0)) | ((ip[1]>256)|(ip[1]<0)) | ((ip[2]>256)|(ip[2]<0)) | ((ip[3]>256)|(ip[3]<0))){return 400;}
         }
 
         if (point == 3 && d_point == 1){// ip avec port
             int ip_port[5];
             sscanf(host, "%d.%d.%d.%d:%d", &ip_port[0], &ip_port[1], &ip_port[2], &ip_port[3], &ip_port[4]);
-            if((ip_port[0]>256|ip_port[0]<0) | (ip_port[1]>256|ip_port[1]<0) | (ip_port[2]>256|ip_port[2]<0) | (ip_port[3]>256|ip_port[3]<0) | ip_port[4] != 8080){return 400;} //ip invalide
+            if(((ip_port[0]>256)|(ip_port[0]<0)) | ((ip_port[1]>256)|(ip_port[1]<0)) | ((ip_port[2]>256)|(ip_port[2]<0)) | ((ip_port[3]>256)|(ip_port[3]<0)) | (ip_port[4] != 8080)){return 400;} //ip invalide
         }
         
         
@@ -712,7 +716,7 @@ int getRepCode(message req, HTTPTable *codes) {
         sscanf(TE_text, "%*s %s", transfer_encoding);
         //printf("te : -%s-\n",transfer_encoding);
 
-        if(!(strcmp(transfer_encoding,"chunked")==0 | strcmp(transfer_encoding,"gzip")==0 | strcmp(transfer_encoding,"deflate")==0 | strcmp(transfer_encoding,"compress")==0 |strcmp(transfer_encoding,"identity")==0 )) {return 400;} // vérifier que la valeur du champ est bien prise en charge
+        if(!((strcmp(transfer_encoding,"chunked")==0) | (strcmp(transfer_encoding,"gzip")==0) | (strcmp(transfer_encoding,"deflate")==0) | (strcmp(transfer_encoding,"compress")==0) |(strcmp(transfer_encoding,"identity")==0) )) {return 400;} // vérifier que la valeur du champ est bien prise en charge
         //printf("ici1 : -%s-\n",TE_text);
         if(!(TE_text[len]=='\r' && TE_text[len+1]=='\n')){return 400;} //&& TE_text[len+2]=='\r' && TE_text[len+3]=='\n' : vérifier \r\n(\r\n) après la valeur du champ
         //printf("ici2\n");    
@@ -852,7 +856,7 @@ message *generateReponse(message req, int opt_code) {
     HTTPTable *codes = loadTable(); //initialisation de la table des codes possibles de retour
 
     int code;
-    if (opt_code == -1) { code = getRepCode(req, codes); } //recherche du code à renvoyer
+    if (opt_code == -1) { code = getRepCode(codes); } //recherche du code à renvoyer
     else { code = opt_code; codes->httpminor = 0; }
 
     HttpReponse *rep = getTable(codes, code);
@@ -870,22 +874,22 @@ message *generateReponse(message req, int opt_code) {
         params[0].valueLengthB0 = strlen("GET");
         params[0].nameData = malloc(strlen("REQUEST_METHOD") + 1);
         params[0].valueData = malloc(strlen("GET") + 1);
-        strcpy(params[0].nameData, "REQUEST_METHOD");
-        strcpy(params[0].valueData, "GET");
+        memcpy(params[0].nameData, "REQUEST_METHOD", params[0].nameLengthB0);
+        memcpy(params[0].valueData, "GET", params[0].valueLengthB0);
 
         params[1].nameLengthB0 = strlen("SCRIPT_NAME");
         params[1].valueLengthB0 = strlen(getScriptName(codes->filename));
         params[1].nameData = malloc(strlen("SCRIPT_NAME") + 1);
         params[1].valueData = malloc(strlen(getScriptName(codes->filename)) + 1);
-        strcpy(params[1].nameData, "SCRIPT_NAME");
-        strcpy(params[1].valueData, getScriptName(codes->filename));
+        memcpy(params[1].nameData, "SCRIPT_NAME", params[1].nameLengthB0);
+        memcpy(params[1].valueData, getScriptName(codes->filename), params[1].valueLengthB0);
         
         params[2].nameLengthB0 = strlen("SCRIPT_FILENAME");
         params[2].valueLengthB0 = strlen(getScriptFilename(codes->filename));
         params[2].nameData = malloc(strlen("SCRIPT_FILENAME") + 1);
         params[2].valueData = malloc(strlen(getScriptFilename(codes->filename)) + 1);
-        strcpy(params[2].nameData, "SCRIPT_FILENAME");
-        strcpy(params[2].valueData, getScriptFilename(codes->filename));        
+        memcpy(params[2].nameData, "SCRIPT_FILENAME", params[2].nameLengthB0);
+        memcpy(params[2].valueData, getScriptFilename(codes->filename), params[2].valueLengthB0);        
         
         send_begin_request(sock, requestId);
         send_params(sock, requestId, params);

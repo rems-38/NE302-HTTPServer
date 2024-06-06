@@ -57,6 +57,6 @@ char *HexaToChar(char *content);
 char* percentEncoding(char* uri);
 char* DotRemovalSegment(char* uri);
 void controlConnection(message *msg);
-int getRepCode(message req, HTTPTable *codes);
+int getRepCode(HTTPTable *codes);
 //HttpReponse *convertFCGI_HTTP(FCGI_Header *reponse, HTTPTable *codes, int code);
 message *generateReponse(message req, int opt_code);

@@ -8,7 +8,7 @@
 #include "../api/api.h"
 #include "config.h"
 
-int main(int argc, char *argv[])
+int main(void)
 {
 	message *requete;
 	
