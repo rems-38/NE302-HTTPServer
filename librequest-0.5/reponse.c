@@ -156,11 +156,11 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* t
     
     message *msg = malloc(sizeof(message));
 
-    rep.headers[0].label = "Content-Type";
+   /*rep.headers[0].label = "Content-Type";
     rep.headers[0].value = "text/html";
     rep.headers[1].label = "Content-Length";
     rep.headers[1].value = "70000";
-    rep.headersCount = 2;
+    rep.headersCount = 2;*/
 
     //recup code erreur (ou pas)
     //ajout du code dans rep 
@@ -173,7 +173,7 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* t
     }
 
     //recup header et les ajouter
-    //headers_from_STDOUT(txtData,rep);
+    headers_from_STDOUT(txtData,rep);
    
     char *message_body = message_body_from_STD_OUT(txtData);
 
@@ -246,10 +246,11 @@ char *message_body_from_STD_OUT(char* STD_OUT_txt){
 
 void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
 
+    printf("std_out dans header : -%s-\n",STD_OUT_txt);
     int j=0; // parcourir STD_OUT_txt
     int k=0; // taille label et value
 
-    char *label = malloc(20);
+    char *label = malloc(50);
     char *value = malloc(50);
 
     int n=0; //vérifier si on a qu'un seul CRLF, sinon fin de la boucle
@@ -257,7 +258,7 @@ void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
 
     while (!fin_headers){
         k=0;
-        label = malloc(20);
+        label = malloc(50);
         value = malloc(50);
 
         while(STD_OUT_txt[j] != ':'){ //label
@@ -267,7 +268,7 @@ void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
         }
         label[k] = '\0';
 
-        //printf("label : %s\n",label);
+        printf("label : %s\n",label);
         j=j+2;
         k=0;
 
@@ -277,10 +278,10 @@ void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
             j++;
         }
         value[k] = '\0';
-        // UpdateHeader 
+        printf("value : %s\n",value);
+        
+        // UpdateHeader ne semple pas bien mettre a jour
         updateHeaderHttpReponse(rep, label, value);
-
-        //printf("value : %s\n",value);
 
         char *CRLF = malloc(3);
         CRLF[0] = STD_OUT_txt[j];
@@ -692,7 +693,7 @@ int getRepCode(message req, HTTPTable *codes) {
         
         int i=0;
         while(c_length[i] != '\0'){
-            printf("c_length[%d] : %c\n",i,c_length[i]);
+            //printf("c_length[%d] : %c\n",i,c_length[i]);
             if(!(c_length[i] >= '0' && c_length[i] <= '9')){return 400;} // valeur invalide (négative ou avec des caractères autres que des chiffres)
             i++;
         }
@@ -709,12 +710,12 @@ int getRepCode(message req, HTTPTable *codes) {
         
         char transfer_encoding[len];
         sscanf(TE_text, "%*s %s", transfer_encoding);
-        printf("te : -%s-\n",transfer_encoding);
+        //printf("te : -%s-\n",transfer_encoding);
 
         if(!(strcmp(transfer_encoding,"chunked")==0 | strcmp(transfer_encoding,"gzip")==0 | strcmp(transfer_encoding,"deflate")==0 | strcmp(transfer_encoding,"compress")==0 |strcmp(transfer_encoding,"identity")==0 )) {return 400;} // vérifier que la valeur du champ est bien prise en charge
-        printf("ici1 : -%s-\n",TE_text);
+        //printf("ici1 : -%s-\n",TE_text);
         if(!(TE_text[len]=='\r' && TE_text[len+1]=='\n')){return 400;} //&& TE_text[len+2]=='\r' && TE_text[len+3]=='\n' : vérifier \r\n(\r\n) après la valeur du champ
-        printf("ici2\n");    
+        //printf("ici2\n");    
     }
 
     // Message Body
@@ -792,7 +793,7 @@ int getRepCode(message req, HTTPTable *codes) {
     // Connection
     _Token *ConnectionNode = searchTree(tree, "connection_option");
     if(ConnectionNode != NULL){
-        printf("connection header\n");
+        //printf("connection header\n");
         char *ConnectionL = getElementValue(ConnectionNode->node, &len);
         char *connection = malloc(len +1);
         strncpy(connection, ConnectionL, len);
@@ -812,13 +813,13 @@ int getRepCode(message req, HTTPTable *codes) {
         free(connection);
     }
     else if (majeur == '1' && mineur == '0'){ // si 1.0 et pas de Connection header : fermer la connection
-        printf("version 1.0\n");
+        //printf("version 1.0\n");
         //renvoyer close
         updateHeader(codes,"Connection","close");
         connecte = 1;
         //et fermer la connection    
         //requestShutdownSocket(req.clientId);
-        printf("fermeture de la connexion !!!\n");
+        //printf("fermeture de la connexion !!!\n");
     }
     
     return 200;
@@ -891,12 +892,9 @@ message *generateReponse(message req, int opt_code) {
         send_empty_params(sock, requestId); // fin des paramètres
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 
-        //char *HexData = malloc(1);
-        //HexData[0] = '\0';
-        //FCGI_Header *reponseFCGI = receive_response(sock, HexData);
         char *HexData = receive_response(sock);
 
-        //printf("FINAL : %s\n", HexData);
+        printf("FINAL : %s\n", HexData);
 
         msg = createMsgFromReponsePHP(*rep, req.clientId, HexData);
 
