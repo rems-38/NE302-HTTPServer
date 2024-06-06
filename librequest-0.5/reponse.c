@@ -28,6 +28,7 @@ void initTable(HTTPTable *codes) {
         {"Content-Type", ""},
         {"Content-Length", ""}
     };
+    free(date);
     int headersCount = sizeof(headers) / sizeof(headers[0]);
 
     codes->filename = NULL;
@@ -639,7 +640,6 @@ int getRepCode(HTTPTable *codes) {
             strncpy(host_cpy,host,len);
             
             if(len >= strlen(host_accepted[i])){
-                printf("OK\n");
                 int limit = strlen(host_accepted[i]);
                 host_cpy[limit] = '\0';
                 if(strcmp(host,host_accepted[i])==0){
@@ -648,7 +648,6 @@ int getRepCode(HTTPTable *codes) {
             }
             i++;
         }
-        printf("OK\n");
         if(i >= taille_host_accepted){
             printf("Site non référencé -> tableau dans champ Host ligne ~ 603\n");
             return 400;
