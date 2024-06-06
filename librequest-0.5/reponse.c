@@ -7,6 +7,7 @@
 #include "config.h"
 
 int connecte = 0;
+int method_post = 0;
 
 void initTable(HTTPTable *codes) {
     for (int i = 0; i < HTTP_CODE_MAX+1; i++) { codes->table[i] = NULL; }
@@ -558,6 +559,7 @@ int getRepCode(HTTPTable *codes) {
     if (!(strcmp(method, "GET") == 0 || strcmp(method, "POST") == 0 || strcmp(method, "HEAD") == 0)) { return 405; }
     else if (len > LEN_METHOD) { return 501; }
     else if (strcmp(method, "HEAD") == 0) { codes->is_head = true; }
+    else if (strcmp(method, "POST") == 0) { method_post = 1; }
     
     if ((strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0) && (searchTree(tree,"message_body") != NULL)){ return 400; }
     if((strcmp(method, "POST") == 0) && (searchTree(tree,"Content_Length_header") == NULL)){return 400;} //Post peut ne pas avoir de message body mais doit quand même avoir un content-length = 0
@@ -912,6 +914,14 @@ message *generateReponse(message req, int opt_code) {
         send_begin_request(sock, requestId);
         send_params(sock, requestId, params);
         send_empty_params(sock, requestId); // fin des paramètres
+        if(method_post == 1){
+            int len;
+            _Token *Message_Body = searchTree(tree,"message_body");
+            char *msg = getElementValue(Message_Body->node, &len);
+            send_stdin(sock, requestId, msg);
+            free(Message_Body);
+            free(msg);
+        }
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 
         char *HexData = receive_response(sock);
