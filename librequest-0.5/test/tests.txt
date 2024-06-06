@@ -21,7 +21,7 @@ GET / HTTP/1.0
 Accept-Encoding: gzip
 
 POST / HTTP/1.1
-Host: www.example.com
+Host: www
 Content-Length: 3
 
 lol

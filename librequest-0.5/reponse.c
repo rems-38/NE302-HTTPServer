@@ -623,7 +623,7 @@ int getRepCode(HTTPTable *codes) {
         char *host_cpy = malloc(20);
         int i = 0;
         
-        printf("sizeof(host_accepted): %d",sizeof(host_accepted));
+        //printf("sizeof(host_accepted): %d",sizeof(host_accepted));
 
         while(i<taille_host_accepted){
             strncpy(host_cpy,host,len);
@@ -644,6 +644,9 @@ int getRepCode(HTTPTable *codes) {
             return 400;
         }
 
+        int code = configFileMsgBody(uri3, codes, host);
+        free(uri3);
+        if (code != 1) { return code; }
         free(host);
     }
     else{
