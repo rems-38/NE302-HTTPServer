@@ -28,7 +28,7 @@ void initTable(HTTPTable *codes) {
         {"Content-Type", ""},
         {"Content-Length", ""}
     };
-    free(date);
+    //free(date);
     int headersCount = sizeof(headers) / sizeof(headers[0]);
 
     codes->filename = NULL;
