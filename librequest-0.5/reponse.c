@@ -180,7 +180,11 @@ message* createMsgFromReponsePHP(HttpReponse rep, unsigned int clientId, char* t
     headers_from_STDOUT(txtData,rep);
    
     char *message_body = message_body_from_STD_OUT(txtData);
-
+    int taille_msg_body = strlen(message_body);
+    char *taille_msg_body_txt = malloc(10000000);
+    sprintf(taille_msg_body_txt,"%d",taille_msg_body);
+    updateHeaderHttpReponse(rep, "Content-Length", taille_msg_body_txt);
+    free(taille_msg_body_txt);
 
     // Calcul de la taille nécessaire pour buf
     int bufSize = strlen("HTTP/1.x ") + 3 + strlen(" ") + strlen(rep.code->info) + strlen("\r\n"); // 3 : taille d'une code (200, 404, ...)
