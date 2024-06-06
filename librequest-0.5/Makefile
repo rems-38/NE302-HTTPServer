@@ -11,7 +11,7 @@ ifeq ($(VALGRIND), yes)
 endif
 
 ifeq ($(DEBUG), yes)
-	FLAGS += -g
+	LINK += -g
 endif
 
 

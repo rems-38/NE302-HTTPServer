@@ -599,6 +599,8 @@ int getRepCode(HTTPTable *codes) {
         if (code != 1) { return code; }
         return 501; 
     }
+    
+    if (strcmp(method, "GET") == 0) { codes->method = 1; }
     else if (strcmp(method, "HEAD") == 0) { codes->method = 2; }
     else if (strcmp(method, "POST") == 0) { codes->method = 3; }
     
@@ -888,47 +890,41 @@ void controlConnection(message *msg){
     }
 }
 
-void createSettingsParams(Header *settings, FCGI_NameValuePair11 *params, HTTPTable *codes) {
-    Header sett[5] = {
+void createSettingsParams(FCGI_NameValuePair11 *params, HTTPTable *codes, char *msg_body) {
+    Header settings[4] = {
         {"SCRIPT_NAME", getScriptName(codes->filename)},
         {"SCRIPT_FILENAME", getScriptFilename(codes->filename)},
         {"REQUEST_METHOD", ""},
-        {"CONTENT_LENGTH", ""},
-        {"message_body", ""}
+        {"CONTENT_LENGTH", ""}
     };
 
-    if (codes->method == 1) { sett[2].value = "GET"; }
-    else if (codes->method == 2) { sett[2].value = "HEAD"; }
+    if (codes->method == 1) { settings[2].value = malloc(4); strcpy(settings[2].value, "GET"); }
+    else if (codes->method == 2) { settings[2].value = malloc(5); strcpy(settings[2].value, "HEAD"); }
     else if (codes->method == 3) {
-        sett[2].value = "POST";
+        settings[2].value = malloc(5);
+        strcpy(settings[2].value, "POST");
 
         int len;
         _Token *Message_Body = searchTree(getRootTree(),"message_body");
-        char *msg = getElementValue(Message_Body->node, &len);
-
-        char *len_str = malloc(7);
-        sprintf(len_str, "%d", len);
-        sett[3].value = len_str;
-        sett[4].value = msg;
+        msg_body = getElementValue(Message_Body->node, &len);
         free(Message_Body);
     }
 
-    FCGI_NameValuePair11 *par = malloc(5 * sizeof(FCGI_NameValuePair11));
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 4; i++) {
         if (strcmp(settings[i].value, "") == 0) { break; }
 
-        par[i].nameLengthB0 = strlen(settings[i].label);
-        par[i].valueLengthB0 = strlen(settings[i].value);
-        par[i].nameData = malloc(strlen(settings[i].label) + 1);
-        par[i].valueData = malloc(strlen(settings[i].value) + 1);
-        memcpy(par[i].nameData, settings[i].label, par[i].nameLengthB0);
-        memcpy(par[i].valueData, settings[i].value, par[i].valueLengthB0);
+        params[i].nameLengthB0 = strlen(settings[i].label);
+        params[i].valueLengthB0 = strlen(settings[i].value);
+        params[i].nameData = malloc(strlen(settings[i].label) + 1);
+        params[i].valueData = malloc(strlen(settings[i].value) + 1);
+        memcpy(params[i].nameData, settings[i].label, params[i].nameLengthB0);
+        memcpy(params[i].valueData, settings[i].value, params[i].valueLengthB0);
     }
 
-    settings = sett;
-    params = par;
-
-    free(par);
+    for (int i = 0; i < 4; i++) {
+        if (strcmp(settings[i].value, "") == 0) { break; }
+        free(settings[i].value);
+    }
 }
 
 
@@ -950,15 +946,15 @@ message *generateReponse(message req, int opt_code) {
         char srv_port_str[6];
         sprintf(srv_port_str, "%d", SERVER_PORT);
         
-        Header *settings;
-        FCGI_NameValuePair11 *params;        
-        createSettingsParams(settings, params, codes);
+        FCGI_NameValuePair11 *params = malloc(4 * sizeof(FCGI_NameValuePair11)); 
+        char *msg_body = NULL; 
+        createSettingsParams(params, codes, msg_body);
 
         send_begin_request(sock, requestId);
         send_params(sock, requestId, params);
         send_empty_params(sock, requestId); // fin des paramètres
         if(codes->method == 3){
-            send_stdin(sock, requestId, settings[4].value);
+            send_stdin(sock, requestId, msg_body);
         }
         send_stdin(sock, requestId, ""); // fin des données d'entrées
 
@@ -967,11 +963,11 @@ message *generateReponse(message req, int opt_code) {
         msg = createMsgFromReponsePHP(*rep, req.clientId, HexData);
 
         free(HexData);
-        free(settings);
-        for (int i = 0; i < 3; i ++) {
-            free(params[i].nameData);
-            free(params[i].valueData);
-        }
+        // for(int i = 0; i < 5; i++) {
+        //     if (strcmp(params[i].valueData, "") == 0) { break; }
+        //     free(params[i].nameData);
+        //     free(params[i].valueData);
+        // }
         free(params);
         close(sock);
     }
