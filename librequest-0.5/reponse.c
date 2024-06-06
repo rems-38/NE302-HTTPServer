@@ -557,6 +557,7 @@ int getRepCode(HTTPTable *codes) {
     else if (strcmp(method, "HEAD") == 0) { codes->is_head = true; }
     
     if ((strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0) && (searchTree(tree,"message_body") != NULL)){ return 400; }
+    if((strcmp(method, "POST") == 0) && (searchTree(tree,"Content_Length_header") == NULL)){return 400;} //Post peut ne pas avoir de message body mais doit quand même avoir un content-length = 0
     free(method);
 
     _Token *uriNode = searchTree(tree, "request_target");
@@ -693,7 +694,7 @@ int getRepCode(HTTPTable *codes) {
 
         sscanf(CL_text, "%*s %s", c_length);
 
-        if(c_length[0]== '0'){return 400;} // on ne veut pas de 0XXXX
+        if(c_length[0]== '0' && (c_length[1] >= '0' && c_length[1] <= '9')){return 400;} // on ne veut pas de 0XXXX
         
         int i=0;
         while(c_length[i] != '\0'){

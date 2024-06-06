@@ -19,3 +19,11 @@ Content-Length: 125
 
 GET / HTTP/1.0
 Accept-Encoding: gzip
+
+POST / HTTP/1.1
+Host: www.example.com
+Content-Length: 3
+
+lol
+
+PUT / HTTP/1.0
