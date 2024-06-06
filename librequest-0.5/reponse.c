@@ -249,7 +249,7 @@ char *message_body_from_STD_OUT(char* STD_OUT_txt){
 
 void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
 
-    printf("std_out dans header : -%s-\n",STD_OUT_txt);
+    printf("STDOUT: %s\n",STD_OUT_txt);
     int j=0; // parcourir STD_OUT_txt
     int k=0; // taille label et value
 
@@ -261,8 +261,6 @@ void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
 
     while (!fin_headers){
         k=0;
-        label = malloc(50);
-        value = malloc(50);
 
         while(STD_OUT_txt[j] != ':'){ //label
             label[k] = STD_OUT_txt[j];
@@ -270,8 +268,14 @@ void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
             k++;
         }
         label[k] = '\0';
+        
+        int MinToMaj=0;
+        while(label[MinToMaj]!='-' && MinToMaj<strlen(label)){MinToMaj++;}
+        MinToMaj++;
+        if(MinToMaj != strlen(label)){
+            label[MinToMaj] = label[MinToMaj] - ('a'-'A');
+        }
 
-        //printf("label : -%s-\n",label);
         j=j+2;
         k=0;
 
@@ -281,10 +285,8 @@ void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
             j++;
         }
         value[k] = '\0';
-        //printf("value : -%s-\n",value);
-        
-        // UpdateHeader ne semple pas bien mettre a jour
-        updateHeaderHttpReponse(rep, label, value);
+
+        updateHeaderHttpReponse(rep,label,value);
 
         char *CRLF = malloc(3);
         CRLF[0] = STD_OUT_txt[j];
@@ -306,7 +308,6 @@ void headers_from_STDOUT(char* STD_OUT_txt,HttpReponse rep){
     free(label);
     free(value);
 }
-
 
 
 int ErrorInSTD_OUT(char* STD_OUT_txt){ // retourne 200 si pas d'erreur, sinon retourne le numéro de l'erreur
