@@ -600,91 +600,32 @@ int getRepCode(HTTPTable *codes) {
         host[len] = '\0';
         if(len > LEN_HOST){return 400;}
 
-        // déterminer la nature du host (nom de domaine ou ip)
-        int i=0;
-        int point = 0;
-        int d_point = 0;
-        while(host[i]!='\0'){
-            if(host[i]=='.'){point++;}
-            else if(host[i]==':'){d_point++;}
+        char *host_accepted[] = {"127.0.0.1","127.0.0.1:8080","www","test"}; // rajouter les sites au fur et à mesure
+        int taille_host_accepted = 4; // à fixer à la main
+        char *host_cpy = malloc(20);
+        int i = 0;
+        
+        printf("sizeof(host_accepted): %d",sizeof(host_accepted));
+
+        while(i<taille_host_accepted){
+            strncpy(host_cpy,host,len);
+            
+            if(len >= strlen(host_accepted[i])){
+                printf("OK\n");
+                int limit = strlen(host_accepted[i]);
+                host_cpy[limit] = '\0';
+                if(strcmp(host,host_accepted[i])==0){
+                    break;
+                }
+            }
             i++;
         }
-
-        //if(point<2 | point>3){return 400;}
-
-        if(point == 2 && d_point == 0){// nom de domaine sans port
-            char txt1[63],txt2[63],txt3[63];
-
-            sscanf(host, "%[^.].%[^.].%s", txt1, txt2, txt3);
-            
-
-            i=0;
-            while (txt1[i] != '\0'){
-                if(!((txt1[i]>=65 && txt1[i]<=90) | (txt1[i]>=97 && txt1[i]<=122) | (txt1[i] == '-'))){return 400;}
-                i++;
-            }
-            if (i>LEN_HOST_TXT){return 400;}
-
-            i=0;
-            while (txt2[i] != '\0'){
-                if(!((txt2[i]>=65 && txt2[i]<=90) | (txt2[i]>=97 && txt2[i]<=122) | (txt2[i] == '-'))){return 400;}
-                i++;
-            }
-            if (i>LEN_HOST_TXT){return 400;}
-
-            i=0;
-            while (txt3[i] != '\0'){
-                if(!((txt3[i]>=65 && txt3[i]<=90) | (txt3[i]>=97 && txt3[i]<=122) | (txt3[i] == '-'))){return 400;}
-                i++;
-            }
-            if (i>LEN_HOST_TXT){return 400;}
-
+        printf("OK\n");
+        if(i >= taille_host_accepted){
+            printf("Site non référencé -> tableau dans champ Host ligne ~ 603\n");
+            return 400;
         }
 
-        if(point == 2 && d_point == 1){// nom de domaine avec port
-            char txt1[63],txt2[63],txt3[63];
-            int port;
-
-            sscanf(host, "%[^.].%[^.].%[^:]:%d", txt1, txt2, txt3,&port);
-
-            i=0;
-            while (txt1[i] != '\0'){
-                if(!((txt1[i]>=65 && txt1[i]<=90) | (txt1[i]>=97 && txt1[i]<=122) | (txt1[i] == '-'))){return 400;}
-                i++;
-            }
-            if (i>LEN_HOST_TXT){return 400;}
-
-            i=0;
-            while (txt2[i] != '\0'){
-                if(!((txt2[i]>=65 && txt2[i]<=90) | (txt2[i]>=97 && txt2[i]<=122) | (txt2[i] == '-'))){return 400;}
-                i++;
-            }
-            if (i>LEN_HOST_TXT){return 400;}
-
-            i=0;
-            while (txt3[i] != '\0'){
-                if(!((txt3[i]>=65 && txt3[i]<=90) | (txt3[i]>=97 && txt3[i]<=122) | (txt3[i] == '-'))){return 400;}
-                i++;
-            }
-            if (i>LEN_HOST_TXT){return 400;}
-
-            if (port!=8080){return 400;}
-
-        }
-
-        if (point == 3 && d_point == 0){// ip sans port
-            int ip[4];
-            sscanf(host, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]);
-            if(((ip[0]>256)|(ip[0]<0)) | ((ip[1]>256)|(ip[1]<0)) | ((ip[2]>256)|(ip[2]<0)) | ((ip[3]>256)|(ip[3]<0))){return 400;}
-        }
-
-        if (point == 3 && d_point == 1){// ip avec port
-            int ip_port[5];
-            sscanf(host, "%d.%d.%d.%d:%d", &ip_port[0], &ip_port[1], &ip_port[2], &ip_port[3], &ip_port[4]);
-            if(((ip_port[0]>256)|(ip_port[0]<0)) | ((ip_port[1]>256)|(ip_port[1]<0)) | ((ip_port[2]>256)|(ip_port[2]<0)) | ((ip_port[3]>256)|(ip_port[3]<0)) | (ip_port[4] != 8080)){return 400;} //ip invalide
-        }
-        
-        
         free(host);
     }
     free(HostNode);
