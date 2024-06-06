@@ -20,7 +20,7 @@ char *generateFileName(const char *filename);
 void encode_name_value_pair(FCGI_NameValuePair11 pair, unsigned char *buffer, int *len);
 char *getScriptName(const char *filename);
 char *getScriptFilename(const char *filename);
-void send_params(int sock, unsigned short requestId, FCGI_NameValuePair11 *params);
+void send_params(int sock, unsigned short requestId, FCGI_NameValuePair11 *params, int method);
 void send_empty_params(int sock, unsigned short requestId);
 void send_stdin(int sock, unsigned short requestId, const char *data) ;
 char *receive_response(int sock);

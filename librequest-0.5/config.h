@@ -1,6 +1,6 @@
 #define SERVER_ROOT "html"
 #define LEN_METHOD 4
-#define LEN_URI 20
+#define LEN_URI 256
 #define LEN_HOST 253
 #define LEN_HOST_TXT 63
 #define HTTP_CODE_MAX 505

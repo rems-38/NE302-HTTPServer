@@ -73,8 +73,18 @@ void encode_name_value_pair(FCGI_NameValuePair11 pair, unsigned char *buffer, in
 }
 
 char *getScriptName(const char *filename) {
-    char *res = malloc(strlen(filename) - strlen(SERVER_ROOT) + 1);;
-    strcpy(res, filename + strlen(SERVER_ROOT));
+    char *res = malloc(strlen(filename) - strlen(SERVER_ROOT) + 1);
+    
+    char *is_query = strchr(filename, '?');
+    if (is_query != NULL) {
+        strncpy(res, filename + strlen(SERVER_ROOT), is_query - filename - strlen(SERVER_ROOT));
+        res[is_query - filename - strlen(SERVER_ROOT)] = '\0';
+    } else {
+        strcpy(res, filename + strlen(SERVER_ROOT));
+    }
+
+    printf("script_name: %s\n", res);
+
     return res;
 }
 
@@ -90,12 +100,14 @@ char *getScriptFilename(const char *filename) {
     return res;
 }
 
-void send_params(int sock, unsigned short requestId, FCGI_NameValuePair11 *params) {
+void send_params(int sock, unsigned short requestId, FCGI_NameValuePair11 *params, int method) {
     FCGI_Header header;
     unsigned char buffer[FASTCGILENGTH];
     int content_len = 0;
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 5; i++) {
+        if (i == 4 && method == 3) { break; } // Skip QUERY_STRING for POST requests
+        if (i == 3 && method == 1) { i++; } // Skip Content-Length for GET requests
         encode_name_value_pair(params[i], buffer, &content_len);
     }
     

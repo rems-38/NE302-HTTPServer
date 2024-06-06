@@ -34,6 +34,7 @@ void initTable(HTTPTable *codes) {
     codes->filename = NULL;
     codes->method = 0;
     codes->is_php = false;
+    codes->query_string = NULL;
 
     codes->headers = malloc(headersCount * sizeof(Header));
     for (int i = 0; i < headersCount; i++) {
@@ -52,9 +53,8 @@ void freeTable(HTTPTable *codes) {
             free(codes->table[i]);
         }
     }
-    if (codes->filename != NULL) {
-        free(codes->filename);
-    }
+    if (codes->filename != NULL) { free(codes->filename); }
+    if (codes->query_string != NULL) { free(codes->query_string); }
     for (int i = 0; i < codes->headersCount; i++) {
         free(codes->headers[i].label);
         free(codes->headers[i].value);
@@ -501,6 +501,22 @@ int configFileMsgBody(char *name, HTTPTable *codes, char* host) {
         strcat(path, name);
     }
 
+    // gérer les query string
+    char *query = strchr(path, '?');
+    if (query != NULL) {
+        codes->query_string = malloc(strlen(query) + 1);
+        strcpy(codes->query_string, query);
+
+        int new_length = query - path;
+        char *new_path = malloc(new_length + 1);
+        if (new_path != NULL) {
+            strncpy(new_path, path, new_length);
+            new_path[new_length] = '\0';
+            free(path);
+            path = new_path;
+        }
+    }
+
     // Gérer le Content-type (à l'aide de `file`)
     char *command = malloc(512);
     sprintf(command, "file --brief --mime-type %s", path);
@@ -616,7 +632,7 @@ int getRepCode(HTTPTable *codes) {
     free(methodNode);
 
     //URI
-    printf("URI");
+    printf("URI\n");
     _Token *uriNode = searchTree(tree, "request_target");
     char *uriL = getElementValue(uriNode->node, &len);
     char *uri = malloc(len + 1);
@@ -890,15 +906,24 @@ void controlConnection(message *msg){
     }
 }
 
-void createSettingsParams(FCGI_NameValuePair11 *params, HTTPTable *codes, char *msg_body) {
-    Header settings[4] = {
+char *createSettingsParams(FCGI_NameValuePair11 *params, HTTPTable *codes) {
+    Header settings[5] = {
         {"SCRIPT_NAME", getScriptName(codes->filename)},
         {"SCRIPT_FILENAME", getScriptFilename(codes->filename)},
         {"REQUEST_METHOD", ""},
-        {"CONTENT_LENGTH", ""}
+        {"CONTENT_LENGTH", ""},
+        {"QUERY_STRING", ""},
     };
+    char *msg_body = NULL;
 
-    if (codes->method == 1) { settings[2].value = malloc(4); strcpy(settings[2].value, "GET"); }
+    if (codes->method == 1) {
+        settings[2].value = malloc(4);
+        strcpy(settings[2].value, "GET");
+        if (codes->query_string != NULL) {
+            settings[4].value = malloc(strlen(codes->query_string+1) + 1); // +1 to skip the '?'
+            strcpy(settings[4].value, codes->query_string+1);
+        }
+    }
     else if (codes->method == 2) { settings[2].value = malloc(5); strcpy(settings[2].value, "HEAD"); }
     else if (codes->method == 3) {
         settings[2].value = malloc(5);
@@ -906,25 +931,37 @@ void createSettingsParams(FCGI_NameValuePair11 *params, HTTPTable *codes, char *
 
         int len;
         _Token *Message_Body = searchTree(getRootTree(),"message_body");
-        msg_body = getElementValue(Message_Body->node, &len);
+        char *msg = getElementValue(Message_Body->node, &len);
+        msg_body = malloc(len + 1);
+        strncpy(msg_body, msg, len);
+        msg_body[len] = '\0';
+
+        char *len_str = malloc(20);
+        sprintf(len_str, "%d", len);
+        settings[3].value = malloc(strlen(len_str) + 1);
+        strcpy(settings[3].value, len_str);
+
         free(Message_Body);
     }
 
-    for (int i = 0; i < 4; i++) {
-        if (strcmp(settings[i].value, "") == 0) { break; }
-
-        params[i].nameLengthB0 = strlen(settings[i].label);
-        params[i].valueLengthB0 = strlen(settings[i].value);
-        params[i].nameData = malloc(strlen(settings[i].label) + 1);
-        params[i].valueData = malloc(strlen(settings[i].value) + 1);
-        memcpy(params[i].nameData, settings[i].label, params[i].nameLengthB0);
-        memcpy(params[i].valueData, settings[i].value, params[i].valueLengthB0);
+    for (int i = 0; i < 5; i++) {
+        if (strcmp(settings[i].value, "") != 0) {
+            params[i].nameLengthB0 = strlen(settings[i].label);
+            params[i].valueLengthB0 = strlen(settings[i].value);
+            params[i].nameData = malloc(strlen(settings[i].label) + 1);
+            params[i].valueData = malloc(strlen(settings[i].value) + 1);
+            memcpy(params[i].nameData, settings[i].label, params[i].nameLengthB0);
+            memcpy(params[i].valueData, settings[i].value, params[i].valueLengthB0);
+        }
     }
 
-    for (int i = 0; i < 4; i++) {
-        if (strcmp(settings[i].value, "") == 0) { break; }
-        free(settings[i].value);
-    }
+    // for (int i = 0; i < 5; i++) {
+    //     if (strcmp(settings[i].value, "") != 0) {
+    //         free(settings[i].value);
+    //     }
+    // }
+
+    return msg_body;
 }
 
 
@@ -947,11 +984,10 @@ message *generateReponse(message req, int opt_code) {
         sprintf(srv_port_str, "%d", SERVER_PORT);
         
         FCGI_NameValuePair11 *params = malloc(4 * sizeof(FCGI_NameValuePair11)); 
-        char *msg_body = NULL; 
-        createSettingsParams(params, codes, msg_body);
+        char *msg_body = createSettingsParams(params, codes);
 
         send_begin_request(sock, requestId);
-        send_params(sock, requestId, params);
+        send_params(sock, requestId, params, codes->method);
         send_empty_params(sock, requestId); // fin des paramètres
         if(codes->method == 3){
             send_stdin(sock, requestId, msg_body);
