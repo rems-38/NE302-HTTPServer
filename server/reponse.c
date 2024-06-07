@@ -622,6 +622,7 @@ int getRepCode(HTTPTable *codes) {
         if (code != 1) { return code; }
         return 400; }
     if((strcmp(method, "POST") == 0) && (searchTree(tree,"Content_Length_header") == NULL)){
+        printf("Post et 0 Content_L\n");
         int code  = configFileMsgBody("/400.html", codes, "");
         if (code != 1) { return code; }
         return 400;} //Post peut ne pas avoir de message body mais doit quand même avoir un content-length = 0
@@ -721,7 +722,7 @@ int getRepCode(HTTPTable *codes) {
         return 400;} // plusieurs content-length
 
     if (C_LengthNode != NULL && C_LengthNode->next == NULL){ // si un seul Content-Length avec valeur invalide : 400
-        if(Message_Body == NULL){return 400;}// il doit y avoir un message_body si il y a content length
+        //if(Message_Body == NULL){return 400;}// il doit y avoir un message_body si il y a content length
 
         char *CL_text = getElementValue(C_LengthNode->node, &len); // nous renvoie "Content-Length : xxxxx" et pas "xxxxxx"
         char c_length[len];
@@ -742,10 +743,27 @@ int getRepCode(HTTPTable *codes) {
             } // valeur invalide (négative ou avec des caractères autres que des chiffres)
             i++;
         }
+
+        if(Message_Body != NULL){
             int content_l_value = atoi(c_length);
+            //printf("conten_l : %d\n", content_l_value);
             char *message_bodyL = getElementValue(Message_Body->node, &len);
-            int taille_message_b = len - 2; // pour ne pas compter CRLF à la fin du message body
-            if(content_l_value != taille_message_b){return 400;}// vérifier que c'est la taille du message body
+            int taille_message_b;
+            if(message_bodyL[len-1] == '\n'){
+                printf("CRLF\n");
+                taille_message_b = len - 2; // pour ne pas compter CRLF à la fin du message body
+            }
+            else{
+
+                taille_message_b = len; 
+            }
+
+            if(content_l_value != taille_message_b){
+                printf("Taille\n");
+                int code  = configFileMsgBody("/400.html", codes, "");
+                if (code != 1) { return code; }
+                return 400;}// vérifier que c'est la taille du message body
+        }
     }
 
     // Transfer-Encoding
