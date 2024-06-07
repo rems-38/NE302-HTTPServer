@@ -953,6 +953,31 @@ char *createSettingsParams(FCGI_NameValuePair11 *params, HTTPTable *codes, char 
         msg_body = malloc(len + 1);
         strncpy(msg_body, msg, len);
         msg_body[len] = '\0';
+        
+        char *file_out = strrchr(msg_body, 0x0A);
+        printf("file_out : %s\n", file_out);
+        file_out++;
+        // 89 50 4E 47 (PNG) ou FF D8 FF E0 (JPEG) ou 25 50 44 46 (PDF) ou 47 49 46 38 (GIF)
+        if (len > 4 && (file_out[0] == 0x89 && file_out[1] == 0x50 && file_out[2] == 0x4E && file_out[3] == 0x47) || (file_out[0] == 0xFF && file_out[1] == 0xD8 && file_out[2] == 0xFF && file_out[3] == 0xE0) || (file_out[0] == 0x25 && file_out[1] == 0x50 && file_out[2] == 0x44 && file_out[3] == 0x46) || (file_out[0] == 0x47 && file_out[1] == 0x49 && file_out[2] == 0x46 && file_out[3] == 0x38)) {
+            printf("Image\n");
+            char *filename = malloc(len - 5);
+            strncpy(filename, msg + 5, len - 5);
+            filename[len - 5] = '\0';
+
+            FILE *file = fopen(filename, "r");
+            if (file == NULL) { perror("fopen"); return NULL; }
+
+            fseek(file, 0, SEEK_END);
+            long fsize = ftell(file);
+            fseek(file, 0, SEEK_SET);
+
+            char *msg_body = malloc(fsize + 1);
+            fread(msg_body, 1, fsize, file);
+            msg_body[fsize] = '\0';
+
+            fclose(file);
+        }
+        printf("msg_body : %s\n", msg_body);
 
         char *len_str = malloc(20);
         sprintf(len_str, "%d", len);
