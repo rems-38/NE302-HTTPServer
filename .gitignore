@@ -3,5 +3,5 @@
 **/*.gch
 **/simple
 .vscode/
-./parseur/httpparser_
-./sock
+parseur/httpparser_
+sock
