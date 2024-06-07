@@ -486,12 +486,10 @@ int configFileMsgBody(char *name, HTTPTable *codes, char* host) {
     }
     char* path = malloc(strlen(SERVER_ROOT) + strlen(name) + 1);
     if(strcmp(domaine, "www") == 0 || strcmp(domaine, "127") == 0 || strcmp(domaine, "") == 0 ){
-        //printf("www");
         path = realloc(path, strlen(SERVER_ROOT)+ sizeof("/www") + strlen(name) + 1);
         strcpy(path, SERVER_ROOT);
         strcat(path, "/www");
         strcat(path, name);
-        printf("Path : %s\n", path);
     }
     else{
         path = realloc(path, strlen(SERVER_ROOT)+ 1 + strlen(domaine) + strlen(name) + 1);
@@ -552,7 +550,6 @@ int configFileMsgBody(char *name, HTTPTable *codes, char* host) {
         
         codes->filename = malloc(strlen(path) + 1);
         strcpy(codes->filename, path);
-        printf("filename : %s\n", codes->filename);
         free(path);
 
         if (strcmp(type, "application/x-httpd-php") == 0 || strcmp(type, "text/x-php") == 0) {
@@ -632,7 +629,6 @@ int getRepCode(HTTPTable *codes) {
     free(methodNode);
 
     //URI
-    printf("URI\n");
     _Token *uriNode = searchTree(tree, "request_target");
     char *uriL = getElementValue(uriNode->node, &len);
     char *uri = malloc(len + 1);
@@ -641,7 +637,6 @@ int getRepCode(HTTPTable *codes) {
     if (len > LEN_URI) { 
         int code  = configFileMsgBody("/414.html", codes, "");
         if (code != 1) { return code; }
-        //printf("414");
         return 414; }
     if (strcmp(uri, "/") == 0) {
         uri = realloc(uri, strlen("/index.html") + 1);
@@ -658,10 +653,8 @@ int getRepCode(HTTPTable *codes) {
     // Host
     _Token *HostNode = searchTree(tree, "Host");
     if (majeur == '1' && mineur == '1' && HostNode == NULL) { 
-        //printf("Host");
         int code  = configFileMsgBody("/400.html", codes, "");
         if (code != 1) { return code; }
-        //printf("400");
         return 400; } // HTTP/1.1 sans Host
     if ((HostNode != NULL) && (HostNode->next != NULL)) { 
         int code  = configFileMsgBody("/400.html", codes, "");
@@ -682,8 +675,6 @@ int getRepCode(HTTPTable *codes) {
         char *host_cpy = malloc(20);
         int i = 0;
         
-        //printf("sizeof(host_accepted): %d",sizeof(host_accepted));
-
         while(i<taille_host_accepted){
             strncpy(host_cpy,host,len);
             
@@ -697,7 +688,6 @@ int getRepCode(HTTPTable *codes) {
             i++;
         }
         if(i >= taille_host_accepted){
-            //printf("Site non référencé -> tableau dans champ Host ligne ~ 603\n");
             int code  = configFileMsgBody("/400.html", codes, "");
             if (code != 1) { return code; }
             return 400;
@@ -709,7 +699,6 @@ int getRepCode(HTTPTable *codes) {
         free(host);
     }
     else{
-        //printf("Pas Hostt");
         int code = configFileMsgBody(uri3, codes, "");
         free(uri3);
         if (code != 1) { return code; }
@@ -746,7 +735,6 @@ int getRepCode(HTTPTable *codes) {
         
         int i=0;
         while(c_length[i] != '\0'){
-            //printf("c_length[%d] : %c\n",i,c_length[i]);
             if(!(c_length[i] >= '0' && c_length[i] <= '9')){
                 int code  = configFileMsgBody("/400.html", codes, "");
                 if (code != 1) { return code; }
@@ -766,18 +754,16 @@ int getRepCode(HTTPTable *codes) {
         
         char transfer_encoding[len];
         sscanf(TE_text, "%*s %s", transfer_encoding);
-        //printf("te : -%s-\n",transfer_encoding);
 
         if(!((strcmp(transfer_encoding,"chunked")==0) | (strcmp(transfer_encoding,"gzip")==0) | (strcmp(transfer_encoding,"deflate")==0) | (strcmp(transfer_encoding,"compress")==0) |(strcmp(transfer_encoding,"identity")==0) )) {
             int code  = configFileMsgBody("/400.html", codes, "");
             if (code != 1) { return code; }
             return 400;} // vérifier que la valeur du champ est bien prise en charge
-        //printf("ici1 : -%s-\n",TE_text);
+
         if(!(TE_text[len]=='\r' && TE_text[len+1]=='\n')){
             int code  = configFileMsgBody("/400.html", codes, "");
             if (code != 1) { return code; }
             return 400;} //&& TE_text[len+2]=='\r' && TE_text[len+3]=='\n' : vérifier \r\n(\r\n) après la valeur du champ
-        //printf("ici2\n");    
     }
     free(T_EncodingNode);
 
@@ -867,7 +853,6 @@ int getRepCode(HTTPTable *codes) {
     // Connection
     _Token *ConnectionNode = searchTree(tree, "connection_option");
     if(ConnectionNode != NULL){
-        //printf("connection header\n");
         char *ConnectionL = getElementValue(ConnectionNode->node, &len);
         char *connection = malloc(len +1);
         strncpy(connection, ConnectionL, len);
@@ -887,13 +872,11 @@ int getRepCode(HTTPTable *codes) {
         free(connection);
     }
     else if (majeur == '1' && mineur == '0'){ // si 1.0 et pas de Connection header : fermer la connection
-        //printf("version 1.0\n");
         //renvoyer close
         updateHeader(codes,"Connection","close");
         connecte = 1;
         //et fermer la connection    
         //requestShutdownSocket(req.clientId);
-        //printf("fermeture de la connexion !!!\n");
     }
     free(ConnectionNode);
     
@@ -974,8 +957,6 @@ message *generateReponse(message req, int opt_code) {
     int code;
     if (opt_code == -1) { code = getRepCode(codes); } //recherche du code à renvoyer
     else { code = opt_code; codes->httpminor = 0; }
-
-    //printf("code de sortie : %d\n",code);
 
     HttpReponse *rep = getTable(codes, code);
     message *msg;
