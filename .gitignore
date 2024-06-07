@@ -1,6 +1,7 @@
-main
 **/sg
 **/*.o
 **/*.gch
 **/simple
 .vscode/
+./parseur/httpparser_
+./sock
