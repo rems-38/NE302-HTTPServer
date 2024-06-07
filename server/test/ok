@@ -1,2 +1,2 @@
-GET / HTTP/1.1
+GET /a/../b/./c/../../ HTTP/1.0
 

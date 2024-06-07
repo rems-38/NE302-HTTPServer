@@ -411,22 +411,33 @@ char* DotRemovalSegment(char* uri){
         else if(uri[i] == '/' && uri[i+1] == '.' && uri[i+2] == '.' && uri[i+3] == '/'){
             i += 3;
             //retirer le dernier /x de out:
-            while(out[j-1] != '/'){
+            if(j == 0){
+                strcat(out,"/");
+                j++;
+            }
+            while(out[j-1] != '/' && j != 0){
                 //out[j] = '-';
                 j--;
             }
-            j--;
+            if(j != 0){
+                j--;
+            }
 
         }
         else if(uri[i] == '/' && uri[i+1] == '.' && uri[i+2] == '.'){
             i += 2;
             //retirer le dernier /x de out:
-            while(out[j-1] != '/'){
+            if(j == 0){
+                strcat(out,"/");
+                j++;
+            }
+            while(out[j-1] != '/' && j != 0){
                 //out[j] = '-';
                 j--;
             }
-            j--;
-
+            if(j != 0){
+                j--;
+            }
         }
         else if(uri[i] == '/' && uri[i+1] == '.' && uri[i+2] == '/'){
             i += 2; //remplacer par '/'
@@ -639,17 +650,18 @@ int getRepCode(HTTPTable *codes) {
         int code  = configFileMsgBody("/414.html", codes, "");
         if (code != 1) { return code; }
         return 414; }
-    if (strcmp(uri, "/") == 0) {
-        uri = realloc(uri, strlen("/index.html") + 1);
-        strcpy(uri, "/index.html");
-    }
     
     //percent-Encoding
     char *uri2 = percentEncoding(uri);
     free(uri);
+
     char *uri3 = DotRemovalSegment(uri2);
     free(uri2);
 
+    if (strcmp(uri3, "/") == 0) {
+        uri3 = realloc(uri3, strlen("/index.html") + 1);
+        strcpy(uri3, "/index.html");
+    }
 
     // Host
     _Token *HostNode = searchTree(tree, "Host");
