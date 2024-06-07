@@ -907,12 +907,13 @@ void controlConnection(message *msg){
 }
 
 char *createSettingsParams(FCGI_NameValuePair11 *params, HTTPTable *codes) {
-    Header settings[5] = {
+    Header settings[6] = {
         {"SCRIPT_NAME", getScriptName(codes->filename)},
         {"SCRIPT_FILENAME", getScriptFilename(codes->filename)},
         {"REQUEST_METHOD", ""},
         {"CONTENT_LENGTH", ""},
         {"QUERY_STRING", ""},
+        {"CONTENT_TYPE", ""}
     };
     char *msg_body = NULL;
 
@@ -928,6 +929,8 @@ char *createSettingsParams(FCGI_NameValuePair11 *params, HTTPTable *codes) {
     else if (codes->method == 3) {
         settings[2].value = malloc(5);
         strcpy(settings[2].value, "POST");
+        settings[5].value = malloc(34);
+        strcpy(settings[5].value, "application/x-www-form-urlencoded");
 
         int len;
         _Token *Message_Body = searchTree(getRootTree(),"message_body");
@@ -944,7 +947,7 @@ char *createSettingsParams(FCGI_NameValuePair11 *params, HTTPTable *codes) {
         free(Message_Body);
     }
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
         if (strcmp(settings[i].value, "") != 0) {
             params[i].nameLengthB0 = strlen(settings[i].label);
             params[i].valueLengthB0 = strlen(settings[i].value);

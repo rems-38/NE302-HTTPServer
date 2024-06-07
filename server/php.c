@@ -105,9 +105,10 @@ void send_params(int sock, unsigned short requestId, FCGI_NameValuePair11 *param
     unsigned char buffer[FASTCGILENGTH];
     int content_len = 0;
 
-    for (int i = 0; i < 5; i++) {
-        if (i == 4 && method == 3) { break; } // Skip QUERY_STRING for POST requests
+    for (int i = 0; i < 6; i++) {
+        if (i == 4 && method == 3) { i++; }
         if (i == 3 && method == 1) { i++; } // Skip Content-Length for GET requests
+        if (i == 5 && method == 1) { break; }
         encode_name_value_pair(params[i], buffer, &content_len);
     }
     
@@ -152,8 +153,16 @@ void send_stdin(int sock, unsigned short requestId, const char *data) {
 
     printf("-> Sending stdin\n");
 
-    write(sock, &header, sizeof(header));
-    write(sock, data, data_len);
+    if (write(sock, &header, sizeof(header)) != sizeof(header)) {
+        perror("Error writing header");
+        return;
+    }
+
+    // Send the data
+    if (write(sock, data, data_len) != data_len) {
+        perror("Error writing data");
+        return;
+    }
 }
 
 char *receive_response(int sock) {
