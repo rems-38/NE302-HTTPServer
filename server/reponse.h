@@ -58,6 +58,6 @@ char* percentEncoding(char* uri);
 char* DotRemovalSegment(char* uri);
 void controlConnection(message *msg);
 int getRepCode(HTTPTable *codes);
-char *createSettingsParams(FCGI_NameValuePair11 *params, HTTPTable *codes);
+char *createSettingsParams(FCGI_NameValuePair11 *params, HTTPTable *codes, char *content_type);
 //HttpReponse *convertFCGI_HTTP(FCGI_Header *reponse, HTTPTable *codes, int code);
 message *generateReponse(message req, int opt_code);
